@@ -1,3 +1,24 @@
+# OpenAlt para Android (fork do Moonlight Android)
+
+Este é o app Android do **OpenAlt** (Catta Studios): usar o celular ou tablet como outra tela do PC,
+espelho ou tela de jogo. Ele é um **fork do [Moonlight Android](https://github.com/moonlight-stream/moonlight-android)**
+12.2 (GPL-3.0), trazido com o histórico completo; o texto original do Moonlight segue abaixo, com os autores.
+
+O que muda em relação ao Moonlight (ver `docs/adr/0012-app-android-fork-moonlight-e-qr.md`):
+- pacote `dev.cattastudios.openalt`, nome e ícone do OpenAlt;
+- tela **Parear** com leitor de QR (`dev.cattastudios.openalt.PairQrActivity`): pareia com o PC sem digitar PIN
+  e confere o certificado do PC com o QR;
+- tocar num PC pareado conecta direto no app "OpenAlt" do Sunshine;
+- padrões: resolução nativa, 60 FPS, 10 Mbps; textos em pt-BR.
+
+Compilar: `git submodule update --init --recursive` na raiz do repositório; depois, em `android/`,
+`./gradlew assembleNonRootDebug testNonRootDebugUnitTest` (Android SDK + NDK 29.0.14206865). O GitHub Actions
+(`.github/workflows/android.yml`) faz isso a cada mudança e guarda o APK.
+
+Licença: GPL-3.0 (`LICENSE.txt`). Leitor de QR: [zxing-android-embedded](https://github.com/journeyapps/zxing-android-embedded) (Apache-2.0).
+
+---
+
 # Moonlight Android
 
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/232a8tadrrn8jv0k/branch/master?svg=true)](https://ci.appveyor.com/project/cgutman/moonlight-android/branch/master)

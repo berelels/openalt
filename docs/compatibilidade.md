@@ -39,6 +39,16 @@ mostra isso antes de tentar).
 | Sunshine nativo (.deb) em vez de Flatpak | mais simples (sem `flatpak-spawn`) | baixo |
 | HiDPI / escala 200% em X11 | escala global; layout em pixels físicos | médio |
 
+## App Android (M2)
+| Item | Estado |
+|---|---|
+| Moonlight Android 12.2 sem mudanças compila (NDK 29.0.14206865, compileSdk 37) | testado (GitHub Actions) |
+| Leitura e validação do QR `openalt://pair` (validade, campos, ordem dos IPs, nome do cliente, `fp`) | só unidade (29 testes) |
+| Pareamento por QR com confirmação automática no PC | suposição: falta o teste com aparelho |
+| Conexão direta no app "OpenAlt" | suposição |
+| Resolução nativa padrão em celulares e tablets (em pé ou deitados), Android 5 a 16 | suposição; o stream sai deitado como no Moonlight |
+| Leitor de QR em aparelhos sem câmera traseira / TV | suposição (sem câmera: a tela explica e manda usar o +) |
+
 ## Observações que pesam no planejamento
 - **Wayland é o padrão** no Ubuntu e no Fedora: boa parte das pessoas cai em "não suportado". Isso pede para rever a ordem dos marcos (M6 antes do M5?). Decisão do usuário.
 - **NVIDIA proprietário** é comum entre quem joga: vale um spike cedo (precisa de alguém com a placa).

@@ -70,7 +70,7 @@ public class PreferenceConfiguration {
     private static final String GAMEPAD_MOTION_SENSORS_PREF_STRING = "checkbox_gamepad_motion_sensors";
     private static final String GAMEPAD_MOTION_FALLBACK_PREF_STRING = "checkbox_gamepad_motion_fallback";
 
-    // Sem resolução gravada, o OpenAlt usa a nativa do aparelho (getNativeResolutionString);
+    // OpenAlt: sem resolução gravada, usa a nativa do aparelho (getNativeResolutionString);
     // esta fica só como reserva (TV, Android < 6, tela desconhecida).
     static final String DEFAULT_RESOLUTION = "1280x720";
     // OpenAlt: 10 Mbps por padrão (Wi-Fi doméstico comum; o 1º teste com tablet travou com 18 Mbps)
