@@ -28,6 +28,9 @@ import com.limelight.utils.ServerHelper;
 import com.limelight.utils.ShortcutHelper;
 import com.limelight.utils.UiHelper;
 
+import dev.cattastudios.openalt.OpenAltLauncher;
+import dev.cattastudios.openalt.PairQrActivity;
+
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Service;
@@ -160,6 +163,16 @@ public class PcView extends Activity implements AdapterFragmentCallbacks {
                 HelpLauncher.launchSetupGuide(PcView.this);
             }
         });
+
+        // OpenAlt: parear escaneando o QR do app do PC
+        OnClickListener pairQrListener = new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(PcView.this, PairQrActivity.class));
+            }
+        };
+        findViewById(R.id.pairQrButton).setOnClickListener(pairQrListener);
+        findViewById(R.id.pairQrBigButton).setOnClickListener(pairQrListener);
 
         // Amazon review didn't like the help button because the wiki was not entirely
         // navigable via the Fire TV remote (though the relevant parts were). Let's hide
@@ -761,8 +774,17 @@ public class PcView extends Activity implements AdapterFragmentCallbacks {
                 } else if (computer.details.pairState != PairState.PAIRED) {
                     // Pair an unpaired machine by default
                     doPair(computer.details);
+                } else if (managerBinder == null) {
+                    Toast.makeText(PcView.this, getResources().getString(R.string.error_manager_not_running), Toast.LENGTH_LONG).show();
                 } else {
-                    doAppList(computer.details, false, false);
+                    // OpenAlt: conecta direto no app "OpenAlt" do PC; a grade só se ele não existir
+                    final ComputerDetails details = computer.details;
+                    OpenAltLauncher.connect(PcView.this, details, managerBinder, new Runnable() {
+                        @Override
+                        public void run() {
+                            doAppList(details, false, false);
+                        }
+                    });
                 }
             }
         });

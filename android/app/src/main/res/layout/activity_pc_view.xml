@@ -43,6 +43,19 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:gravity="center"
                 android:text="@string/searching_pc"/>
+            <!-- OpenAlt: o caminho principal para o primeiro PC é o QR -->
+            <Button
+                android:id="@+id/pairQrBigButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/pcs_loading"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="24dp"
+                android:minHeight="56dp"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:text="@string/openalt_pair_button"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
         </RelativeLayout>
 
     </RelativeLayout>
@@ -83,6 +96,22 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:src="@drawable/ic_add"
+        android:preferKeepClear="true"
+        style="?android:attr/borderlessButtonStyle"/>
+
+    <!-- OpenAlt: parear com QR -->
+    <ImageButton
+        android:id="@+id/pairQrButton"
+        android:layout_width="70dp"
+        android:layout_height="65dp"
+        android:cropToPadding="false"
+        android:scaleType="fitXY"
+        android:padding="14dp"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/manuallyAddPc"
+        android:layout_toStartOf="@+id/manuallyAddPc"
+        android:src="@drawable/ic_qr"
+        android:contentDescription="@string/openalt_pair_button_description"
         android:preferKeepClear="true"
         style="?android:attr/borderlessButtonStyle"/>
 

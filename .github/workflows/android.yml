@@ -39,11 +39,18 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$ndk" > /dev/null
 
-      - name: Compilar (debug)
-        run: ./gradlew --no-daemon assembleNonRootDebug
+      - name: Compilar (debug) e testes de unidade
+        run: ./gradlew --no-daemon assembleNonRootDebug testNonRootDebugUnitTest
 
       - uses: actions/upload-artifact@v4
         with:
-          name: apk-debug
+          name: openalt-apk-debug
           path: android/app/build/outputs/apk/nonRoot/debug/*.apk
           if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: testes-unidade
+          path: android/app/build/reports/tests/
+          if-no-files-found: ignore

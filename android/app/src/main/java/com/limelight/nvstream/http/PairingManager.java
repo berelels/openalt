@@ -24,13 +24,18 @@ public class PairingManager {
     private byte[] pemCertBytes;
 
     private X509Certificate serverCert;
-    
+
+    // OpenAlt: SHA-256 do certificado que o PC deve apresentar (vem do QR). Se não bater, o pareamento
+    // para antes de mandar qualquer dado derivado do PIN.
+    private byte[] expectedServerCertSha256;
+
     public enum PairState {
         NOT_PAIRED,
         PAIRED,
         PIN_WRONG,
         FAILED,
-        ALREADY_IN_PROGRESS
+        ALREADY_IN_PROGRESS,
+        CERT_MISMATCH
     }
     
     public PairingManager(NvHTTP http, LimelightCryptoProvider cryptoProvider) {
@@ -178,6 +183,18 @@ public class PairingManager {
                 r.nextInt(10), r.nextInt(10));
     }
 
+    public void setExpectedServerCertSha256(byte[] sha256) {
+        expectedServerCertSha256 = sha256 == null ? null : sha256.clone();
+    }
+
+    private static boolean certMatches(X509Certificate cert, byte[] sha256) {
+        try {
+            return MessageDigest.isEqual(MessageDigest.getInstance("SHA-256").digest(cert.getEncoded()), sha256);
+        } catch (NoSuchAlgorithmException | CertificateEncodingException e) {
+            return false;
+        }
+    }
+
     public X509Certificate getPairedCert() {
         return serverCert;
     }
@@ -218,6 +235,14 @@ public class PairingManager {
             // to give an empty cert in the response.
             http.unpair();
             return PairState.ALREADY_IN_PROGRESS;
+        }
+
+        if (expectedServerCertSha256 != null && !certMatches(serverCert, expectedServerCertSha256)) {
+            // Não é o PC do QR (ou o Sunshine trocou de certificado): nada do PIN sai daqui
+            LimeLog.warning("Server certificate does not match the pairing QR code");
+            serverCert = null;
+            http.unpair();
+            return PairState.CERT_MISMATCH;
         }
 
         // Require this cert for TLS to this host

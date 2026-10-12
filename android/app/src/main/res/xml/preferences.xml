@@ -9,8 +9,8 @@
             android:title="@string/title_resolution_list"
             android:summary="@string/summary_resolution_list"
             android:entries="@array/resolution_names"
-            android:entryValues="@array/resolution_values"
-            android:defaultValue="1280x720" />
+            android:entryValues="@array/resolution_values" />
+        <!-- OpenAlt: sem defaultValue; a primeira leitura grava a resolução nativa do aparelho -->
         <ListPreference
             android:key="list_fps"
             android:title="@string/title_fps_list"
@@ -284,4 +284,14 @@
             android:summary="@string/summary_privacy_policy"
             url="https://moonlight-stream.org/privacy.html"/>
     </PreferenceCategory-->
+    <!-- OpenAlt: créditos (GPL-3.0; ADR-0007) -->
+    <PreferenceCategory android:title="@string/openalt_about_title"
+        android:key="category_openalt_about">
+        <Preference
+            android:key="openalt_about"
+            android:selectable="false"
+            android:persistent="false"
+            android:title="@string/openalt_app_name"
+            android:summary="@string/openalt_about_text"/>
+    </PreferenceCategory>
 </PreferenceScreen>

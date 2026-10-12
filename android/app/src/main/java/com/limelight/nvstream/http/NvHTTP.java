@@ -8,10 +8,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.Proxy;
 import java.net.Socket;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -63,6 +65,11 @@ import okhttp3.ResponseBody;
 public class NvHTTP {
     private String uniqueId;
     private PairingManager pm;
+
+    // OpenAlt: nome mandado no pareamento. O Moonlight manda sempre "roth"; o pareamento por QR
+    // manda "OpenAlt-<id do pedido> <modelo>", que o PC reconhece e confirma sozinho.
+    private static final String DEFAULT_PAIRING_DEVICE_NAME = "roth";
+    private String pairingDeviceName = DEFAULT_PAIRING_DEVICE_NAME;
 
     private static final int DEFAULT_HTTPS_PORT = 47984;
     public static final int DEFAULT_HTTP_PORT = 47989;
@@ -704,14 +711,27 @@ public class NvHTTP {
         }
     }
 
+    public void setPairingDeviceName(String name) {
+        pairingDeviceName = (name == null || name.isEmpty()) ? DEFAULT_PAIRING_DEVICE_NAME : name;
+    }
+
+    private String encodedPairingDeviceName() {
+        try {
+            // Espaço como %20: o "+" do URLEncoder não é decodificado igual em todo servidor
+            return URLEncoder.encode(pairingDeviceName, "UTF-8").replace("+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     String executePairingCommand(String additionalArguments, boolean enableReadTimeout) throws HostHttpResponseException, IOException {
         return openHttpConnectionToString(enableReadTimeout ? httpClientLongConnectTimeout : httpClientLongConnectNoReadTimeout,
-                baseUrlHttp, "pair", "devicename=roth&updateState=1&" + additionalArguments);
+                baseUrlHttp, "pair", "devicename=" + encodedPairingDeviceName() + "&updateState=1&" + additionalArguments);
     }
 
     String executePairingChallenge() throws HostHttpResponseException, IOException {
         return openHttpConnectionToString(httpClientLongConnectTimeout, getHttpsUrl(true),
-                "pair", "devicename=roth&updateState=1&phrase=pairchallenge");
+                "pair", "devicename=" + encodedPairingDeviceName() + "&updateState=1&phrase=pairchallenge");
     }
 
     public void unpair() throws IOException {

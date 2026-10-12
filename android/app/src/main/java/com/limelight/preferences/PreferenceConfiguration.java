@@ -3,6 +3,7 @@ package com.limelight.preferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.view.Display;
@@ -69,7 +70,11 @@ public class PreferenceConfiguration {
     private static final String GAMEPAD_MOTION_SENSORS_PREF_STRING = "checkbox_gamepad_motion_sensors";
     private static final String GAMEPAD_MOTION_FALLBACK_PREF_STRING = "checkbox_gamepad_motion_fallback";
 
+    // Sem resolução gravada, o OpenAlt usa a nativa do aparelho (getNativeResolutionString);
+    // esta fica só como reserva (TV, Android < 6, tela desconhecida).
     static final String DEFAULT_RESOLUTION = "1280x720";
+    // OpenAlt: 10 Mbps por padrão (Wi-Fi doméstico comum; o 1º teste com tablet travou com 18 Mbps)
+    public static final int OPENALT_DEFAULT_BITRATE_KBPS = 10000;
     static final String DEFAULT_FPS = "60";
     private static final boolean DEFAULT_STRETCH = false;
     private static final boolean DEFAULT_SOPS = true;
@@ -340,10 +345,35 @@ public class PreferenceConfiguration {
     }
 
     public static int getDefaultBitrate(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return getDefaultBitrate(
-                prefs.getString(RESOLUTION_PREF_STRING, DEFAULT_RESOLUTION),
-                prefs.getString(FPS_PREF_STRING, DEFAULT_FPS));
+        // OpenAlt: padrão fixo. Ao trocar a resolução ou o FPS nas configurações, o bitrate ainda
+        // é recalculado pela tabela do Moonlight (getDefaultBitrate(res, fps)).
+        return OPENALT_DEFAULT_BITRATE_KBPS;
+    }
+
+    /**
+     * OpenAlt: resolução nativa da tela do aparelho, deitada (largura ≥ altura), no mesmo formato
+     * das opções "Nativa" das configurações. Reserva: DEFAULT_RESOLUTION.
+     */
+    static String getNativeResolutionString(Context context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return DEFAULT_RESOLUTION;
+        }
+        // As configurações também evitam a "nativa" em TVs (valores estranhos)
+        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEVISION)) {
+            return DEFAULT_RESOLUTION;
+        }
+        DisplayManager displayManager = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
+        Display display = displayManager != null ? displayManager.getDisplay(Display.DEFAULT_DISPLAY) : null;
+        if (display == null) {
+            return DEFAULT_RESOLUTION;
+        }
+        Display.Mode mode = display.getMode();
+        int width = Math.max(mode.getPhysicalWidth(), mode.getPhysicalHeight());
+        int height = Math.min(mode.getPhysicalWidth(), mode.getPhysicalHeight());
+        if (width <= 0 || height <= 0) {
+            return DEFAULT_RESOLUTION;
+        }
+        return width + "x" + height;
     }
 
     private static FormatOption getVideoFormatValue(Context context) {
@@ -514,7 +544,12 @@ public class PreferenceConfiguration {
         }
         else {
             // Use the new preference location
-            String resStr = prefs.getString(RESOLUTION_PREF_STRING, PreferenceConfiguration.DEFAULT_RESOLUTION);
+            String resStr = prefs.getString(RESOLUTION_PREF_STRING, null);
+            if (resStr == null) {
+                // OpenAlt: primeira vez, resolução nativa (gravada para aparecer nas configurações)
+                resStr = getNativeResolutionString(context);
+                prefs.edit().putString(RESOLUTION_PREF_STRING, resStr).apply();
+            }
 
             // Convert legacy resolution strings to the new style
             if (!resStr.contains("x")) {
