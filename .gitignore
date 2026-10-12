@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.log
+.env
+.backup/
+.secrets/
+spikes/out/
+desktop/dist/
+.dev/
+core/dist/
+core/test/.tmp/

@@ -1,0 +1,27 @@
+{
+  "name": "@openalt/desktop",
+  "version": "0.0.1",
+  "description": "Interface do OpenAlt no PC (Electron).",
+  "license": "GPL-3.0-or-later",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.renderer.json && tsc -p tsconfig.main.json && node scripts/copy-static.mjs",
+    "typecheck": "tsc -p tsconfig.renderer.json --noEmit && tsc -p tsconfig.main.json --noEmit",
+    "start": "npm run build && electron .",
+    "capture": "npm run build && electron scripts/capture.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@fontsource-variable/newsreader": "^5.3.0",
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
+    "material-symbols": "^0.48.0"
+  },
+  "allowScripts": {
+    "electron@44.5.1": true
+  },
+  "devDependencies": {
+    "electron": "^44.5.1"
+  },
+  "main": "dist/main/main.js"
+}

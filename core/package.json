@@ -1,0 +1,33 @@
+{
+  "name": "@openalt/core",
+  "version": "0.0.1",
+  "description": "N\u00facleo do OpenAlt: monitor virtual, Sunshine, Tailscale e pareamento.",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=24"
+  },
+  "bin": {
+    "openalt-core": "src/cli.ts"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "@types/qrcode": "^1.5.6",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  }
+}

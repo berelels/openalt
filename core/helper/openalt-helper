@@ -1,0 +1,93 @@
+#!/bin/sh
+# Ajudante com privilégio do OpenAlt. Roda como root (pkexec/polkit) e faz UMA coisa:
+# marcar um conector de vídeo DESCONECTADO como conectado (para o GNOME aceitá-lo como
+# monitor) e devolvê-lo ao automático. Nada além disso.
+#
+# uso: openalt-helper connector <cardN-TIPO-N> on [--edid-stdin]
+#      openalt-helper connector <cardN-TIPO-N> detect
+#
+# --edid-stdin: lê um EDID (128 a 512 bytes) da entrada padrão e o usa como "ficha" do
+# monitor (debugfs edid_override). Sem EDID, o kernel tenta ler um monitor que não existe a
+# cada sondagem e a tela trava ~4 s. "detect" também apaga o EDID.
+#
+# Saídas: 2 uso inválido, 3 conector não existe, 4 conector não está livre,
+#         5 EDID não pode ser usado aqui (sem debugfs), 6 EDID inválido,
+#         7 a saída continuou conectada depois do detect.
+set -eu
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+umask 077
+
+die() { echo "openalt-helper: $2" >&2; exit "$1"; }
+
+[ "$#" -ge 3 ] && [ "$#" -le 4 ] && [ "$1" = connector ] || die 2 "uso: openalt-helper connector <conector> on [--edid-stdin] | detect"
+NAME=$2
+ACTION=$3
+OPT=${4:-}
+
+# card1-DP-1, card0-HDMI-A-1, card1-eDP-1... (sem barras, sem "..")
+printf '%s\n' "$NAME" | grep -Eqx 'card[0-9]+-[A-Za-z]+(-[A-Za-z])?-[0-9]+' || die 2 "conector inválido"
+STATUS="/sys/class/drm/$NAME/status"
+[ -f "$STATUS" ] || die 3 "conector não existe: $NAME"
+
+CARD=${NAME%%-*}            # card1
+MINOR=${CARD#card}          # 1
+CONN=${NAME#*-}             # DP-1
+OVERRIDE="/sys/kernel/debug/dri/$MINOR/$CONN/edid_override"
+
+# Confere tamanho (múltiplo de 128, até 512), cabeçalho e a soma de cada bloco.
+valid_edid() {
+  od -An -v -tu1 "$1" | tr -s ' \n' '\n\n' | grep -v '^$' | awk '
+    { b[NR-1] = $1 }
+    END {
+      n = NR
+      if (n == 0 || n % 128 != 0 || n > 512) exit 1
+      split("0 255 255 255 255 255 255 0", h, " ")
+      for (i = 0; i < 8; i++) if (b[i] != h[i + 1]) exit 1
+      for (off = 0; off < n; off += 128) {
+        s = 0; for (i = 0; i < 128; i++) s += b[off + i]
+        if (s % 256 != 0) exit 1
+      }
+    }'
+}
+
+case "$ACTION" in
+  on)
+    # Só conectores sem nada plugado: nunca mexe num monitor de verdade.
+    [ "$(cat "$STATUS")" = disconnected ] || die 4 "$NAME não está desconectado"
+    case "$OPT" in
+      "") ;;
+      --edid-stdin)
+        [ -f "$OVERRIDE" ] || die 5 "EDID indisponível (sem debugfs para $NAME)"
+        TMP=$(mktemp)
+        trap 'rm -f "$TMP"' EXIT
+        head -c 513 > "$TMP"
+        valid_edid "$TMP" || die 6 "EDID inválido"
+        cat "$TMP" > "$OVERRIDE"
+        ;;
+      *) die 2 "opção inválida: $OPT" ;;
+    esac
+    echo on > "$STATUS"
+    ;;
+  detect)
+    [ -z "$OPT" ] || die 2 "opção inválida: $OPT"
+    # Com o EDID, o amdgpu cria um monitor "simulado" e só o solta num desplugar de verdade,
+    # que nunca vem (não há cabo). Então: apaga o EDID, simula o desplugar (debugfs do
+    # amdgpu, se existir) e volta ao automático. (S12: sem isso a saída continuava ligada.)
+    # A ordem importa: o desplugar simulado é ignorado enquanto a saída está forçada.
+    if [ -f "$OVERRIDE" ]; then printf reset > "$OVERRIDE" || true; fi  # exatamente "reset", sem quebra de linha
+    echo detect > "$STATUS"
+    HOTPLUG="/sys/kernel/debug/dri/$MINOR/$CONN/trigger_hotplug"
+    if [ "$(cat "$STATUS")" = connected ] && [ -f "$HOTPLUG" ]; then
+      echo 0 > "$HOTPLUG" || true
+      for _ in 1 2 3 4 5 6 7 8 9 10; do
+        sleep 0.3
+        echo detect > "$STATUS"
+        [ "$(cat "$STATUS")" != connected ] && break
+      done
+    fi
+    [ "$(cat "$STATUS")" != connected ] || die 7 "$NAME continuou conectado depois do detect"
+    ;;
+  *)
+    die 2 "ação inválida: $ACTION"
+    ;;
+esac

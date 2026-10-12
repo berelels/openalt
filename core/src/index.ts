@@ -1,0 +1,17 @@
+// API pública do núcleo usada pelo app (Electron). A CLI (cli.ts) usa os mesmos módulos.
+export * from './layout.ts';
+export * from './paths.ts';
+export * from './settings.ts';
+export { windowMaximizer } from './linux-x11/windows.ts';
+export { drmConnectorFor, listDrmConnectors, parseConnectorIds } from './linux-x11/drm.ts';
+export * from './connection.ts';
+export * from './pairing.ts';
+export * from './sunshine/setup.ts';
+export * from './sunshine/api.ts';
+export * from './sunshine/process.ts';
+export { assessEnvironment, gatherFacts, type Assessment, type Check, type Support } from './linux-x11/environment.ts';
+export { extendDesktop, moveDesktop, retractDesktop, resolvePlacement, fileSessionStore, fileForcedStore } from './linux-x11/extend.ts';
+export { getMutterState, isOpenAltMonitor, layoutFromMutter, layoutSize, type MutterState } from './linux-x11/mutter.ts';
+export { chooseOutput, dockPreferredConnectors, pickOutput, removeVirtualDisplays, scaleRequest } from './linux-x11/virtual-display.ts';
+export { parseXrandrQuery } from './linux-x11/xrandr.ts';
+export { run, CommandError, type Runner } from './proc.ts';

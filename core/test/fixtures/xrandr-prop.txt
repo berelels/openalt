@@ -1,0 +1,13 @@
+DisplayPort-0 disconnected (normal left inverted right x axis y axis)
+	CONNECTOR_ID: 435 
+	non-desktop: 0 
+		supported: 0, 1
+DisplayPort-1 disconnected (normal left inverted right x axis y axis)
+	CONNECTOR_ID: 444 
+DisplayPort-2 connected primary 1920x1080+1440+0 (normal left inverted right x axis y axis) 600mm x 340mm
+	EDID: 
+		00ffffffffffff001e6d
+	CONNECTOR_ID: 450 
+   1920x1080    180.00*+
+HDMI-A-0 connected 1440x900+0+0 (normal left inverted right x axis y axis) 408mm x 255mm
+	CONNECTOR_ID: 457 

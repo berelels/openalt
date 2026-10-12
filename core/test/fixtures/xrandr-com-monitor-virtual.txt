@@ -1,0 +1,14 @@
+Screen 0: minimum 320 x 200, current 4640 x 1080, maximum 16384 x 16384
+DisplayPort-0 disconnected 1280x800+3360+0 (normal left inverted right x axis y axis) 0mm x 0mm
+   OA_1280x800_60  59.81*
+DisplayPort-1 disconnected (normal left inverted right x axis y axis)
+   OA_1600x900_60  59.95
+DisplayPort-2 connected primary 1920x1080+1440+0 (normal left inverted right x axis y axis) 600mm x 340mm
+   1920x1080    180.00*+ 143.98    74.99    60.00    59.94
+   1280x720      60.00    50.00    59.94
+HDMI-A-0 connected 1440x900+0+0 (normal left inverted right x axis y axis) 408mm x 255mm
+   1440x900      59.89*+  74.98
+   720x400       70.08
+  OA_2000x1200_90 (0x543) 305.250MHz -HSync +VSync
+        h: width  2000 start 2160 end 2376 total 2752 skew    0 clock 110.92KHz
+        v: height 1200 start 1203 end 1213 total 1234           clock  89.89Hz

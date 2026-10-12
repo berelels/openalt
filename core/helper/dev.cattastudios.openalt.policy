@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+ "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<!-- Instalado pelo pacote do OpenAlt (com a única senha da instalação). Permite ao usuário
+     da sessão ativa rodar SÓ o openalt-helper, que só força conectores desconectados. -->
+<policyconfig>
+  <vendor>Catta Studios</vendor>
+  <action id="dev.cattastudios.openalt.connector">
+    <description>Use a free video output as an OpenAlt monitor</description>
+    <description xml:lang="pt_BR">Usar uma saída de vídeo livre como monitor do OpenAlt</description>
+    <message>OpenAlt needs to enable a free video output to use your phone as a monitor.</message>
+    <message xml:lang="pt_BR">O OpenAlt precisa ativar uma saída de vídeo livre para usar o celular como monitor.</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/openalt/openalt-helper</annotate>
+  </action>
+</policyconfig>

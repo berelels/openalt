@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": ["es2023", "dom", "dom.iterable"],
+    "strict": true,
+    "moduleDetection": "auto",
+    "outDir": "dist/renderer",
+    "rootDir": "src/renderer",
+    "skipLibCheck": true,
+    "types": []
+  },
+  "include": ["src/renderer/**/*.ts"]
+}

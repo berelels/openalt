@@ -1,0 +1,15 @@
+{
+  "name": "openalt",
+  "private": true,
+  "description": "Use o celular Android como monitor extra, espelho do PC ou tela de jogo em streaming.",
+  "license": "GPL-3.0-or-later",
+  "author": "Catta Studios",
+  "workspaces": [
+    "core",
+    "desktop"
+  ],
+  "scripts": {
+    "test": "npm test --workspaces",
+    "typecheck": "npm run typecheck --workspaces"
+  }
+}
