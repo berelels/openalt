@@ -31,13 +31,13 @@ jobs:
           java-version: '21'
           cache: gradle
 
-      - name: SDK, NDK e plataforma pedidos pelo app/build.gradle
+      # O NDK na versão do app/build.gradle; a plataforma e o build-tools o próprio Gradle baixa
+      - name: NDK pedido pelo app/build.gradle
         run: |
           ndk=$(sed -n 's/^ *ndkVersion "\(.*\)"/\1/p' app/build.gradle)
-          sdk=$(sed -n 's/^ *compileSdk \([0-9]*\)/\1/p' app/build.gradle)
-          echo "NDK $ndk, compileSdk $sdk"
+          echo "NDK $ndk"
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$ndk" "platforms;android-$sdk" > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$ndk" > /dev/null
 
       - name: Compilar (debug)
         run: ./gradlew --no-daemon assembleNonRootDebug
