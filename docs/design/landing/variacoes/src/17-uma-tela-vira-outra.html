@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>17 Uma tela vira outra</title>
+<link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="../devices.css">
+<style>
+body { background: #0F0D0B; color: #F3EEE6; font-family: 'Inter', sans-serif; }
+.glow { position: absolute; border-radius: 50%; filter: blur(90px); }
+.g1 { width: 700px; height: 500px; right: 0; top: 120px; background: radial-gradient(circle, rgba(255,116,108,.4), transparent 70%); }
+.g2 { width: 600px; height: 420px; left: -160px; bottom: -160px; background: radial-gradient(circle, rgba(143,191,146,.35), transparent 70%); }
+nav { position: absolute; top: 36px; left: 90px; right: 90px; display: flex; align-items: center; justify-content: space-between; z-index: 5; padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,.1); }
+.logo { color: #F3EEE6; } .logo em { color: var(--red); }
+nav ul { display: flex; gap: 40px; list-style: none; font-size: 15px; font-weight: 500; color: rgba(243,238,230,.75); }
+.dl { background: #F6F1E7; color: #14110E; padding: 13px 24px; font-weight: 600; font-size: 14px; }
+h1 { position: absolute; left: 90px; top: 150px; font-size: 96px; font-weight: 700; letter-spacing: -0.05em; line-height: .96; z-index: 3; }
+h1 span { font-family: 'Newsreader'; font-weight: 400; font-style: italic; color: var(--red); letter-spacing: -0.03em; }
+.lede { position: absolute; left: 90px; top: 480px; width: 380px; font-size: 18px; font-weight: 600; line-height: 1.5; z-index: 3; }
+.lede u { text-decoration-color: var(--red); text-decoration-thickness: 3px; text-underline-offset: 4px; }
+.ctas { position: absolute; left: 90px; top: 610px; display: flex; gap: 12px; z-index: 3; }
+.ctas > span { display: inline-flex; gap: 8px; align-items: center; padding: 14px 22px; border-radius: 999px; font-weight: 600; font-size: 15px; }
+.ctas .red { background: var(--red); color: #14110E; } .ctas .out { border: 1px solid rgba(255,255,255,.25); }
+.st { position: absolute; z-index: 3; }
+.lbl { position: absolute; z-index: 4; font-size: 14px; } .lbl b { font-weight: 600; } .lbl b::before { content: '•'; color: var(--red); margin-right: 8px; }
+.lbl small { display: block; margin-top: 3px; font-family: 'JetBrains Mono'; font-size: 11px; color: rgba(243,238,230,.5); }
+svg.arrows { position: absolute; inset: 0; z-index: 2; }
+.cont { position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900'%3E%3Crect width='1440' height='900' fill='%23FBE3D6'/%3E%3Cpath d='M0 720C220 560 420 780 720 600S1180 480 1440 660V900H0Z' fill='%23FF746C'/%3E%3Cpath d='M0 800C260 660 520 860 820 720S1220 620 1440 760V900H0Z' fill='%234A7350'/%3E%3Cpath d='M120 600C360 520 560 680 780 580S1140 460 1340 540' fill='none' stroke='%2326211B' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E") 0 0 / 1440px 900px no-repeat fixed; }
+.time { position: absolute; left: 90px; right: 90px; bottom: 46px; display: flex; align-items: center; gap: 18px; font-family: 'JetBrains Mono'; font-size: 12px; color: rgba(243,238,230,.55); z-index: 3; }
+.time i { flex: 1; height: 1px; background: rgba(255,255,255,.15); } .time .on { color: var(--red); }
+</style></head><body>
+<div class="glow g1"></div><div class="glow g2"></div>
+<nav>{{LOGO}}<ul><li>The day</li><li>New screen</li><li>Games</li><li>Away</li></ul><span class="dl">Download</span></nav>
+<h1>Any screen<br>is <span>your</span><br>screen</h1>
+<p class="lede">Freedom to stream <u>anywhere</u>, for <u>anyone</u>. As you scroll, one screen turns into the next.</p>
+<div class="ctas"><span class="red"><span class="ms">download</span>Download free</span><span class="out">How it works ↗</span></div>
+<svg class="arrows" viewBox="0 0 1440 900" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 10">
+  <path d="M700 520C760 420 820 380 880 380"/><path d="M1060 330C1110 300 1150 320 1180 360"/></svg>
+<div class="st" style="left:600px;top:420px">{{PHONE:130:dark}}</div>
+<span class="lbl" style="left:560px;top:720px"><b>Pair</b><small>07:55 · one QR</small></span>
+<div class="st" style="left:900px;top:190px;transform:rotate(-4deg)"><div class="phn land dark" style="--w:130px"><div class="bz"><div class="scr"><div class="island"></div><div class="game"><div class="sun"></div><div class="mt"></div><div class="car"></div></div></div></div></div></div>
+<span class="lbl" style="left:900px;top:430px"><b>Play</b><small>08:30 · 4G</small></span>
+<div class="st" style="left:1090px;top:400px;transform:rotate(3deg)"><div class="tab" style="--w:280px"><div class="bz"><div class="scr"><div class="cont"></div><div class="desk" style="background:none"><div class="win" style="left:8%;right:30%;top:20%;bottom:20%"><div class="tb"><i></i><i></i><i></i></div><div class="body"><div></div><div></div><div></div></div></div></div></div></div></div></div>
+<span class="lbl" style="left:1100px;top:610px"><b>Work</b><small>09:10 · new screen</small></span>
+<div class="time"><span>07:55</span><i></i><span class="on">08:30 ●</span><i></i><span>09:10</span></div>
+</body></html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>15 O aparelho é o protagonista</title>
+<link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="../devices.css">
+<style>
+body { background: #0B0A09; color: #F3EEE6; }
+.frame { position: absolute; inset: 22px; border-radius: 30px; background: #000; overflow: hidden; }
+.glow { position: absolute; border-radius: 50%; filter: blur(90px); }
+.g1 { width: 760px; height: 520px; right: -160px; top: -140px; background: radial-gradient(circle, rgba(255,116,108,.6), transparent 70%); }
+.g2 { width: 640px; height: 480px; left: -200px; bottom: -200px; background: radial-gradient(circle, rgba(143,191,146,.45), transparent 70%); }
+.stars { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.35) 1px, transparent 1.4px); background-size: 46px 46px; opacity: .2; }
+nav { position: absolute; top: 26px; left: 40px; right: 40px; display: flex; align-items: center; justify-content: space-between; z-index: 5; }
+.logo { color: #F3EEE6; } .logo em { color: var(--red); }
+.pillnav { display: flex; gap: 4px; padding: 6px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); font-size: 14px; }
+.pillnav span { padding: 8px 14px; border-radius: 999px; color: rgba(243,238,230,.75); } .pillnav span.on { background: rgba(255,255,255,.1); color: #fff; }
+.dl { padding: 11px 20px; border-radius: 999px; background: #F6F1E7; color: #14110E; font-weight: 600; font-size: 14px; }
+.copy { position: absolute; left: 60px; top: 150px; width: 520px; z-index: 4; }
+.chip { display: inline-flex; gap: 8px; align-items: center; padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1); font-size: 13px; }
+h1 { margin-top: 20px; font-size: 70px; font-weight: 500; letter-spacing: -0.045em; line-height: 1.02; }
+h1 .fade { background: linear-gradient(90deg, #fff 30%, rgba(255,255,255,.4)); -webkit-background-clip: text; color: transparent; }
+.copy p { margin-top: 18px; font-size: 17px; line-height: 1.55; color: rgba(243,238,230,.7); }
+.ctas { margin-top: 30px; display: flex; gap: 12px; }
+.ctas > span { display: inline-flex; gap: 8px; align-items: center; padding: 14px 22px; border-radius: 999px; font-weight: 600; font-size: 15px; }
+.ctas .solid { background: var(--red); color: #14110E; } .ctas .ghost { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); }
+svg.trail { position: absolute; inset: 0; z-index: 1; }
+.ghost-ph { position: absolute; z-index: 2; opacity: .28; filter: blur(.4px); }
+.main-ph { position: absolute; left: 860px; top: 250px; z-index: 3; transform: rotate(-8deg); }
+.stop { position: absolute; z-index: 4; font-size: 15px; display: flex; gap: 12px; align-items: center; }
+.stop .ic { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); }
+.stop.on .ic { background: var(--red); color: #14110E; border-color: var(--red); box-shadow: 0 0 20px rgba(255,116,108,.6); }
+.stop b { font-weight: 500; } .stop small { display: block; margin-top: 3px; font-size: 12px; color: rgba(243,238,230,.5); font-family: 'JetBrains Mono'; }
+.strip { position: absolute; left: 0; right: 0; bottom: 30px; display: flex; justify-content: center; gap: 64px; font-size: 17px; font-weight: 600; color: rgba(243,238,230,.4); z-index: 4; }
+.strip span { display: inline-flex; gap: 8px; align-items: center; } .strip .ms { font-size: 20px; }
+</style></head><body>
+<div class="frame">
+  <div class="glow g1"></div><div class="glow g2"></div><div class="stars"></div>
+  <nav><span class="logo"><svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg><span>Open<em>Alt</em></span></span><div class="pillnav"><span class="on">The day</span><span>New screen</span><span>Mirror</span><span>Games</span><span>FAQ</span></div><span class="dl">Download</span></nav>
+  <svg class="trail" viewBox="0 0 1396 856" fill="none"><path d="M640 700C700 560 760 520 860 470S1080 300 1270 210" stroke="rgba(255,255,255,.22)" stroke-width="2" stroke-dasharray="2 12" stroke-linecap="round"/>
+    <path d="M640 700C700 560 760 520 860 470" stroke="#FF746C" stroke-width="3" stroke-linecap="round"/></svg>
+  <div class="ghost-ph" style="left:590px;top:520px;transform:rotate(14deg)"><div class="phn dark" style="--w:100px"><i class="btn-l1"></i><i class="btn-l2"></i><i class="btn-r"></i><div class="bz"><div class="scr"><div class="island"></div><div class="status"><span>9:41</span><span><span class="ms">wifi</span> <span class="ms">battery_full</span></span></div><div class="app-oa"><div class="wm">Open<em>Alt</em></div><p class="sb">Your phone or tablet as a PC screen</p><div class="pc"><span class="ms">computer</span><div><b>my-pc</b><small>● Paired · tap to connect</small></div></div><div class="qr"><b>Pair a new PC</b><span><span class="ms">qr_code_scanner</span>Scan QR</span></div></div><div class="home"></div></div></div></div></div>
+  <div class="ghost-ph" style="left:1200px;top:110px;transform:rotate(-20deg)"><div class="phn dark" style="--w:90px"><i class="btn-l1"></i><i class="btn-l2"></i><i class="btn-r"></i><div class="bz"><div class="scr"><div class="island"></div><div class="status"><span>9:41</span><span><span class="ms">wifi</span> <span class="ms">battery_full</span></span></div><div class="app-oa"><div class="wm">Open<em>Alt</em></div><p class="sb">Your phone or tablet as a PC screen</p><div class="pc"><span class="ms">computer</span><div><b>my-pc</b><small>● Paired · tap to connect</small></div></div><div class="qr"><b>Pair a new PC</b><span><span class="ms">qr_code_scanner</span>Scan QR</span></div></div><div class="home"></div></div></div></div></div>
+  <div class="main-ph"><div class="phn land dark" style="--w:170px"><i class="btn-l1"></i><i class="btn-l2"></i><i class="btn-r"></i><div class="bz"><div class="scr"><div class="island"></div><div class="game"><div class="sun"></div><div class="mt"></div><div class="car"></div></div></div></div></div></div>
+  <div class="stop" style="left:660px;top:740px"><span class="ic"><span class="ms">home</span></span><div><b>Home</b><small>07:55 · Wi-Fi</small></div></div>
+  <div class="stop on" style="left:1040px;top:560px"><span class="ic"><span class="ms">directions_bus</span></span><div><b>On the bus</b><small>08:30 · 4G · game</small></div></div>
+  <div class="stop" style="left:1150px;top:300px"><span class="ic"><span class="ms">local_cafe</span></span><div><b>Café</b><small>09:10 · new screen</small></div></div>
+  <div class="copy"><span class="chip">● One phone. One day. Every place.</span>
+    <h1>Freedom to stream<br><span class="fade">anywhere, for anyone.</span></h1>
+    <p>Scroll and follow the phone: it leaves home with your game, rides the bus on 4G and becomes a second monitor at the café.</p>
+    <div class="ctas"><span class="solid"><span class="ms">download</span>Download free</span><span class="ghost">Follow the day ↓</span></div></div>
+  <div class="strip"><span><span class="ms">wb_sunny</span>Sunshine</span><span><span class="ms">dark_mode</span>Moonlight</span><span><span class="ms">hub</span>Tailscale</span><span><span class="ms">android</span>Android</span><span><span class="ms">gavel</span>GPL-3.0</span></div>
+</div>
+</body></html>

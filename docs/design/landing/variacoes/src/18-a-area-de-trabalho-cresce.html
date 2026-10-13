@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>18 A área de trabalho cresce</title>
+<link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="../devices.css">
+<style>
+body { background: #FBF6EE; font-family: 'Inter', sans-serif; }
+.glow { position: absolute; border-radius: 50%; filter: blur(100px); }
+.g1 { width: 700px; height: 480px; left: 380px; top: 360px; background: radial-gradient(circle, rgba(255,116,108,.4), transparent 70%); }
+.g2 { width: 500px; height: 400px; right: -100px; top: 80px; background: radial-gradient(circle, rgba(143,191,146,.4), transparent 70%); }
+nav { position: absolute; top: 36px; left: 100px; right: 100px; display: flex; align-items: center; justify-content: space-between; z-index: 5; }
+.pillnav { display: flex; gap: 4px; padding: 6px; border-radius: 999px; background: rgba(255,255,255,.7); border: 1px solid var(--line); font-size: 14px; font-weight: 500; }
+.pillnav span { padding: 8px 14px; border-radius: 999px; } .pillnav span.on { background: var(--ink); color: #fff; }
+.dl { background: var(--ink); color: #fff; padding: 13px 24px; font-weight: 600; font-size: 14px; }
+.top { position: absolute; top: 120px; left: 0; right: 0; text-align: center; z-index: 3; }
+.chip { display: inline-flex; gap: 8px; align-items: center; padding: 8px 14px; border-radius: 999px; background: #fff; border: 1px solid var(--line); font-size: 13px; font-weight: 600; }
+h1 { margin-top: 16px; font-size: 72px; font-weight: 700; letter-spacing: -0.05em; line-height: 1; }
+h1 span { font-family: 'Newsreader'; font-weight: 400; font-style: italic; color: var(--red-ink); }
+.top p { margin-top: 14px; font-size: 18px; color: var(--muted); }
+.cont { position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900'%3E%3Crect width='1440' height='900' fill='%23FBE3D6'/%3E%3Cpath d='M0 720C220 560 420 780 720 600S1180 480 1440 660V900H0Z' fill='%23FF746C'/%3E%3Cpath d='M0 800C260 660 520 860 820 720S1220 620 1440 760V900H0Z' fill='%234A7350'/%3E%3Cpath d='M120 600C360 520 560 680 780 580S1140 460 1340 540' fill='none' stroke='%2326211B' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E") 0 0 / 1440px 900px no-repeat fixed; }
+.wn { position: absolute; border-radius: 6px; background: #FFFDF8; box-shadow: 0 10px 24px -10px rgba(0,0,0,.35); overflow: hidden; }
+.wn::before { content: ''; display: block; height: 13px; background: #EFE8DA; }
+.wn .ln { margin: 8px 10px; height: 6px; border-radius: 3px; background: #E3DACB; } .wn .ln.s { width: 50%; }
+.L { position: absolute; left: 470px; top: 380px; z-index: 3; }
+.P { position: absolute; left: 300px; top: 470px; z-index: 3; }
+.T { position: absolute; left: 1010px; top: 470px; z-index: 3; }
+.ghost { position: absolute; z-index: 2; border: 2.5px dashed rgba(38,33,27,.35); border-radius: 26px; }
+.step { position: absolute; z-index: 4; display: flex; gap: 10px; align-items: center; padding: 8px 14px 8px 8px; border-radius: 999px; background: #fff; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); font-size: 14px; font-weight: 600; }
+.step i { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-family: 'JetBrains Mono'; font-size: 13px; background: var(--ink); color: #fff; }
+.step.next { opacity: .55; box-shadow: none; border-style: dashed; } .step.next i { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+.strip { position: absolute; left: 0; right: 0; bottom: 30px; display: flex; justify-content: center; gap: 64px; font-size: 17px; font-weight: 600; color: rgba(38,33,27,.38); z-index: 3; }
+.strip span { display: inline-flex; gap: 8px; align-items: center; } .strip .ms { font-size: 20px; }
+</style></head><body>
+<div class="glow g1"></div><div class="glow g2"></div>
+<nav>{{LOGO}}<div class="pillnav"><span class="on">Home</span><span>New screen</span><span>Mirror</span><span>Games</span><span>Away</span></div><span class="dl">Download</span></nav>
+<div class="top"><span class="chip">Scroll to add screens ↓</span>
+  <h1>Freedom to stream <span>anywhere,</span> for anyone.</h1>
+  <p>Start with your PC. Every phone or tablet you add makes the same desktop bigger.</p></div>
+<div class="P"><div class="phn" style="--w:120px"><i class="btn-l1"></i><i class="btn-l2"></i><i class="btn-r"></i><div class="bz"><div class="scr"><div class="cont"></div><div class="island"></div><div class="wn" style="left:10%;right:10%;top:24%;height:28%"><div class="ln"></div><div class="ln s"></div></div><div class="home"></div></div></div></div></div>
+<div class="L"><div class="lap" style="--w:520px"><div class="lid"><div class="scr"><div class="cont"></div>
+  <div class="wn" style="left:8%;top:12%;width:44%;height:58%"><div class="ln"></div><div class="ln"></div><div class="ln s"></div></div>
+  <div class="wn" style="left:60%;top:30%;width:50%;height:46%"><div class="ln"></div><div class="ln s"></div></div></div></div><div class="deck"></div><div class="shadow"></div></div></div>
+<div class="ghost" style="left:1010px;top:470px;width:270px;height:184px"></div>
+<span class="step" style="left:560px;top:345px"><i>1</i>Your PC</span>
+<span class="step" style="left:250px;top:430px"><i>2</i>+ phone</span>
+<span class="step next" style="left:1060px;top:430px"><i>3</i>+ tablet</span>
+<div class="strip"><span><span class="ms">wb_sunny</span>Sunshine</span><span><span class="ms">dark_mode</span>Moonlight</span><span><span class="ms">hub</span>Tailscale</span><span><span class="ms">desktop_windows</span>GNOME</span><span><span class="ms">android</span>Android</span><span><span class="ms">gavel</span>GPL-3.0</span></div>
+</body></html>

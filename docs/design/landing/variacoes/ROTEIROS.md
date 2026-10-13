@@ -66,3 +66,36 @@ embaixo da outra.
 
 As imagens estão em `../png/09-…` a `../png/14-…`. As fontes são `src/*.html`; para remontar, rode
 `python3 ../montar.py` e depois o `capture.mjs`.
+
+## Sem o boneco (15–18): a mesma história, contada pelas coisas
+
+Mesmo dia (07:55 em casa → 08:30 no ônibus → 09:10 no café) e mesma mistura da 02 com a 03, mas sem
+personagem.
+
+**15 · O aparelho é o protagonista** (escura)
+1. Um único celular segue a rolagem por um caminho pontilhado, com os "fantasmas" das paradas anteriores.
+2. Cada parada acende no caminho: Home → On the bus → Café.
+3. A tela do celular muda a cada parada: o app, depois o jogo, depois ele vira um segundo monitor.
+
+**16 · Objetos do dia** (clara)
+1. Uma mesa de objetos ilustrados: chaves (07:55), bilhete de ônibus (08:30), xícara (09:10), mais os aparelhos de verdade.
+2. Rolando, cada objeto entra na mesa com a sua etiqueta, e a linha pontilhada do horário se preenche.
+3. No fim, o tablet desliza para o lado do notebook.
+
+**17 · Uma tela vira outra** (escura, editorial)
+1. A manchete "Any screen is your screen" fica parada à esquerda.
+2. À direita, a tela se transforma com a rolagem:
+   - celular em pé, no pareamento (Pair);
+   - celular deitado, jogando (Play);
+   - tablet ao lado, como monitor extra (Work).
+3. A linha do tempo embaixo marca a hora.
+
+**18 · A área de trabalho cresce** (clara)
+1. Começa só o PC (passo 1).
+2. Rolando, o celular encaixa à esquerda (passo 2) e o papel de parede passa a continuar nele.
+3. O tablet preenche o contorno tracejado à direita (passo 3).
+4. É o que o app faz de verdade, sem cena inventada. A mais simples de explicar.
+
+**Combinações sem o boneco:**
+- 15 ou 17 como abertura e 18 para explicar a "Nova tela";
+- ou só a 16, para uma página mais leve e calorosa.

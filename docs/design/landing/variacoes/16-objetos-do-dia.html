@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>16 Objetos do dia</title>
+<link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="../devices.css">
+<style>
+body { background: #FBF6EE; font-family: 'Inter', sans-serif; }
+.glow { position: absolute; border-radius: 50%; filter: blur(90px); }
+.g1 { width: 640px; height: 460px; right: 120px; top: 180px; background: radial-gradient(circle, rgba(255,116,108,.35), transparent 70%); }
+.g2 { width: 560px; height: 420px; right: 520px; top: 420px; background: radial-gradient(circle, rgba(143,191,146,.4), transparent 70%); }
+nav { position: absolute; top: 36px; left: 100px; right: 100px; display: flex; align-items: center; justify-content: space-between; z-index: 5; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+nav ul { display: flex; gap: 40px; list-style: none; font-size: 15px; font-weight: 500; }
+.dl { background: var(--ink); color: #fff; padding: 13px 24px; font-weight: 600; font-size: 14px; }
+h1 { position: absolute; left: 100px; top: 140px; font-size: 92px; font-weight: 700; letter-spacing: -0.05em; line-height: .98; z-index: 3; }
+h1 span { font-family: 'Newsreader'; font-weight: 400; font-style: italic; color: var(--red-ink); letter-spacing: -0.03em; }
+.lede { position: absolute; left: 100px; top: 470px; width: 330px; font-size: 17px; line-height: 1.55; color: var(--muted); z-index: 3; }
+.lede b { color: var(--ink); }
+.ctas { position: absolute; left: 100px; top: 600px; display: flex; gap: 12px; z-index: 3; }
+.ctas > span { display: inline-flex; gap: 8px; align-items: center; padding: 14px 22px; border-radius: 999px; font-weight: 600; font-size: 15px; }
+.ctas .red { background: var(--red); } .ctas .out { border: 1.5px solid var(--ink); }
+.table { position: absolute; left: 520px; right: 60px; top: 300px; bottom: 120px; border-radius: 40px; background: #F1E6D6; z-index: 1; }
+.obj { position: absolute; z-index: 3; }
+.tag { position: absolute; z-index: 4; padding: 8px 12px; border-radius: 12px; background: #fff; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); font-size: 13px; font-weight: 600; }
+.tag small { display: block; font-family: 'JetBrains Mono'; font-weight: 400; font-size: 11px; color: var(--muted); margin-top: 2px; }
+.tag b { color: var(--red-ink); font-family: 'JetBrains Mono'; font-weight: 500; margin-right: 6px; }
+.foot { position: absolute; left: 100px; right: 100px; bottom: 44px; display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; z-index: 3; }
+.foot i { flex: 1; margin: 8px 24px 0; height: 2px; background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 10px); }
+</style></head><body>
+<div class="glow g1"></div><div class="glow g2"></div>
+<nav><span class="logo"><svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg><span>Open<em>Alt</em></span></span><ul><li>The day</li><li>Features</li><li>Devices</li><li>Open source</li></ul><span class="dl">Download</span></nav>
+<h1>Any screen<br>is <span>your</span><br>screen</h1>
+<p class="lede">Your keys, a bus ticket, a coffee — <b>and your PC everywhere you go.</b> Freedom to stream anywhere, for anyone.</p>
+<div class="ctas"><span class="red"><span class="ms">download</span>Download free</span><span class="out">Follow the day ↓</span></div>
+<div class="table"></div>
+<!-- chaves -->
+<svg class="obj" style="left:600px;top:350px" width="170" height="120" viewBox="0 0 170 120" fill="none" stroke="#26211B" stroke-width="3" stroke-linejoin="round">
+  <circle cx="40" cy="60" r="30" fill="#F2B33D"/><circle cx="40" cy="60" r="10" fill="#F1E6D6"/>
+  <path d="M68 52h86v16h-12v12h-12V68h-12v10h-12V68H68z" fill="#E3DACB"/><circle cx="18" cy="30" r="12" fill="#8FBF92"/></svg>
+<span class="tag" style="left:600px;top:470px"><b>07:55</b>Leave home<small>the game stays on the PC</small></span>
+<!-- bilhete -->
+<svg class="obj" style="left:640px;top:600px;transform:rotate(-8deg)" width="200" height="96" viewBox="0 0 200 96" fill="none" stroke="#26211B" stroke-width="3">
+  <path d="M6 6h188v28a14 14 0 0 0 0 28v28H6V62a14 14 0 0 0 0-28z" fill="#FF746C"/><path d="M140 10v76" stroke-dasharray="4 6"/>
+  <path d="M24 32h90M24 50h60" stroke-width="5" stroke-linecap="round"/></svg>
+<span class="tag" style="left:860px;top:660px"><b>08:30</b>Bus · 4G<small>still playing on the phone</small></span>
+<!-- celular deitado jogando -->
+<div class="obj" style="left:880px;top:420px;transform:rotate(-10deg)"><div class="phn land dark" style="--w:120px"><i class="btn-l1"></i><i class="btn-l2"></i><i class="btn-r"></i><div class="bz"><div class="scr"><div class="island"></div><div class="game"><div class="sun"></div><div class="mt"></div><div class="car"></div></div></div></div></div></div>
+<!-- notebook + tablet -->
+<div class="obj" style="left:1040px;top:330px"><div class="lap" style="--w:260px"><div class="lid"><div class="scr"><img src="../img/app-claro.png" alt=""></div></div><div class="deck"></div></div></div>
+<div class="obj" style="left:1150px;top:520px;transform:rotate(6deg)"><div class="tab dark" style="--w:190px"><div class="bz"><div class="scr"><div class="desk"><div class="win"><div class="tb"><i></i><i></i><i></i></div><div class="body"><div></div><div></div><div></div></div></div></div></div></div></div></div>
+<!-- xícara -->
+<svg class="obj" style="left:1260px;top:380px" width="90" height="90" viewBox="0 0 90 90" fill="none" stroke="#26211B" stroke-width="3"><path d="M10 30h52v26c0 16-10 26-26 26S10 72 10 56z" fill="#FBF6EE"/><path d="M62 38h8c8 0 12 6 12 12s-4 12-12 12h-8"/><path d="M26 6c-6 8 6 12 0 20M42 6c-6 8 6 12 0 20" stroke-linecap="round"/></svg>
+<span class="tag" style="left:1100px;top:700px"><b>09:10</b>Café<small>tablet = one more monitor</small></span>
+<div class="foot"><span>07:55</span><i></i><span>09:10</span></div>
+</body></html>
