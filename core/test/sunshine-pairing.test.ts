@@ -219,3 +219,12 @@ test('captura X11: output_name pelo nome da saída (o Sunshine atual procura pel
   assert.match(sunshineConf({ dir: '/c', outputIndex: 1, name: 'pc', outputName: 'DisplayPort-1' }), /^output_name = DisplayPort-1$/m);
   assert.throws(() => sunshineConf({ dir: '/c', outputIndex: 1, name: 'pc', outputName: 'DP-1\nfile_apps = /x' }), RangeError);
 });
+
+test('o Sunshine não decodifica o nome do pedido: "%20" também casa, e o nome amigável sai limpo', async () => {
+  const { newPairing, matchPending, friendlyName } = await import('../src/pairing.ts');
+  const p = newPairing({ pcName: 'pc', hosts: ['192.168.1.100'], port: 47989, fingerprint: 'aa'.repeat(32), now: 0 });
+  const pending = [{ id: 'x', name: `OpenAlt-${p.id}%20SM-P619`, address: '192.168.1.12' }];
+  assert.equal(matchPending(p, pending, 1)?.id, 'x');
+  assert.equal(friendlyName(pending[0].name), 'SM-P619');
+  assert.equal(matchPending(p, [{ id: 'y', name: `OpenAlt-${p.id}x%20SM`, address: '' }], 1), undefined);
+});
