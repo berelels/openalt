@@ -197,6 +197,8 @@ export const LINKS: Record<string, string> = {
   'moonlight-common-c': 'https://github.com/moonlight-stream/moonlight-common-c',
   sunshine: 'https://github.com/LizardByte/Sunshine',
   tailscale: 'https://github.com/tailscale/tailscale',
+  'tailscale-pc': 'https://tailscale.com/download/linux',
+  'tailscale-device': 'https://tailscale.com/download',
 };
 
 // ── canais da interface → controlador (todos conferem a origem; argumentos validados lá) ──
@@ -218,6 +220,7 @@ const actions: Record<string, (...args: unknown[]) => Promise<unknown>> = {
   instalarSunshine: () => controller.instalarSunshine(),
   instalarPermissao: () => controller.instalarPermissao(),
   plan: (p, size) => controller.plan(p, size),
+  remote: () => controller.remote(),
   openLink: async (name) => {
     const url = typeof name === 'string' && Object.hasOwn(LINKS, name) ? LINKS[name] : null;
     if (url) await shell.openExternal(url);

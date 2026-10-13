@@ -35,5 +35,6 @@ contextBridge.exposeInMainWorld('openalt', {
   instalarSunshine: call('instalarSunshine'),
   instalarPermissao: call('instalarPermissao'),
   plan: call('plan'),
+  remote: call('remote'),
   openLink: call('openLink'),
 });

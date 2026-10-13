@@ -38,6 +38,8 @@ import {
   parseConnectorIds,
   type SunshineKind,
   localAddresses,
+  mobilePeers,
+  tailscaleStatus,
   matchPending,
   moveDesktop,
   newPairing,
@@ -100,6 +102,12 @@ export interface UiState {
   setup: { sunshine: 'ok' | 'missing'; helper: 'ok' | 'missing' };
   checks: Assessment['checks'];
   error: UiText | null;
+}
+
+export interface RemoteState {
+  state: 'missing' | 'stopped' | 'needs-login' | 'running' | 'unknown';
+  ip: string | null;
+  devices: { name: string; os: string; online: boolean; path: 'direct' | 'relay' | null }[];
 }
 
 /** A tela do aparelho é mais "quadrada" num tablet (~1,6) do que num celular (~2,2). */
@@ -203,6 +211,16 @@ export class Controller extends EventEmitter {
       },
       checks: this.assessment?.checks ?? [],
       error: this.error,
+    };
+  }
+
+  /** "Fora de casa": estado do Tailscale, só leitura. A tela "Este PC" pede a cada poucos segundos. */
+  async remote(): Promise<RemoteState> {
+    const s = await tailscaleStatus(run);
+    return {
+      state: s.state,
+      ip: s.ip,
+      devices: mobilePeers(s).slice(0, 8).map((p) => ({ name: p.name, os: p.os, online: p.online, path: p.path })),
     };
   }
 

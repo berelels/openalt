@@ -581,3 +581,21 @@ body:not(.ready) .fade-up { animation-play-state: paused; }
 #view.settled .fade-up { animation: none; }
 .pin-name { width: 17ch; font: inherit; font-size: 14px; padding: 8px 10px; border-radius: 10px; border: 1.5px solid var(--border-strong); background: transparent; color: inherit; }
 .pin-name:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
+
+/* Fora de casa (Tailscale) */
+.remote-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 12px; margin-top: 14px; position: relative; z-index: 1; }
+@media (max-width: 860px) { .remote-grid { grid-template-columns: 1fr; } }
+.remote-box { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: var(--r-sm); background: color-mix(in srgb, currentColor 10%, transparent); }
+.remote-label { font-size: 12px; font-weight: 600; opacity: 0.9; }
+.remote-ip { font-family: ui-monospace, 'JetBrains Mono', monospace; font-size: 17px; }
+.remote-devices { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.remote-devices li { display: flex; align-items: center; gap: 10px; font-size: 13.5px; }
+.remote-devices .ms { font-size: 20px; }
+.remote-dev-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.remote-dev-state { font-size: 12.5px; opacity: 0.9; }
+.card.sage .pill.remote-ok { background: color-mix(in srgb, currentColor 16%, transparent); color: inherit; }
+.remote-cmd-row { list-style: none; padding: 0 0 12px 46px; }
+.remote-cmd { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.remote-cmd code { font-family: ui-monospace, 'JetBrains Mono', monospace; font-size: 13px; padding: 8px 12px; border-radius: var(--r-xs); background: var(--bg-deep); }
+.remote-auto { margin-top: 10px; }
+.card-hint + .checks { margin-top: 10px; }

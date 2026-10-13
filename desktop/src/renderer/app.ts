@@ -49,6 +49,13 @@ interface State {
   error: UiText | string | null;
 }
 
+/** "Fora de casa": o Tailscale oficial, como o processo principal o leu (só leitura). */
+interface Remote {
+  state: 'missing' | 'stopped' | 'needs-login' | 'running' | 'unknown';
+  ip: string | null;
+  devices: { name: string; os: string; online: boolean; path: 'direct' | 'relay' | null }[];
+}
+
 type Plan = { layout: Record<string, Rect>; error?: undefined } | { layout?: undefined; error: UiText | string };
 
 interface OpenAltApi {
@@ -71,6 +78,7 @@ interface OpenAltApi {
   instalarPermissao(): Promise<void>;
   plan(p: Placement, size: { width: number; height: number }): Promise<Plan>;
   openLink?(name: string): Promise<void>;
+  remote?(): Promise<Remote>;
 }
 
 // ── utilidades ──────────────────────────────────────────────────────────────
@@ -200,6 +208,7 @@ const DEMO_LINKS: Record<string, string> = {
   'moonlight-android': 'https://github.com/moonlight-stream/moonlight-android',
   'moonlight-common-c': 'https://github.com/moonlight-stream/moonlight-common-c',
   sunshine: 'https://github.com/LizardByte/Sunshine', tailscale: 'https://github.com/tailscale/tailscale',
+  'tailscale-pc': 'https://tailscale.com/download/linux', 'tailscale-device': 'https://tailscale.com/download',
 };
 
 type DemoPatch = Partial<State> & { monitorsKey?: string; deviceKey?: string | null };
@@ -264,6 +273,11 @@ function mockApi(): OpenAltApi & { demo(patch: DemoPatch): void } {
       emit();
     },
     async plan(p, size) { return placeBesideMock(s.monitors, size, p); },
+    async remote() {
+      const k = new URLSearchParams(location.search).get('remote') ?? 'needs-login';
+      const devices = [{ name: 'galaxy-tab-s9', os: 'android', online: true, path: k === 'relay' ? 'relay' as const : 'direct' as const }, { name: 'moto-g84', os: 'android', online: false, path: null }];
+      return k === 'running' || k === 'relay' ? { state: 'running', ip: '100.101.102.103', devices } : { state: k as Remote['state'], ip: null, devices: [] };
+    },
     async openLink(name) { const url = DEMO_LINKS[name]; if (url) window.open(url, '_blank', 'noopener'); },
     demo(patch) {
       if (patch.monitorsKey) {
@@ -579,7 +593,73 @@ function renderPc(): string {
         ${state.checks.map((c) => { const [cls, icon] = map[c.status]; return checkRow(cls, icon, t(`check.${c.id}`), c.key ? uiText({ key: c.key, vars: c.vars }) : esc(c.message)); }).join('')}
       </ul></section>
       <section class="card sage c4 fade-up d3"><div class="card-top"><h2 class="card-name">${t('pc.summary')}</h2></div>
-        <p class="big">2/2</p><p class="big-sub">${t('pc.summary.text')}</p></section></div>`;
+        <p class="big">2/2</p><p class="big-sub">${t('pc.summary.text')}</p></section>
+      ${remoteCard()}</div>`;
+}
+
+/** Comando que a pessoa roda no terminal (o OpenAlt não entra na conta nem liga serviços por ela). */
+function remoteCommand(r: Remote): string {
+  return r.state === 'stopped' ? 'sudo systemctl enable --now tailscaled' : 'sudo tailscale up';
+}
+
+/**
+ * "Fora de casa". Confere sozinho a cada poucos segundos (sem botão "conferir"): a pessoa só faz
+ * o passo que falta, e o cartão avança. Pronto = cartão sálvia com o endereço e os aparelhos.
+ */
+function remoteCard(): string {
+  const r = remote;
+  const head = (pill: string) => `<div class="card-top"><div><h2 class="card-name" id="remoteTitle">${t('remote.title')}</h2></div>${pill}</div>`;
+  if (!r) return `<section class="card c12 fade-up d4" aria-labelledby="remoteTitle">${head('')}<p class="card-hint">${t('remote.checking')}</p></section>`;
+  const deviceLink = `<button class="btn outline small" data-link="tailscale-device"><span class="ms" aria-hidden="true">open_in_new</span>${t('remote.getDevice')}</button>`;
+  if (r.state === 'running') {
+    const relay = state.phase === 'connected' && r.devices.some((d) => d.online && d.path === 'relay');
+    const devs = r.devices.length
+      ? `<ul class="remote-devices">${r.devices.map((d) => `<li><span class="ms" aria-hidden="true">${/ios/i.test(d.os) ? 'smartphone' : 'tablet_android'}</span><span class="remote-dev-name">${esc(d.name)}</span><span class="remote-dev-state">${t(d.online ? (d.path === 'relay' ? 'remote.dev.relay' : 'remote.dev.online') : 'remote.dev.offline')}</span></li>`).join('')}</ul>`
+      : `<p class="card-hint">${t('remote.noDevice')}</p><div class="device-actions">${deviceLink}</div>`;
+    return `<section class="card ${relay ? '' : 'sage'} c12 fade-up d4" aria-labelledby="remoteTitle">
+      ${head(`<span class="pill ${relay ? 'wait' : 'ok remote-ok'}">${t(relay ? 'remote.pill.relay' : 'remote.pill.ready')}</span>`)}
+      <p class="card-hint">${t(relay ? 'remote.relay' : 'remote.ready')}</p>
+      <div class="remote-grid">
+        <div class="remote-box"><span class="remote-label">${t('remote.pcAddress')}</span><span class="remote-ip">${esc(r.ip ?? '—')}</span></div>
+        <div class="remote-box"><span class="remote-label">${t('remote.devices')}</span>${devs}</div>
+      </div></section>`;
+  }
+  const installed = r.state !== 'missing';
+  const cmd = remoteCommand(r);
+  const step2 = installed
+    ? `<div class="remote-cmd"><code>${esc(cmd)}</code><button class="btn primary small" id="btnCopyCmd" data-cmd="${esc(cmd)}"><span class="ms" aria-hidden="true">content_copy</span>${t('remote.copy')}</button></div>`
+    : '';
+  return `<section class="card c12 fade-up d4" aria-labelledby="remoteTitle">
+    ${head(`<span class="pill wait">${t(installed ? (r.state === 'stopped' ? 'remote.pill.stopped' : 'remote.pill.login') : 'remote.pill.install')}</span>`)}
+    <p class="card-hint">${t('remote.hint')}</p>
+    <ul class="checks">
+      ${checkRow(installed ? 'ok' : 'todo', installed ? 'check' : 'download', t('remote.step.install'), t(installed ? 'remote.step.install.ok' : 'remote.step.install.todo'),
+        installed ? '' : `<button class="btn primary small" data-link="tailscale-pc"><span class="ms" aria-hidden="true">open_in_new</span>${t('remote.howInstall')}</button>`)}
+      ${checkRow(installed ? 'todo' : 'warn', installed ? 'login' : 'more_horiz', t(r.state === 'stopped' ? 'remote.step.start' : 'remote.step.login'), t(r.state === 'stopped' ? 'remote.step.start.text' : 'remote.step.login.text'))}
+      ${step2 ? `<li class="remote-cmd-row">${step2}</li>` : ''}
+      ${checkRow('warn', 'more_horiz', t('remote.step.device'), t('remote.step.device.text'), deviceLink)}
+    </ul>
+    <p class="card-hint remote-auto" aria-live="polite">${t('remote.auto')}</p></section>`;
+}
+
+// O cartão "Fora de casa" confere o Tailscale sozinho enquanto a tela "Este PC" está aberta
+let remote: Remote | null = null;
+let remoteTimer: number | undefined;
+async function refreshRemote() {
+  if (!api.remote) return;
+  const r = await api.remote().catch(() => null);
+  if (!r || JSON.stringify(r) === JSON.stringify(remote)) return;
+  remote = r;
+  if (view === 'pc') render();
+}
+function watchRemote() {
+  if (view === 'pc' && remoteTimer === undefined) {
+    void refreshRemote();
+    remoteTimer = window.setInterval(() => void refreshRemote(), 4000);
+  } else if (view !== 'pc' && remoteTimer !== undefined) {
+    window.clearInterval(remoteTimer);
+    remoteTimer = undefined;
+  }
 }
 
 function renderAbout(): string {
@@ -718,6 +798,7 @@ function render() {
     else b.removeAttribute('aria-current');
   });
   bindView();
+  watchRemote();
   sizeIllustrations();
   void renderStage();
   tickCountdown();
@@ -738,6 +819,10 @@ function bindView() {
   });
   on('#view [data-link]', (b) => void api.openLink?.(b.dataset.link!));
   on('#view [data-lang]', (b) => { setLangPref(b.dataset.lang as LangPref); render(); });
+  $('#btnCopyCmd')?.addEventListener('click', (e) => {
+    const b = e.currentTarget as HTMLButtonElement;
+    void navigator.clipboard.writeText(b.dataset.cmd ?? '').then(() => { b.lastChild!.textContent = t('remote.copied'); });
+  });
   $('#btnFullscreen')?.addEventListener('click', () => void toggleFullscreen());
   $('#btnSunshine')?.addEventListener('click', () => void api.instalarSunshine());
   $('#btnHelper')?.addEventListener('click', () => void api.instalarPermissao());
