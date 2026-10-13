@@ -12,6 +12,9 @@ mostra isso antes de tentar).
 | AMD RX 6600 (`amdgpu`), Mesa 26.2 | PC de testes |
 | 2 monitores (1440x900 + 1920x1080), lado a lado | PC de testes |
 | Sunshine 2026.914 em **Flatpak**, codificação VAAPI (H.264/HEVC) | PC de testes |
+| AMD + VAAPI: **HEVC deixa faixas verdes** ao espelhar (Sunshine#4314); o OpenAlt força **H.264** com AMD, bordas pretas (ADR-0013) | PC de testes + Galaxy S20 FE |
+| Fora de casa pelo **4G** com Tailscale oficial nos dois aparelhos (endereço 100.x guardado no pareamento) | PC de testes + Galaxy S20 FE |
+| Controle (Xbox e PS4) pelo celular: o Sunshine cria o controle virtual; Steam e navegador o reconhecem | PC de testes + Galaxy S20 FE |
 | Moonlight **PC** 6.2.0 como cliente (no mesmo PC) | PC de testes |
 | "Nova tela" ligada e desligada **pelo Sunshine** (prep-cmd), captura só do monitor do celular | PC de testes |
 | "Nova tela" pelo GNOME: conector forçado + **EDID do OpenAlt** + layout preservado, ligar e desligar sem travadas; posições à direita, entre os monitores, acima e abaixo; janela maximizada | PC de testes |

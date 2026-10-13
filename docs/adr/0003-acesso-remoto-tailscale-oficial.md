@@ -54,6 +54,6 @@ o tráfego passa pelo DERP, com latência e banda piores. Isso é o spike 6 e de
 - Rever: resultado do spike 6 (direta × relay, latência medida em 4G/5G).
 
 ## Ações
-1. [ ] Spike 6: testar com o celular **em 4G/5G** (Wi-Fi desligado), medindo `tailscale ping`, se a conexão é direta ou por relay, e a latência no Moonlight.
-2. [ ] M3: detecção do estado (`tailscale status --json`) e guia na interface.
+1. [x] Spike 6 (parcial, 13/10): conectou e transmitiu pelo 4G (`docs/m3-resultados.md`); falta medir `tailscale ping`, direta × relay e a latência. Testar com o celular **em 4G/5G** (Wi-Fi desligado), medindo `tailscale ping`, se a conexão é direta ou por relay, e a latência no Moonlight.
+2. [x] M3: detecção do estado (`tailscale status --json`) e guia na interface.
 3. [ ] M7: spike de tsnet embutido e de WebRTC.
