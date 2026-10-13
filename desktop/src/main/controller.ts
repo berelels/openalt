@@ -24,6 +24,8 @@ import {
   isAudioOut,
   realSink,
   startHostEcho,
+  sunshineSink,
+  setDefaultSink,
   stopHostEcho,
   reloadMonitorSensitiveExtensions,
   restoreExtensions,
@@ -228,7 +230,6 @@ export class Controller extends EventEmitter {
         outputIndex: Math.max(0, outputIndex),
         kmsConnector,
         outputName: output,
-        streamAudio: this.settings.audio !== 'pc',
         name: hostname(),
         prep: {
           runner: this.opts.cli.runner,
@@ -266,20 +267,39 @@ export class Controller extends EventEmitter {
   private pcSink: string | null = null;
   private echoId: string | null = null;
 
-  /** "Nos dois": com o aparelho conectado, devolve o som da saída do Sunshine para a saída do PC. */
-  private async updateHostEcho() {
-    const want = !!this.connection && this.settings.audio === 'both' && !!this.pcSink;
-    if (want && !this.echoId) this.echoId = await startHostEcho(this.pcSink!, { run }).catch(() => null);
-    if (!want && this.echoId) { await stopHostEcho(this.echoId, run); this.echoId = null; }
+  /**
+   * Com o aparelho conectado, põe o som onde a pessoa escolheu (settings.audio), na hora.
+   * O Sunshine escolhe a saída dele um instante depois de conectar, por isso espera ela aparecer.
+   */
+  private audioBusy = false;
+  private async updateAudio() {
+    if (this.audioBusy) return;
+    this.audioBusy = true;
+    try {
+      if (!this.connection || !this.pcSink) {
+        await stopHostEcho(this.echoId, run);
+        this.echoId = null;
+        return;
+      }
+      let sun: string | null = null;
+      for (let i = 0; i < 40 && !sun && this.connection; i++) {
+        sun = await sunshineSink(run);
+        if (!sun) await new Promise((r) => setTimeout(r, 500));
+      }
+      if (!sun || !this.connection) return;
+      const a = this.settings.audio;
+      await setDefaultSink(a === 'pc' ? this.pcSink : sun, run).catch(() => {});
+      if (a === 'both' && !this.echoId) this.echoId = await startHostEcho(this.pcSink, { run }).catch(() => null);
+      if (a !== 'both' && this.echoId) { await stopHostEcho(this.echoId, run); this.echoId = null; }
+    } finally {
+      this.audioBusy = false;
+    }
   }
 
   async setAudio(v: unknown) {
     if (!isAudioOut(v) || v === this.settings.audio) return;
-    const streamChanged = (v === 'pc') !== (this.settings.audio === 'pc');
     await this.save({ audio: v });
-    void this.updateHostEcho();
-    // "no PC" liga/desliga a transmissão de som no Sunshine: sem aparelho conectado, religa já
-    if (streamChanged && this.phase === 'waiting') { await this.desligar(); await this.ligar(); }
+    void this.updateAudio();
   }
 
   private stopping = false;
@@ -309,6 +329,8 @@ export class Controller extends EventEmitter {
     this.maximizeTimer = null;
     await stopHostEcho(this.echoId, run);
     this.echoId = null;
+    // a saída padrão volta para a do PC (o Sunshine também volta, ao desconectar)
+    if (this.pcSink) await setDefaultSink(this.pcSink, run).catch(() => {});
     this.watcher?.close();
     this.watcher = null;
     if (this.connection) {
@@ -402,7 +424,7 @@ export class Controller extends EventEmitter {
       // recarregar as extensões resolvia o Super, mas não o papel de parede, que só volta reiniciando.
       if ((c && c.mode !== 'mirror') || (!c && wasExtend)) this.emit('monitors-changed');
       this.updateMaximizer();
-      void this.updateHostEcho();
+      void this.updateAudio();
       this.emitState();
     };
     this.watcher = watch(this.paths.runtime, () => void update());

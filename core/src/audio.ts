@@ -1,9 +1,9 @@
 // Onde sai o som com o aparelho conectado: no aparelho, no PC ou nos dois (settings.audio).
-// - "pc": o Sunshine nem transmite som (stream_audio = disabled) e o PC toca normal.
-// - "device": o Sunshine troca a saída padrão do PC pela saída virtual dele (o PC fica mudo).
-// - "both": como "device", e o OpenAlt devolve uma cópia (loopback do PipeWire/Pulse) da saída
-//   virtual do Sunshine para a saída real do PC. A opção do cliente ("tocar no PC") não chega
-//   pelo app do PC, então isso é feito aqui.
+// Tudo pela saída PADRÃO do PC, então muda na hora, mesmo com o aparelho conectado:
+// - "device": a saída padrão é a virtual do Sunshine (ele a escolhe ao conectar; o PC fica mudo).
+// - "pc": a saída padrão volta para a real do PC; o Sunshine transmite silêncio.
+// - "both": a do Sunshine, mais uma cópia (loopback do PipeWire/Pulse) para a real do PC.
+// (A opção do cliente "tocar no PC" não chega pelo app do PC, então isso é feito aqui.)
 import { run as defaultRun, type Runner } from './proc.ts';
 
 export type AudioOut = 'device' | 'pc' | 'both';
@@ -42,6 +42,20 @@ export async function startHostEcho(
   if (!from) return null;
   const id = (await run('pactl', ['load-module', 'module-loopback', `source=${from}.monitor`, `sink=${toSink}`, 'latency_msec=40'])).stdout.trim();
   return /^\d+$/.test(id) ? id : null;
+}
+
+/** O nome da saída virtual do Sunshine, quando ela existe (ele a cria ao conectar). */
+export async function sunshineSink(run: Runner = defaultRun): Promise<string | null> {
+  const out = (await run('pactl', ['list', 'short', 'sinks']).catch(() => ({ stdout: '' }))).stdout;
+  for (const line of out.split('\n')) {
+    const name = line.split('\t')[1];
+    if (name && SUNSHINE_SINK.test(name) && SAFE_SINK.test(name)) return name;
+  }
+  return null;
+}
+
+export async function setDefaultSink(name: string, run: Runner = defaultRun): Promise<void> {
+  if (SAFE_SINK.test(name)) await run('pactl', ['set-default-sink', name]);
 }
 
 export async function stopHostEcho(id: string | null, run: Runner = defaultRun): Promise<void> {

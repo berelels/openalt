@@ -155,3 +155,14 @@ Decisões: ADR-0012. Código: `android/`, com o fork do Moonlight Android 12.2 e
     teclas por 5 s.
   - 1ª tentativa: a caixa abriu, mas o `xdotool type r` não chegou, porque o `type` remapeia o teclado.
     Trocado por `xdotool key r`. Não testado de novo.
+- **Reinício do GNOME, de novo:**
+  - O `busctl ... Eval 'Meta.restart(...)'` não serve: o `Eval` está desativado desde o GNOME 41 e
+    responde `false`.
+  - Com capturas só da área da caixa, deu para ver que o Alt+F2 abre a caixa e o `key r` chega. Com
+    0,15 s entre o "r" e o Enter não reiniciava; com 0,4 s reiniciou (00:01:28, "Running GNOME Shell").
+  - O app agora confere o reinício pelo nome do Shell no D-Bus (`GetNameOwner org.gnome.Shell` muda) e
+    tenta até 3 vezes, fechando a caixa com Esc entre as tentativas.
+- **Som:**
+  - Passou a ser pela saída padrão do PC (`pactl set-default-sink`), que vale na hora, mesmo conectado.
+  - O "PC" via `stream_audio = disabled` só valia depois de religar o Sunshine; no teste, a pessoa
+    mudou com ele ligado.
