@@ -34,6 +34,7 @@ import {
   parseConnectorIds,
   type SunshineKind,
   localAddresses,
+  prefersH264,
   mobilePeers,
   runSignIn,
   signInCommands,
@@ -135,6 +136,7 @@ export class Controller extends EventEmitter {
   private sunshineInstalled = false;
   private sunshineKind: SunshineKind | null = null;
   private error: UiText | null = null;
+  private gpuDrivers: string[] = [];
 
   constructor(private readonly opts: ControllerOptions) {
     super();
@@ -156,7 +158,9 @@ export class Controller extends EventEmitter {
     this.sunshineKind = await findSunshine(run);
     this.sunshineInstalled = this.sunshineKind !== null;
     this.mutter = await getMutterState(run).catch(() => null);
-    this.assessment = assessEnvironment(await gatherFacts(run));
+    const facts = await gatherFacts(run);
+    this.gpuDrivers = facts.gpuDrivers;
+    this.assessment = assessEnvironment(facts);
   }
 
   // ── estado para a interface ─────────────────────────────────────────────
@@ -290,6 +294,8 @@ export class Controller extends EventEmitter {
         kmsConnector,
         outputName: output,
         // o Sunshine sempre transmite o som; onde ele toca é a opção "Tocar áudio no PC" do app do aparelho
+        // placa AMD: só H.264 (o HEVC pela VAAPI deixa faixas verdes, Sunshine#4314)
+        h264Only: prefersH264(this.gpuDrivers),
         name: hostname(),
         prep: {
           runner: this.opts.cli.runner,

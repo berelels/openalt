@@ -61,7 +61,16 @@ export interface SunshineConfOptions {
   outputName?: string;
   /** false = o Sunshine não transmite som (som só no PC) */
   streamAudio?: boolean;
+  /**
+   * Só H.264 (sem HEVC nem AV1). Placa AMD pela VAAPI: o HEVC deixa faixas e linhas verdes
+   * (LizardByte/Sunshine#4314), e ao espelhar as bordas saem verdes em vez de pretas.
+   */
+  h264Only?: boolean;
 }
+
+/** O Sunshine vai codificar pela VAAPI de uma placa AMD (sem NVIDIA, que teria o NVENC antes)? */
+export const prefersH264 = (gpuDrivers: readonly string[]): boolean =>
+  gpuDrivers.includes('amdgpu') && !gpuDrivers.includes('nvidia');
 
 /** Nome de conector no formato do Sunshine (tipo DRM + índice), ex.: "DP-1". */
 export const isKmsConnectorName = (n: string): boolean => /^[A-Za-z]+(-[A-Za-z]+)?-\d{1,2}$/.test(n);
@@ -83,6 +92,7 @@ export function sunshineConf(o: SunshineConfOptions): string {
     `pkey = ${join(o.dir, 'credentials', 'cakey.pem')}`,
     `log_path = ${join(o.dir, 'sunshine.log')}`,
     ...(o.streamAudio === false ? ['stream_audio = disabled'] : []),
+    ...(o.h264Only ? ['hevc_mode = 1', 'av1_mode = 1'] : []),
     ...(process.env.OPENALT_SUNSHINE_DEBUG ? ['min_log_level = debug'] : []),
     '',
   ].join('\n');
@@ -157,7 +167,7 @@ export interface SetupResult {
  */
 export async function writeSunshineSetup(
   paths: Paths,
-  o: { outputIndex: number; name: string; kmsConnector?: string; outputName?: string; streamAudio?: boolean; prep: PrepScriptOptions },
+  o: { outputIndex: number; name: string; kmsConnector?: string; outputName?: string; streamAudio?: boolean; h264Only?: boolean; prep: PrepScriptOptions },
 ): Promise<SetupResult> {
   const dir = sunshineDir(paths);
   await mkdir(join(dir, 'credentials'), { recursive: true, mode: 0o700 });
@@ -169,7 +179,7 @@ export async function writeSunshineSetup(
   await chmod(prepPath, 0o700);
 
   const confPath = join(dir, 'sunshine.conf');
-  await writeFile(confPath, sunshineConf({ dir, outputIndex: o.outputIndex, name: o.name, kmsConnector: o.kmsConnector, outputName: o.outputName, streamAudio: o.streamAudio }), { mode: 0o600 });
+  await writeFile(confPath, sunshineConf({ dir, outputIndex: o.outputIndex, name: o.name, kmsConnector: o.kmsConnector, outputName: o.outputName, streamAudio: o.streamAudio, h264Only: o.h264Only }), { mode: 0o600 });
   await writeFile(join(dir, 'apps.json'), appsJson(prepPath), { mode: 0o600 });
 
   let createdCredentials = false;

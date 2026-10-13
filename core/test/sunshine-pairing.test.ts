@@ -228,3 +228,13 @@ test('o Sunshine não decodifica o nome do pedido: "%20" também casa, e o nome 
   assert.equal(friendlyName(pending[0].name), 'SM-P619');
   assert.equal(matchPending(p, [{ id: 'y', name: `OpenAlt-${p.id}x%20SM`, address: '' }], 1), undefined);
 });
+
+test('placa AMD pela VAAPI: só H.264 (o HEVC deixa faixas verdes)', async () => {
+  const { prefersH264 } = await import('../src/sunshine/setup.ts');
+  assert.equal(prefersH264(['amdgpu']), true);
+  assert.equal(prefersH264(['amdgpu', 'nvidia']), false);
+  assert.equal(prefersH264(['i915']), false);
+  assert.equal(prefersH264([]), false);
+  assert.match(sunshineConf({ dir: '/c', outputIndex: 0, name: 'pc', h264Only: true }), /^hevc_mode = 1\nav1_mode = 1$/m);
+  assert.doesNotMatch(sunshineConf({ dir: '/c', outputIndex: 0, name: 'pc' }), /hevc_mode|av1_mode/);
+});
