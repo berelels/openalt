@@ -88,3 +88,13 @@ export async function restartShellViaHelper(run: Runner = defaultRun): Promise<b
     '--method', `${IFACE}.Restart`], { timeoutMs: 3000 }).catch(() => ({ stdout: '' }));
   return r.stdout.trim() === '(true,)';
 }
+
+/**
+ * Pede à extensão para refazer os fundos (o papel de parede some quando a tela do aparelho sai) SEM
+ * reiniciar o GNOME. true = a extensão respondeu. Usado ao desconectar sem a permissão do sistema.
+ */
+export async function refreshBackgroundsViaHelper(run: Runner = defaultRun): Promise<boolean> {
+  const r = await run('gdbus', ['call', '--session', '--dest', 'org.gnome.Shell', '--object-path', OBJECT_PATH,
+    '--method', `${IFACE}.RefreshBackgrounds`], { timeoutMs: 3000 }).catch(() => null);
+  return r !== null;
+}

@@ -54,6 +54,7 @@ import {
   resolvePlacement,
   retractDesktop,
   fileForcedStore,
+  refreshBackgroundsViaHelper,
   run,
   startSunshine,
   stopLeftoverSunshine,
@@ -456,6 +457,8 @@ export class Controller extends EventEmitter {
       // trabalho). Reiniciar o GNOME agora poderia religá-la; o "Desligar" a devolve e aí reinicia.
       const pending = !c && wasExtend && (await fileForcedStore(this.paths.runtime).read().catch(() => [] as string[])).length > 0;
       if ((c && c.mode !== 'mirror') || (!c && wasExtend && !pending)) this.emit('monitors-changed');
+      // sem reiniciar, o papel de parede não volta sozinho: a extensão do OpenAlt só refaz os fundos
+      if (pending) void refreshBackgroundsViaHelper(run);
       this.updateMaximizer();
       this.emitState();
     };

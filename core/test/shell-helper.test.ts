@@ -77,3 +77,14 @@ test('pasta de extensões: XDG_DATA_HOME (absoluto) ou ~/.local/share; a fonte e
   const meta = JSON.parse(await readFile(join(shellHelperSource(), 'metadata.json'), 'utf8'));
   assert.equal(meta.uuid, SHELL_HELPER_UUID);
 });
+
+test('refreshBackgroundsViaHelper: chama só o método da extensão, sem reiniciar', async () => {
+  const { refreshBackgroundsViaHelper } = await import('../src/linux-x11/shell-helper.ts');
+  const calls: string[] = [];
+  const ok = await refreshBackgroundsViaHelper(async (cmd, args) => { calls.push([cmd, ...args].join(' ')); return { stdout: '()', stderr: '' }; });
+  assert.equal(ok, true);
+  assert.equal(calls.length, 1);
+  assert.match(calls[0]!, /RefreshBackgrounds$/);
+  assert.doesNotMatch(calls[0]!, /Restart/);
+  assert.equal(await refreshBackgroundsViaHelper(async () => { throw new Error('sem extensão'); }), false);
+});
