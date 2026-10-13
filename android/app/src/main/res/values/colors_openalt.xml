@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cores do OpenAlt: as mesmas do app do PC (desktop/src/renderer/styles/app.css). -->
+<resources>
+    <color name="oa_bg">#F6F1E7</color>
+    <color name="oa_surface">#FCF9F3</color>
+    <color name="oa_border">#E6DDCB</color>
+    <color name="oa_border_strong">#D7CCB6</color>
+    <color name="oa_text">#26211B</color>
+    <color name="oa_muted">#A326211B</color>
+    <!-- vermelho da marca: só como fundo, com texto escuro (6,05:1) -->
+    <color name="oa_accent">#FF746C</color>
+    <color name="oa_accent_ink">#26211B</color>
+    <!-- vermelho para texto sobre o papel claro (5,15:1) -->
+    <color name="oa_accent_text">#B8372F</color>
+    <color name="oa_sage">#4A7350</color>
+    <color name="oa_sage_ink">#FFFAF3</color>
+    <color name="oa_pill">#26211B</color>
+    <color name="oa_pill_ink">#FFFAF3</color>
+</resources>

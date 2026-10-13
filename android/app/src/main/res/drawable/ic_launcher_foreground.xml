@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ícone do OpenAlt (docs/design/logo/openalt-icone.svg): traço #26211B; o fundo #FF746C vem de
+     @color/ic_launcher_background. O desenho fica dentro da zona segura de 66dp do ícone adaptativo. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.135117"
+        android:scaleY="0.135117"
+        android:translateX="19.4776"
+        android:translateY="18.3291">
+        <path
+            android:pathData="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"
+            android:strokeColor="#26211B"
+            android:strokeWidth="34"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M270 152c50-8 96-10 144-6"
+            android:strokeColor="#26211B"
+            android:strokeWidth="34"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+    </group>
+</vector>

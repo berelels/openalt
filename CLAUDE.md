@@ -39,6 +39,7 @@ genéricos, não só o do PC de testes.
 - Rodar o app: `node scripts/dev.mjs` — grava tudo em `.dev/`, abre no monitor SECUNDÁRIO, usa o ajudante do projeto via pkexec. `OPENALT_DEBUG=1` registra eventos da janela.
 - `desktop/`: `src/main` (processo principal + `controller.ts`), `src/preload/preload.cjs` (ponte mínima), `src/renderer` (interface + `intro.ts`).
 - Monitor virtual: modos com prefixo `OA_`; a remoção apaga tudo com esse prefixo.
+- `android/`: fork do Moonlight Android 12.2 (ADR-0012; `moonlight-common-c` é submódulo). Código novo em `android/app/src/main/java/dev/cattastudios/openalt/`; mudanças em arquivos do Moonlight marcadas com "OpenAlt:" e mínimas (para `git subtree pull`). A nuvem não alcança `dl.google.com`: o build e os testes Android rodam no GitHub Actions (`.github/workflows/android.yml`).
 - Textos da interface em pt-BR primeiro (en/es depois).
 
 ## Design

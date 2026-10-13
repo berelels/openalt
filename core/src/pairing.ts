@@ -56,12 +56,27 @@ export function newPairing(o: PairingOptions): Pairing {
 export function matchPending(p: Pairing, pending: PendingPairing[], now = Date.now()): PendingPairing | undefined {
   if (p.used || now >= p.expiresAt) return undefined;
   const base = deviceNameFor(p.id);
-  return pending.find((x) => x.name === base || x.name.startsWith(`${base} `));
+  return pending.find((x) => {
+    const n = decodeName(x.name);
+    return n === base || n.startsWith(`${base} `);
+  });
+}
+
+/**
+ * O Sunshine guarda o `devicename` do pedido como veio na URL, sem decodificar: o espaço chega
+ * como "%20" ("OpenAlt-3bf6e2b6d6a0%20SM-P619" no 1º teste com o tablet). Decodifica aqui.
+ */
+export function decodeName(name: string): string {
+  try {
+    return decodeURIComponent(name); // "+" fica como está ("Galaxy Tab S9+")
+  } catch {
+    return name;
+  }
 }
 
 /** Nome amigável para guardar no Sunshine (o modelo que o aparelho mandou), sem caracteres estranhos. */
 export function friendlyName(pendingName: string): string {
-  const rest = pendingName.replace(/^OpenAlt-[0-9a-f]+\s*/, '').replace(/[^\p{L}\p{N} ._()+\-]/gu, '').trim().slice(0, 48);
+  const rest = decodeName(pendingName).replace(/^OpenAlt-[0-9a-f]+\s*/, '').replace(/[^\p{L}\p{N} ._()+\-]/gu, '').trim().slice(0, 48);
   return rest || 'Aparelho';
 }
 

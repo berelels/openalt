@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos do OpenAlt (pt-BR primeiro; en/es depois). Ficam no padrão "values" até haver traduções. -->
+<resources>
+    <string name="openalt_app_name" translatable="false">OpenAlt</string>
+
+    <!-- Tela inicial -->
+    <string name="openalt_home_subtitle">Seu celular ou tablet como tela do PC</string>
+    <string name="openalt_searching_short">Procurando PCs na rede…</string>
+    <string name="openalt_settings">Configurações</string>
+    <string name="openalt_help">Ajuda</string>
+    <string name="openalt_add_pc">Adicionar PC pelo endereço</string>
+
+    <!-- Tela Parear -->
+    <string name="openalt_pair_title">Parear com o PC</string>
+    <string name="openalt_pair_button">Parear com QR</string>
+    <string name="openalt_pair_button_description">Parear com um PC escaneando o QR do OpenAlt</string>
+    <string name="openalt_pair_intro">No PC, abra o OpenAlt, toque em Ligar e depois em Parear. Aponte a câmera para o QR que aparece na tela.</string>
+    <string name="openalt_pair_scan">Escanear o QR</string>
+    <string name="openalt_pair_scan_again">Escanear de novo</string>
+    <string name="openalt_pair_cancel">Cancelar</string>
+    <string name="openalt_pair_done">Pronto</string>
+    <string name="openalt_scan_prompt">Aponte para o QR na tela do OpenAlt no PC</string>
+    <string name="openalt_pair_searching">Procurando %1$s…</string>
+    <string name="openalt_pair_trying">Tentando %1$s (%2$d de %3$d)</string>
+    <string name="openalt_pair_pairing">Pareando com %1$s… O PC confirma sozinho; não precisa digitar nada.</string>
+    <string name="openalt_pair_saving">Guardando o PC…</string>
+    <string name="openalt_pair_success">Pareado com %1$s! Toque nele na lista para conectar.</string>
+    <string name="openalt_pc_unnamed">o PC</string>
+
+    <!-- Problemas com o QR -->
+    <string name="openalt_qr_not_openalt">Este QR não é do OpenAlt. No PC, abra o OpenAlt e toque em Parear.</string>
+    <string name="openalt_qr_version">Este QR foi feito por outra versão do OpenAlt. Atualize o app do celular e o do PC.</string>
+    <string name="openalt_qr_invalid">Este QR está incompleto ou danificado. Gere outro no PC.</string>
+    <string name="openalt_qr_expired">Este QR venceu (vale 2 minutos). No PC, gere um QR novo e escaneie de novo.\n\nSe o QR acabou de aparecer, confira se a data e a hora do aparelho estão certas.</string>
+
+    <!-- Problemas no pareamento -->
+    <string name="openalt_pair_unreachable">Não achei o PC em nenhum endereço do QR (%1$s).\n\nConfira se o OpenAlt está ligado no PC e se o aparelho está na mesma rede Wi-Fi. Longe de casa, os dois precisam estar no Tailscale.</string>
+    <string name="openalt_pair_cert_mismatch">O PC que respondeu não é o do QR (o certificado não confere). Por segurança, o pareamento foi cancelado.\n\nGere outro QR no PC e tente de novo.</string>
+    <string name="openalt_pair_pin_wrong">O PC recusou o código. Gere um QR novo no PC e tente de novo.</string>
+    <string name="openalt_pair_failed">O pareamento não deu certo. Gere um QR novo no PC e tente de novo.</string>
+    <string name="openalt_pair_in_progress">Outro aparelho está pareando com este PC agora. Espere um pouco e tente de novo.</string>
+    <string name="openalt_pair_timeout">O PC não confirmou a tempo. O QR pode ter vencido ou já ter sido usado: gere outro no PC.</string>
+    <string name="openalt_pair_error">Erro ao falar com o PC: %1$s</string>
+    <string name="openalt_pair_save_failed">Pareou, mas não consegui guardar o PC na lista. Tente adicionar de novo pelo QR.</string>
+    <string name="openalt_no_camera">Este aparelho não tem câmera para ler o QR. Adicione o PC pelo botão +, com o endereço dele.</string>
+
+    <!-- Conectar direto no app OpenAlt do PC -->
+    <string name="openalt_connecting">Conectando a %1$s…</string>
+    <string name="openalt_app_missing">Este PC não tem o app OpenAlt no Sunshine. Mostrando os apps disponíveis.</string>
+
+    <!-- Sobre -->
+    <string name="openalt_about_title">Sobre o OpenAlt</string>
+    <string name="openalt_about_text">OpenAlt, da Catta Studios: o celular ou tablet como outra tela do PC.\n\nBaseado no Moonlight para Android (moonlight-stream.org), de Cameron Gutman e colaboradores, e feito para o Sunshine (LizardByte). Software livre sob a licença GPL-3.0: o código está em github.com/berelels/openalt.\n\nLeitor de QR: ZXing e zxing-android-embedded (Apache-2.0).</string>
+</resources>

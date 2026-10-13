@@ -21,6 +21,14 @@ import {
   drmConnectorFor,
   findSunshine,
   isUiScale,
+  isAudioOut,
+  realSink,
+  startHostEcho,
+  sunshineSink,
+  setDefaultSink,
+  stopHostEcho,
+  reloadMonitorSensitiveExtensions,
+  restoreExtensions,
   chooseOutput,
   windowMaximizer,
   forgetPairedDevice,
@@ -76,7 +84,7 @@ export interface UiState {
   placement: { anchor: string; side: Settings['placement']['side']; align: Settings['placement']['align']; offset: number };
   mode: Settings['mode'];
   mirrorOf: string;
-  audioOnHost: boolean;
+  audio: Settings['audio'];
   rememberLayout: boolean;
   orientation: Settings['orientation'];
   previewKind: Kind;
@@ -128,6 +136,7 @@ export class Controller extends EventEmitter {
     // sobras de uma execução que caiu: nosso Sunshine e a "Nova tela"
     await stopLeftoverSunshine(join(sunshineDir(this.paths), 'sunshine.conf')).catch(() => {});
     await clearConnection(this.paths.runtime).catch(() => {});
+    await restoreExtensions({ run, runtimeDir: this.paths.runtime }).catch(() => {});
     await this.refreshSystem();
     this.phase = this.sunshineInstalled ? 'off' : 'setup';
     this.emitState();
@@ -171,7 +180,7 @@ export class Controller extends EventEmitter {
       placement: { anchor, side: s.placement.side, align: s.placement.align, offset: s.placement.offset ?? 0 },
       mode: s.mode,
       mirrorOf,
-      audioOnHost: s.audioOnHost,
+      audio: s.audio,
       rememberLayout: s.rememberLayout,
       orientation: s.orientation,
       previewKind: s.previewKind,
@@ -234,6 +243,7 @@ export class Controller extends EventEmitter {
           },
         },
       });
+      this.pcSink = await realSink(run); // antes de o Sunshine trocar a saída padrão
       this.sunshine = await startSunshine(setup.confPath, { kind: this.sunshineKind ?? 'flatpak' });
       const mine = this.sunshine;
       // só é "fechou sozinho" se não fomos nós que mandamos parar
@@ -247,6 +257,49 @@ export class Controller extends EventEmitter {
       await this.desligar();
       this.fail(e);
     }
+  }
+
+  /** Sem reiniciar o GNOME (Wayland, sem xdotool, janela fechada): recarrega as extensões. */
+  async reloadExtensions(): Promise<void> {
+    await reloadMonitorSensitiveExtensions({ run, runtimeDir: this.paths.runtime }).catch(() => {});
+  }
+
+  private pcSink: string | null = null;
+  private echoId: string | null = null;
+
+  /**
+   * Com o aparelho conectado, põe o som onde a pessoa escolheu (settings.audio), na hora.
+   * O Sunshine escolhe a saída dele um instante depois de conectar, por isso espera ela aparecer.
+   */
+  private audioBusy = false;
+  private async updateAudio() {
+    if (this.audioBusy) return;
+    this.audioBusy = true;
+    try {
+      if (!this.connection || !this.pcSink) {
+        await stopHostEcho(this.echoId, run);
+        this.echoId = null;
+        return;
+      }
+      let sun: string | null = null;
+      for (let i = 0; i < 40 && !sun && this.connection; i++) {
+        sun = await sunshineSink(run);
+        if (!sun) await new Promise((r) => setTimeout(r, 500));
+      }
+      if (!sun || !this.connection) return;
+      const a = this.settings.audio;
+      await setDefaultSink(a === 'pc' ? this.pcSink : sun, run).catch(() => {});
+      if (a === 'both' && !this.echoId) this.echoId = await startHostEcho(this.pcSink, { run }).catch(() => null);
+      if (a !== 'both' && this.echoId) { await stopHostEcho(this.echoId, run); this.echoId = null; }
+    } finally {
+      this.audioBusy = false;
+    }
+  }
+
+  async setAudio(v: unknown) {
+    if (!isAudioOut(v) || v === this.settings.audio) return;
+    await this.save({ audio: v });
+    void this.updateAudio();
   }
 
   private stopping = false;
@@ -274,12 +327,18 @@ export class Controller extends EventEmitter {
     this.stopPairing();
     if (this.maximizeTimer) clearInterval(this.maximizeTimer);
     this.maximizeTimer = null;
+    await stopHostEcho(this.echoId, run);
+    this.echoId = null;
+    // a saída padrão volta para a do PC (o Sunshine também volta, ao desconectar)
+    if (this.pcSink) await setDefaultSink(this.pcSink, run).catch(() => {});
     this.watcher?.close();
     this.watcher = null;
     if (this.connection) {
+      const wasExtend = this.connection.mode === 'extend';
       await retractDesktop().catch(() => {});
       await clearConnection(this.paths.runtime).catch(() => {});
       this.connection = null;
+      if (wasExtend) this.emit('monitors-changed');
     }
     this.mutter = await getMutterState(run).catch(() => this.mutter); // a lista de monitores sem o do aparelho
     await this.sunshine?.stop().catch(() => {});
@@ -355,10 +414,17 @@ export class Controller extends EventEmitter {
       const c = await readConnection(this.paths.runtime);
       const changed = JSON.stringify(c) !== JSON.stringify(this.connection);
       if (!changed) return;
+      const wasExtend = this.connection?.mode === 'extend';
       this.connection = c;
       if (this.phase === 'waiting' || this.phase === 'connected') this.phase = c ? 'connected' : 'waiting';
       this.mutter = await getMutterState(run).catch(() => this.mutter);
+      // monitor do aparelho entrou ou saiu: extensões que guardam o monitor pelo número se perdem
+      // (ArcMenu abria o Super no tablet); recarregar só elas
+      // O monitor do aparelho entrou ou saiu: o processo principal reinicia o GNOME (Alt+F2 → r). Só
+      // recarregar as extensões resolvia o Super, mas não o papel de parede, que só volta reiniciando.
+      if ((c && c.mode !== 'mirror') || (!c && wasExtend)) this.emit('monitors-changed');
       this.updateMaximizer();
+      void this.updateAudio();
       this.emitState();
     };
     this.watcher = watch(this.paths.runtime, () => void update());
@@ -404,7 +470,7 @@ export class Controller extends EventEmitter {
   async setOrientation(o: unknown) { if (o === 'auto' || o === 'portrait' || o === 'landscape') await this.save({ orientation: o }); }
   async setPreviewKind(k: unknown) { if (k === 'phone' || k === 'tablet') await this.save({ previewKind: k }); }
   async setPref(key: unknown, value: unknown) {
-    if ((key === 'audioOnHost' || key === 'rememberLayout' || key === 'maximizeOnDevice') && typeof value === 'boolean') {
+    if ((key === 'rememberLayout' || key === 'maximizeOnDevice') && typeof value === 'boolean') {
       await this.save({ [key]: value });
       this.updateMaximizer();
     }

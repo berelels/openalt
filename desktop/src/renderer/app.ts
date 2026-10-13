@@ -27,7 +27,7 @@ interface State {
   placement: Placement;
   mode: Mode;
   mirrorOf: string;
-  audioOnHost: boolean;
+  audio: 'device' | 'pc' | 'both';
   rememberLayout: boolean;
   orientation: Orientation;
   /** Tipo usado na prévia enquanto nenhum aparelho está conectado. */
@@ -59,9 +59,10 @@ interface OpenAltApi {
   setMode(m: Mode): Promise<void>;
   setMirrorOf(id: string): Promise<void>;
   setOrientation(o: Orientation): Promise<void>;
+  setAudio(v: 'device' | 'pc' | 'both'): Promise<void>;
   setUiScale(v: number): Promise<void>;
   setPreviewKind(k: Kind): Promise<void>;
-  setPref(key: 'audioOnHost' | 'rememberLayout' | 'maximizeOnDevice', value: boolean): Promise<void>;
+  setPref(key: 'rememberLayout' | 'maximizeOnDevice', value: boolean): Promise<void>;
   esquecer(id: string): Promise<void>;
   instalarSunshine(): Promise<void>;
   instalarPermissao(): Promise<void>;
@@ -192,7 +193,7 @@ function mockApi(): OpenAltApi & { demo(patch: DemoPatch): void } {
     placement: { anchor: 'DisplayPort-2', side: 'right', align: 'start', offset: 0 },
     mode: 'extend',
     mirrorOf: 'DisplayPort-2',
-    audioOnHost: true,
+    audio: 'pc',
     rememberLayout: false,
     orientation: 'auto',
     previewKind: 'phone',
@@ -231,6 +232,7 @@ function mockApi(): OpenAltApi & { demo(patch: DemoPatch): void } {
     async setMode(m) { s.mode = m; emit(); },
     async setMirrorOf(id) { s.mirrorOf = id; emit(); },
     async setOrientation(o) { s.orientation = o; emit(); },
+    async setAudio(v) { s.audio = v; emit(); },
     async setUiScale(v) { s.uiScale = v; emit(); },
     async setPreviewKind(k) { s.previewKind = k; emit(); },
     async setPref(k, v) { s[k] = v; emit(); },
@@ -332,6 +334,8 @@ function topbar(title: string, sub: string, live = false): string {
     ${s.error ? `<p class="error-banner fade-up" role="alert"><span class="ms" aria-hidden="true">error</span>${esc(s.error)}</p>` : ''}`;
 }
 
+const AUDIO_LABEL: Record<string, string> = { device: 'Aparelho', pc: 'PC', both: 'Os dois' };
+
 function seg(name: string, label: string, items: [string, string, string?][], current: string, attr: string): string {
   return `<div class="seg" role="radiogroup" aria-label="${label}" data-group="${name}">${items.map(([v, text, icon]) =>
     `<button role="radio" ${attr}="${esc(v)}" aria-checked="${v === current}">${icon ? `<span class="ms" aria-hidden="true">${icon}</span>` : ''}${text}</button>`).join('')}</div>`;
@@ -349,7 +353,7 @@ function connectionCard(): string {
   }[s.phase];
   const stats = d
     ? [[`${d.width}×${d.height}`, 'resolução'], [`${d.fps} Hz`, 'taxa'], [d.network === 'tailscale' ? 'Remota' : 'Local', 'conexão']]
-    : [[String(s.monitors.length), s.monitors.length === 1 ? 'monitor' : 'monitores'], [s.mode === 'mirror' ? 'Espelho' : 'Nova', 'modo'], [s.audioOnHost ? 'Os dois' : 'Aparelho', 'som']];
+    : [[String(s.monitors.length), s.monitors.length === 1 ? 'monitor' : 'monitores'], [s.mode === 'mirror' ? 'Espelho' : 'Nova', 'modo'], [AUDIO_LABEL[s.audio] ?? 'PC', 'som']];
   const on = s.phase === 'waiting' || s.phase === 'connected';
   return `
     <section class="card accent c4 fade-up d1" aria-labelledby="connTitle">
@@ -439,8 +443,10 @@ function prefsCard(): string {
           <p class="mini-label">Tamanho das coisas na Nova tela</p>
           ${seg('uiscale', 'Tamanho das coisas na Nova tela', ([100, 125, 150, 200]).map((v) => [String(v), `${v}%`] as [string, string]), String(s.uiScale ?? 125), 'data-uiscale')}
         </div>
-        <label class="switch-row"><span><span class="switch-title">Som também no PC</span><span class="switch-hint">Toca no aparelho e aqui</span></span>
-          <input type="checkbox" class="switch" id="optAudio" ${s.audioOnHost ? 'checked' : ''}></label>
+        <div>
+          <p class="mini-label">Onde sai o som</p>
+          ${seg('audio', 'Onde sai o som', [['device', 'Aparelho', 'smartphone'], ['pc', 'PC', 'computer'], ['both', 'Os dois', 'speaker_group']], s.audio ?? 'pc', 'data-audio')}
+        </div>
         <label class="switch-row"><span><span class="switch-title">Maximizar janelas ${s.previewKind === 'tablet' ? 'no tablet' : 'no aparelho'}</span><span class="switch-hint">Ao levar uma janela para a Nova tela</span></span>
           <input type="checkbox" class="switch" id="optMaximize" ${s.maximizeOnDevice !== false ? 'checked' : ''}></label>
         <label class="switch-row"><span><span class="switch-title">Lembrar o arranjo</span><span class="switch-hint">Menos piscadas; grava no GNOME</span></span>
@@ -713,7 +719,7 @@ function bindView() {
   on('#view [data-uiscale]', (b) => void api.setUiScale(Number(b.dataset.uiscale)));
   on('#view [data-kind]', (b) => void api.setPreviewKind(b.dataset.kind as Kind));
   on('#view [data-forget]', (b) => void api.esquecer(b.dataset.forget!));
-  $<HTMLInputElement>('#optAudio')?.addEventListener('change', (e) => void api.setPref('audioOnHost', (e.target as HTMLInputElement).checked));
+  on('#view [data-audio]', (b) => void api.setAudio(b.dataset.audio as State['audio']));
   $<HTMLInputElement>('#optRemember')?.addEventListener('change', (e) => void api.setPref('rememberLayout', (e.target as HTMLInputElement).checked));
   $<HTMLInputElement>('#optMaximize')?.addEventListener('change', (e) => void api.setPref('maximizeOnDevice', (e.target as HTMLInputElement).checked));
   // setas do teclado movem a seleção dentro de cada grupo de opções
@@ -733,13 +739,18 @@ function tickCountdown() {
   window.clearInterval(countdownTimer);
   const el = document.getElementById('countdown');
   if (!el || !state.pairing) return;
-  const update = () => {
+  const update = (first: boolean) => {
     const left = Math.max(0, Math.round((state.pairing!.expiresAt - Date.now()) / 1000));
     el.textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
-    if (left === 0) { window.clearInterval(countdownTimer); render(); }
+    if (left === 0) {
+      window.clearInterval(countdownTimer);
+      // redesenha UMA vez, ao vencer agora; se já estava vencido ao desenhar, não redesenha
+      // (o render chama tickCountdown de novo — antes isso virava um laço infinito e travava o app)
+      if (!first) render();
+    }
   };
-  update();
-  countdownTimer = window.setInterval(update, 1000);
+  update(true);
+  countdownTimer = window.setInterval(() => update(false), 1000);
 }
 
 function bindRail() {

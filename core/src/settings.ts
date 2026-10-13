@@ -1,6 +1,7 @@
 // Preferências do OpenAlt (settings.json, 0600). Lidas também pela ponte que o Sunshine chama,
 // então ficam num arquivo e não só na memória do app (ADR-0011).
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
+import { isAudioOut, type AudioOut } from './audio.ts';
 import { join } from 'node:path';
 import { isAlign, isSide, type Placement } from './layout.ts';
 
@@ -16,7 +17,8 @@ export interface Settings {
   /** monitor espelhado no modo "Espelhar" ("primary" = o principal) */
   mirrorOf: string;
   rememberLayout: boolean;
-  audioOnHost: boolean;
+  /** onde sai o som com o aparelho conectado (ver audio.ts) */
+  audio: AudioOut;
   orientation: Orientation;
   previewKind: Kind;
   /**
@@ -57,7 +59,7 @@ export const DEFAULT_SETTINGS: Settings = {
   mode: 'extend',
   mirrorOf: 'primary',
   rememberLayout: false,
-  audioOnHost: true,
+  audio: 'pc',
   orientation: 'auto',
   previewKind: 'phone',
   uiScale: 125,
@@ -81,7 +83,8 @@ export function sanitizeSettings(raw: unknown): Settings {
   if (r.mode === 'extend' || r.mode === 'mirror') s.mode = r.mode;
   if (typeof r.mirrorOf === 'string' && SAFE_NAME.test(r.mirrorOf)) s.mirrorOf = r.mirrorOf;
   if (typeof r.rememberLayout === 'boolean') s.rememberLayout = r.rememberLayout;
-  if (typeof r.audioOnHost === 'boolean') s.audioOnHost = r.audioOnHost;
+  if (isAudioOut(r.audio)) s.audio = r.audio;
+  else if (r.audioOnHost === true) s.audio = 'both'; // configuração antiga ("som também no PC")
   if (r.orientation === 'auto' || r.orientation === 'portrait' || r.orientation === 'landscape') s.orientation = r.orientation;
   if (r.previewKind === 'phone' || r.previewKind === 'tablet') s.previewKind = r.previewKind;
   if (isUiScale(r.uiScale)) s.uiScale = r.uiScale;
