@@ -41,7 +41,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.limelight.LimeLog;
-import com.limelight.PcView;
 import com.limelight.R;
 import com.limelight.computers.ComputerManagerListener;
 import com.limelight.computers.ComputerManagerService;
@@ -70,9 +69,9 @@ import javax.microedition.khronos.opengles.GL10;
  *   controle conectado, no estilo escolhido (Xbox, PlayStation ou Nintendo).
  * - A mesma abertura do app do PC (assets/intro, copiada de desktop/src/renderer/intro.ts).
  *
- * A lista original do Moonlight (PcView) continua no app: opções do PC (X ou toque longo).
+ * As opções de cada PC (as do menu do Moonlight) abrem aqui mesmo: toque longo ou X (PcOptions).
  */
-public class StartActivity extends Activity implements InputManager.InputDeviceListener {
+public class StartActivity extends Activity implements InputManager.InputDeviceListener, PcOptions.Host {
     private static final String INTRO_DONE = "openalt-intro:done";
 
     private final Map<String, ComputerDetails> computers = new LinkedHashMap<>();
@@ -451,7 +450,7 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
         card.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                openClassicList();
+                PcOptions.show(StartActivity.this, d, StartActivity.this);
                 return true;
             }
         });
@@ -508,14 +507,25 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
             OpenAltLauncher.connect(this, d, managerBinder, new Runnable() {
                 @Override
                 public void run() {
-                    openClassicList();
+                    // sem o app "OpenAlt" no PC (ou outro app aberto nele): a lista de apps do PC
+                    Intent i = new Intent(StartActivity.this, com.limelight.AppView.class);
+                    i.putExtra(com.limelight.AppView.NAME_EXTRA, d.name);
+                    i.putExtra(com.limelight.AppView.UUID_EXTRA, d.uuid);
+                    startActivity(i);
                 }
             });
         }
     }
 
-    private void openClassicList() {
-        startActivity(new Intent(this, PcView.class));
+    @Override
+    public ComputerManagerService.ComputerManagerBinder binder() {
+        return managerBinder;
+    }
+
+    @Override
+    public void onComputerRemoved(ComputerDetails d) {
+        computers.remove(d.uuid);
+        renderCards();
     }
 
     private void openSettings() {
@@ -649,8 +659,11 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
             case KeyEvent.KEYCODE_BUTTON_X: {
                 View f = getCurrentFocus();
                 if (f != null && f.getTag() instanceof String && ((String) f.getTag()).startsWith("pc:")) {
-                    openClassicList();
-                    return true;
+                    ComputerDetails d = computers.get(((String) f.getTag()).substring(3));
+                    if (d != null) {
+                        PcOptions.show(this, d, this);
+                        return true;
+                    }
                 }
                 break;
             }
