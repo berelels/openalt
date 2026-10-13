@@ -55,13 +55,12 @@
             android:layout_weight="1"
             android:minHeight="16dp" />
 
-        <TextView
+        <dev.cattastudios.openalt.FitTextView
             android:id="@+id/oaCardTitle"
             style="@style/OpenAlt.CardTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:maxLines="2"
             android:textColor="@color/oa_text"
             android:textSize="32sp" />
 

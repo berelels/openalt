@@ -119,6 +119,11 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         UiHelper.setLocale(this);
+        // tela cheia de verdade: desenha também atrás do recorte da câmera
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            getWindow().getAttributes().layoutInDisplayCutoutMode =
+                    android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        }
         setContentView(R.layout.oa_home);
 
         cards = findViewById(R.id.oaCards);
@@ -454,7 +459,9 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
 
     private void bindPairCard(View card) {
         card.findViewById(R.id.oaCardBody).setBackgroundResource(R.drawable.oa_dashed_card_bg);
-        ((ImageView) card.findViewById(R.id.oaCardIcon)).setImageResource(R.drawable.ic_qr);
+        ImageView icon = card.findViewById(R.id.oaCardIcon);
+        icon.setImageResource(R.drawable.ic_qr);
+        icon.setColorFilter(getResources().getColor(R.color.oa_text));
         card.findViewById(R.id.oaCardStatus).setVisibility(View.GONE);
         ((TextView) card.findViewById(R.id.oaCardTitle)).setText(R.string.openalt_home_pair_title);
         ((TextView) card.findViewById(R.id.oaCardDetail)).setText(R.string.openalt_home_pair_detail);
