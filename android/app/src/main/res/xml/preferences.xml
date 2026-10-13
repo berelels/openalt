@@ -293,5 +293,25 @@
             android:persistent="false"
             android:title="@string/openalt_app_name"
             android:summary="@string/openalt_about_text"/>
+        <com.limelight.preferences.WebLauncherPreference
+            android:title="@string/openalt_link_openalt"
+            android:summary="@string/openalt_link_openalt_summary"
+            url="https://github.com/berelels/openalt"/>
+        <com.limelight.preferences.WebLauncherPreference
+            android:title="@string/openalt_link_moonlight"
+            android:summary="@string/openalt_link_moonlight_summary"
+            url="https://github.com/moonlight-stream/moonlight-android"/>
+        <com.limelight.preferences.WebLauncherPreference
+            android:title="@string/openalt_link_common"
+            android:summary="@string/openalt_link_common_summary"
+            url="https://github.com/moonlight-stream/moonlight-common-c"/>
+        <com.limelight.preferences.WebLauncherPreference
+            android:title="@string/openalt_link_sunshine"
+            android:summary="@string/openalt_link_sunshine_summary"
+            url="https://github.com/LizardByte/Sunshine"/>
+        <com.limelight.preferences.WebLauncherPreference
+            android:title="@string/openalt_link_catta"
+            android:summary="@string/openalt_link_catta_summary"
+            url="https://berelels.github.io"/>
     </PreferenceCategory>
 </PreferenceScreen>

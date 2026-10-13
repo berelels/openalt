@@ -7,6 +7,7 @@
   <title>OpenAlt</title>
   <link rel="stylesheet" href="styles/fonts.css">
   <link rel="stylesheet" href="styles/app.css">
+  <script src="i18n.js" defer></script>
   <script src="intro.js" defer></script>
   <script src="app.js" defer></script>
 </head>
@@ -15,7 +16,7 @@
 
   <div class="app">
     <!-- Trilho de navegação (só ícones; nomes no aria-label e na dica) -->
-    <nav class="rail" aria-label="Navegação">
+    <nav class="rail" aria-label="Navegação" data-i18n-aria="nav.label">
       <span class="rail-logo" aria-hidden="true">
         <svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round">
           <path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/>
@@ -23,16 +24,16 @@
         </svg>
       </span>
       <div class="rail-nav">
-        <button class="rail-btn" data-view="home" aria-label="Painel" data-tip="Painel"><span class="ms" aria-hidden="true">space_dashboard</span></button>
-        <button class="rail-btn" data-view="devices" aria-label="Aparelhos" data-tip="Aparelhos"><span class="ms" aria-hidden="true">devices</span></button>
-        <button class="rail-btn" data-view="pc" aria-label="Este PC" data-tip="Este PC"><span class="ms" aria-hidden="true">computer</span></button>
-        <button class="rail-btn" data-view="about" aria-label="Sobre" data-tip="Sobre"><span class="ms" aria-hidden="true">info</span></button>
+        <button class="rail-btn" data-view="home" aria-label="Painel" data-tip="Painel" data-i18n-aria="nav.home" data-i18n-tip="nav.home"><span class="ms" aria-hidden="true">space_dashboard</span></button>
+        <button class="rail-btn" data-view="devices" aria-label="Aparelhos" data-tip="Aparelhos" data-i18n-aria="nav.devices" data-i18n-tip="nav.devices"><span class="ms" aria-hidden="true">devices</span></button>
+        <button class="rail-btn" data-view="pc" aria-label="Este PC" data-tip="Este PC" data-i18n-aria="nav.pc" data-i18n-tip="nav.pc"><span class="ms" aria-hidden="true">computer</span></button>
+        <button class="rail-btn" data-view="about" aria-label="Sobre" data-tip="Sobre" data-i18n-aria="nav.about" data-i18n-tip="nav.about"><span class="ms" aria-hidden="true">info</span></button>
       </div>
       <div class="rail-end">
-        <div class="theme-toggle vertical" role="radiogroup" aria-label="Tema">
-          <button role="radio" data-theme-opt="light" aria-label="Tema claro"><span class="ms" aria-hidden="true">light_mode</span></button>
-          <button role="radio" data-theme-opt="system" aria-label="Tema automático"><span class="ms" aria-hidden="true">contrast</span></button>
-          <button role="radio" data-theme-opt="dark" aria-label="Tema escuro"><span class="ms" aria-hidden="true">dark_mode</span></button>
+        <div class="theme-toggle vertical" role="radiogroup" aria-label="Tema" data-i18n-aria="theme.label">
+          <button role="radio" data-theme-opt="light" aria-label="Tema claro" data-i18n-aria="theme.light"><span class="ms" aria-hidden="true">light_mode</span></button>
+          <button role="radio" data-theme-opt="system" aria-label="Tema automático" data-i18n-aria="theme.system"><span class="ms" aria-hidden="true">contrast</span></button>
+          <button role="radio" data-theme-opt="dark" aria-label="Tema escuro" data-i18n-aria="theme.dark"><span class="ms" aria-hidden="true">dark_mode</span></button>
         </div>
         <span class="rail-catta" aria-label="Catta Studios" role="img">C</span>
       </div>

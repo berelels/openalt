@@ -1,6 +1,6 @@
 // Processo principal do OpenAlt (Electron). ADR-0011: nenhuma porta aberta; a interface fala
 // com este processo só por IPC, e só por canais conhecidos vindos da nossa própria página.
-import { app, BrowserWindow, ipcMain, screen, type IpcMainInvokeEvent } from 'electron';
+import { app, BrowserWindow, ipcMain, screen, shell, type IpcMainInvokeEvent } from 'electron';
 import { Controller } from './controller.js';
 import { restartShellViaHelper, run } from '@openalt/core';
 import { dirname, join } from 'node:path';
@@ -186,6 +186,19 @@ async function restartWithAltF2(win: BrowserWindow, before: string): Promise<boo
   }
 }
 
+/**
+ * Links da aba Sobre. A página pede pelo NOME; só estes endereços abrem (no navegador da pessoa,
+ * fora do app). Assim uma página comprometida não consegue abrir um endereço qualquer.
+ */
+export const LINKS: Record<string, string> = {
+  openalt: 'https://github.com/berelels/openalt',
+  catta: 'https://berelels.github.io',
+  'moonlight-android': 'https://github.com/moonlight-stream/moonlight-android',
+  'moonlight-common-c': 'https://github.com/moonlight-stream/moonlight-common-c',
+  sunshine: 'https://github.com/LizardByte/Sunshine',
+  tailscale: 'https://github.com/tailscale/tailscale',
+};
+
 // ── canais da interface → controlador (todos conferem a origem; argumentos validados lá) ──
 const actions: Record<string, (...args: unknown[]) => Promise<unknown>> = {
   getState: () => controller.state(),
@@ -205,6 +218,10 @@ const actions: Record<string, (...args: unknown[]) => Promise<unknown>> = {
   instalarSunshine: () => controller.instalarSunshine(),
   instalarPermissao: () => controller.instalarPermissao(),
   plan: (p, size) => controller.plan(p, size),
+  openLink: async (name) => {
+    const url = typeof name === 'string' && Object.hasOwn(LINKS, name) ? LINKS[name] : null;
+    if (url) await shell.openExternal(url);
+  },
 };
 for (const [name, fn] of Object.entries(actions)) {
   ipcMain.handle(`openalt:${name}`, (e, ...args) => {

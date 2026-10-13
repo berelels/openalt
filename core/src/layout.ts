@@ -9,6 +9,21 @@ export interface Rect {
   height: number;
 }
 
+/**
+ * Erro de arranjo com um código e os nomes envolvidos, para a interface traduzir
+ * (a mensagem em pt-BR continua para a CLI e os registros).
+ */
+export class LayoutError extends Error {
+  readonly code: 'no-anchor' | 'overlap' | 'overlap-pair' | 'loose' | 'impossible' | 'duplicate';
+  readonly vars: Record<string, string>;
+  constructor(code: LayoutError['code'], message: string, vars: Record<string, string> = {}) {
+    super(message);
+    this.name = 'LayoutError';
+    this.code = code;
+    this.vars = vars;
+  }
+}
+
 /** Monitores pelo nome (ex.: "DisplayPort-2"). */
 export type Layout = Record<string, Rect>;
 
@@ -53,8 +68,8 @@ export function placeBeside(
   placement: Placement,
 ): Layout {
   const a = layout[placement.anchor];
-  if (!a) throw new Error(`Monitor de referência não encontrado: ${placement.anchor}`);
-  if (name in layout) throw new Error(`Já existe um monitor chamado ${name}`);
+  if (!a) throw new LayoutError('no-anchor', `Monitor de referência não encontrado: ${placement.anchor}`, { monitor: placement.anchor });
+  if (name in layout) throw new LayoutError('duplicate', `Já existe um monitor chamado ${name}`, { monitor: name });
   const offset = placement.offset ?? 0;
   if (!Number.isInteger(offset)) throw new RangeError(`Deslocamento inválido: ${offset}`);
 
@@ -102,11 +117,11 @@ function pushAway(layout: Layout, start: string, anchor: string, side: Side): vo
     const m = layout[moverName];
     for (const [k, r] of Object.entries(layout)) {
       if (k === moverName || !overlaps(m, r)) continue;
-      if (!pushable(r)) throw new Error(`Não cabe aí: ${moverName} ficaria por cima de ${k}`);
+      if (!pushable(r)) throw new LayoutError('overlap', `Não cabe aí: ${moverName} ficaria por cima de ${k}`, { mover: moverName, monitor: k });
       if (horizontal) r.x = forward ? m.x + m.width : m.x - r.width;
       else r.y = forward ? m.y + m.height : m.y - r.height;
       queue.push(k);
-      if (++moves > 10_000) throw new Error('Layout impossível de resolver');
+      if (++moves > 10_000) throw new LayoutError('impossible', 'Layout impossível de resolver');
     }
   }
 }
@@ -142,7 +157,7 @@ export function validateLayout(layout: Layout): void {
       const [na, a] = entries[i];
       const [nb, b] = entries[j];
       if (overlaps(a, b)) {
-        throw new Error(`Os monitores ${na} e ${nb} ficariam sobrepostos`);
+        throw new LayoutError('overlap-pair', `Os monitores ${na} e ${nb} ficariam sobrepostos`, { a: na, b: nb });
       }
     }
   }
@@ -160,5 +175,5 @@ export function validateLayout(layout: Layout): void {
     }
   }
   const loose = entries.find(([n]) => !reached.has(n));
-  if (loose) throw new Error(`O monitor ${loose[0]} ficaria solto, sem encostar em nenhum outro`);
+  if (loose) throw new LayoutError('loose', `O monitor ${loose[0]} ficaria solto, sem encostar em nenhum outro`, { monitor: loose[0] });
 }

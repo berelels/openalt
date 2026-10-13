@@ -57,6 +57,7 @@ import {
   stopLeftoverSunshine,
   sunshineApi,
   sunshineDir,
+  LayoutError,
   writeSettings,
   writeSunshineSetup,
   type Assessment,
@@ -68,6 +69,9 @@ import {
   type Settings,
   type SunshineApi,
 } from '@openalt/core';
+
+/** Texto para a interface: uma chave do i18n (com valores) ou um texto cru (erro técnico de fora). */
+export type UiText = { key: string; vars?: Record<string, string | number> } | { text: string };
 
 type Phase = 'setup' | 'off' | 'starting' | 'waiting' | 'connected';
 type Kind = 'phone' | 'tablet';
@@ -95,7 +99,7 @@ export interface UiState {
   addresses: string[];
   setup: { sunshine: 'ok' | 'missing'; helper: 'ok' | 'missing' };
   checks: Assessment['checks'];
-  error: string | null;
+  error: UiText | null;
 }
 
 /** A tela do aparelho é mais "quadrada" num tablet (~1,6) do que num celular (~2,2). */
@@ -125,7 +129,7 @@ export class Controller extends EventEmitter {
   private assessment: Assessment | null = null;
   private sunshineInstalled = false;
   private sunshineKind: SunshineKind | null = null;
-  private error: string | null = null;
+  private error: UiText | null = null;
 
   constructor(private readonly opts: ControllerOptions) {
     super();
@@ -171,7 +175,7 @@ export class Controller extends EventEmitter {
       const live = !!this.connection && this.connection.name === d.name;
       const w = live ? this.connection!.width : 0;
       const h = live ? this.connection!.height : 0;
-      return { id: d.uuid, name: d.name, kind: w ? kindOf(w, h) : 'phone' as Kind, width: w, height: h, network: 'local' as const, lastSeen: live ? 'agora' : '', live };
+      return { id: d.uuid, name: d.name, kind: w ? kindOf(w, h) : 'phone' as Kind, width: w, height: h, network: 'local' as const, lastSeen: '', live };
     });
     const c = this.connection;
     return {
@@ -207,8 +211,18 @@ export class Controller extends EventEmitter {
   }
 
   private fail(e: unknown) {
-    this.error = e instanceof Error ? e.message : String(e);
+    this.error = this.uiText(e);
     this.emitState();
+  }
+
+  /** Erro de arranjo vira chave do i18n, com os nomes dos monitores (não os conectores). */
+  private uiText(e: unknown): UiText {
+    if (e instanceof LayoutError) {
+      const name = (id: string) => (id === 'cel' ? '' : this.mutter?.monitors.find((m) => m.connector === id)?.displayName ?? id);
+      return { key: `layout.${e.code}`, vars: Object.fromEntries(Object.entries(e.vars).map(([k, v]) => [k, name(v)])) };
+    }
+    if (e && typeof e === 'object' && 'key' in e && typeof (e as { key: unknown }).key === 'string') return e as UiText;
+    return { text: e instanceof Error ? e.message : String(e) };
   }
 
   // ── Ligar / Desligar ────────────────────────────────────────────────────
@@ -255,7 +269,7 @@ export class Controller extends EventEmitter {
       this.sunshine = await startSunshine(setup.confPath, { kind: this.sunshineKind ?? 'flatpak' });
       const mine = this.sunshine;
       // só é "fechou sozinho" se não fomos nós que mandamos parar
-      mine.onExit(() => { if (this.sunshine === mine && !this.stopping) { this.sunshine = null; void this.desligar('O Sunshine fechou sozinho'); } });
+      mine.onExit(() => { if (this.sunshine === mine && !this.stopping) { this.sunshine = null; void this.desligar({ key: 'err.sunshineExited' }); } });
       const pem = await readFile(join(setup.dir, 'credentials', 'cacert.pem'), 'utf8');
       this.api = sunshineApi(httpsTransport({ credentials: await readCredentials(this.paths), fingerprint: certFingerprint(pem) }));
       this.watchConnection();
@@ -333,12 +347,12 @@ export class Controller extends EventEmitter {
     this.maximizeTimer = setInterval(() => void tick().catch(() => {}), 1000);
   }
 
-  async desligar(reason?: string): Promise<void> {
+  async desligar(reason?: UiText): Promise<void> {
     this.stopping = true;
     try { await this.desligarAgora(reason); } finally { this.stopping = false; }
   }
 
-  private async desligarAgora(reason?: string): Promise<void> {
+  private async desligarAgora(reason?: UiText): Promise<void> {
     this.stopPairing();
     if (this.maximizeTimer) clearInterval(this.maximizeTimer);
     this.maximizeTimer = null;
@@ -400,7 +414,7 @@ export class Controller extends EventEmitter {
       p.used = true; // uso único, mesmo que algo dê errado daqui para frente
       this.stopPolling();
       const ok = await this.api.submitPin(mine.id, p.pin, friendlyName(mine.name));
-      if (!ok) this.error = 'O pareamento não foi aceito. Gere outro código e tente de novo.';
+      if (!ok) this.error = { key: 'err.pairRejected' };
       this.emitState();
     } catch (e) {
       this.fail(e);
@@ -411,17 +425,17 @@ export class Controller extends EventEmitter {
    * Pareamento pelo Moonlight oficial (enquanto o app Android do OpenAlt não existe): o
    * Moonlight mostra um PIN de 4 dígitos e a pessoa digita aqui. Só vale com o OpenAlt ligado.
    */
-  async parearPin(pin: unknown, name?: unknown): Promise<{ ok: boolean; message: string }> {
-    if (typeof pin !== 'string' || !/^\d{4}$/.test(pin)) return { ok: false, message: 'O PIN tem 4 números.' };
-    if (!this.api) return { ok: false, message: 'Ligue o OpenAlt primeiro.' };
+  async parearPin(pin: unknown, name?: unknown): Promise<{ ok: boolean; message: UiText }> {
+    if (typeof pin !== 'string' || !/^\d{4}$/.test(pin)) return { ok: false, message: { key: 'pin.format' } };
+    if (!this.api) return { ok: false, message: { key: 'pin.turnOn' } };
     const pending = (await this.api.pendingPairings()).filter((x) => !/^OpenAlt-/.test(x.name));
-    if (pending.length === 0) return { ok: false, message: 'Nenhum pedido ainda. No Moonlight, toque neste PC para aparecer o PIN.' };
+    if (pending.length === 0) return { ok: false, message: { key: 'pin.noRequest' } };
     const req = pending[pending.length - 1];
     // o nome que a pessoa deu; senão o que o Moonlight mandou (o nome interno do aparelho)
     const given = typeof name === 'string' ? name.replace(/[^\p{L}\p{N} ._()+\-]/gu, '').trim().slice(0, 32) : '';
     const ok = await this.api.submitPin(req.id, pin, (given || req.name || 'Aparelho').slice(0, 48));
     this.emitState();
-    return ok ? { ok, message: 'Pareado! No Moonlight, toque em “OpenAlt”.' } : { ok, message: 'PIN não aceito. Confira e tente de novo.' };
+    return { ok, message: { key: ok ? 'pin.ok' : 'pin.rejected' } };
   }
 
   // ── conexão do aparelho (a ponte grava connection.json) ────────────────
@@ -501,10 +515,10 @@ export class Controller extends EventEmitter {
     try {
       // ligado: pelo Sunshine; desligado: direto no arquivo de estado (é nosso, e o Sunshine não está rodando)
       if (this.api) await this.api.unpair(id);
-      else if (!(await forgetPairedDevice(this.paths, id))) throw new Error('Aparelho não encontrado');
+      else if (!(await forgetPairedDevice(this.paths, id))) throw new Error('not found');
       this.error = null;
     } catch (e) {
-      this.fail(new Error(`Não deu para esquecer o aparelho: ${e instanceof Error ? e.message : e}`));
+      this.fail({ key: 'err.forget', vars: { detail: e instanceof Error ? e.message : String(e) } });
       return;
     }
     this.emitState();
@@ -523,23 +537,23 @@ export class Controller extends EventEmitter {
   }
 
   async instalarPermissao(): Promise<void> {
-    this.fail(new Error('A permissão do sistema é instalada pelo instalador do OpenAlt (próximo marco).'));
+    this.fail({ key: 'err.helperLater' });
   }
 
   /** Prévia de posição: mesma conta do núcleo (layout.ts), com o arranjo atual do GNOME. */
-  async plan(p: unknown, size: unknown): Promise<{ layout?: Record<string, Rect>; error?: string }> {
+  async plan(p: unknown, size: unknown): Promise<{ layout?: Record<string, Rect>; error?: UiText }> {
     const v = p as Record<string, unknown>;
     const z = size as Record<string, unknown>;
-    if (!this.mutter) return { error: 'O GNOME não informou os monitores' };
+    if (!this.mutter) return { error: { key: 'layout.noMonitors' } };
     if (!v || typeof v.side !== 'string' || !isSide(v.side) || typeof v.align !== 'string' || !isAlign(v.align)
-      || !z || !Number.isInteger(z.width) || !Number.isInteger(z.height)) return { error: 'pedido inválido' };
+      || !z || !Number.isInteger(z.width) || !Number.isInteger(z.height)) return { error: { key: 'layout.badRequest' } };
     try {
       const base = layoutFromMutter(this.mutter);
       for (const k of Object.keys(base)) { const mon = this.mutter.monitors.find((m) => m.connector === k); if (mon && isOpenAltMonitor(mon)) delete base[k]; }
       const placement = resolvePlacement(this.mutter, { anchor: typeof v.anchor === 'string' ? v.anchor : undefined, side: v.side, align: v.align, offset: Number.isInteger(v.offset) ? (v.offset as number) : 0 });
       return { layout: placeBeside(base, 'cel', layoutSize(this.mutter, z.width as number, z.height as number), placement) };
     } catch (e) {
-      return { error: e instanceof Error ? e.message : String(e) };
+      return { error: this.uiText(e) };
     }
   }
 

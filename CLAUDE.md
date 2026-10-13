@@ -41,7 +41,7 @@ genéricos, não só o do PC de testes.
 - `desktop/`: `src/main` (processo principal + `controller.ts`), `src/preload/preload.cjs` (ponte mínima), `src/renderer` (interface + `intro.ts`).
 - Monitor virtual: modos com prefixo `OA_`; a remoção apaga tudo com esse prefixo.
 - `android/`: fork do Moonlight Android 12.2 (ADR-0012; `moonlight-common-c` é submódulo). Código novo em `android/app/src/main/java/dev/cattastudios/openalt/`; mudanças em arquivos do Moonlight marcadas com "OpenAlt:" e mínimas (para `git subtree pull`). A nuvem não alcança `dl.google.com`: o build e os testes Android rodam no GitHub Actions (`.github/workflows/android.yml`).
-- Textos da interface em pt-BR primeiro (en/es depois).
+- Idiomas: pt-BR, espanhol e inglês; vale o do sistema (se não for nenhum dos três, inglês), e a pessoa troca na aba Sobre. PC: `desktop/src/renderer/i18n.ts` (`t('chave', {valores})`); o processo principal e o núcleo mandam CHAVES (`UiText`, `Check.key`, `LayoutError.code`), não frases. Android: `values/strings_openalt.xml` (inglês, padrão), `values-pt/`, `values-es/`. Texto novo entra nos três; `desktop/test/i18n.test.mjs` confere.
 
 ## Design
 - App: família Respiro/Pauca, em **painel de cartões** (trilho de ícones à esquerda, título grande + pílulas no topo, grade de cartões; aprovado pelo usuário em 2026-10-12). Papel #F6F1E7, tinta #26211B, Newsreader + Plus Jakarta Sans locais, raios 12/20/28, easing cubic-bezier(0.22,1,0.36,1), textura de papel, claro/escuro.

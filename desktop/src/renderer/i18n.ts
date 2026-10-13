@@ -1,0 +1,424 @@
+// Textos da interface em pt-BR, espanhol e inglês. O idioma é o do sistema (navigator.languages,
+// que o Electron tira do LANG/LC_* do PC); se não for nenhum dos três, inglês. A pessoa pode trocar
+// na aba Sobre (guardado neste PC, como o tema).
+// Valores: "{nome}" no texto é trocado pelo valor (já escapado por quem chama, quando vem de fora).
+
+type Lang = 'pt' | 'es' | 'en';
+type LangPref = Lang | 'system';
+type Dict = Record<string, string>;
+
+const LANGS: Lang[] = ['pt', 'es', 'en'];
+const HTML_LANG: Record<Lang, string> = { pt: 'pt-BR', es: 'es', en: 'en' };
+/** Nome de cada idioma nele mesmo (o seletor mostra assim, em qualquer idioma). */
+const LANG_NAME: Record<Lang, string> = { pt: 'Português', es: 'Español', en: 'English' };
+
+const PT: Dict = {
+  // trilho e tema (index.html)
+  'nav.label': 'Navegação', 'nav.home': 'Painel', 'nav.devices': 'Aparelhos', 'nav.pc': 'Este PC', 'nav.about': 'Sobre',
+  'theme.label': 'Tema', 'theme.light': 'Tema claro', 'theme.system': 'Tema automático', 'theme.dark': 'Tema escuro',
+
+  // o aparelho dentro das frases
+  'dev.generic': 'o aparelho', 'dev.phone': 'o celular', 'dev.tablet': 'o tablet',
+  'kind.phone': 'Celular', 'kind.tablet': 'Tablet',
+  'orient.auto': 'Automática', 'orient.portrait': 'Em pé', 'orient.landscape': 'Deitado',
+  'orient.portrait.lc': 'em pé', 'orient.landscape.lc': 'deitado',
+  'side.right': 'À direita', 'side.left': 'À esquerda', 'side.above': 'Acima', 'side.below': 'Abaixo',
+  'place.at.right': 'À direita de {m}', 'place.at.left': 'À esquerda de {m}', 'place.at.above': 'Acima de {m}', 'place.at.below': 'Abaixo de {m}',
+  'align.top': 'Topo', 'align.middle': 'Centro', 'align.bottom': 'Base', 'align.left': 'Esquerda', 'align.right': 'Direita',
+  'audio.device': 'Aparelho', 'audio.pc': 'PC', 'audio.both': 'Os dois',
+
+  // topo
+  'net.local': 'Rede local', 'net.away': 'Fora de casa',
+  'top.pcChecks': 'O que funciona neste PC', 'top.fullscreen': 'Tela cheia (F11)', 'top.exitFullscreen': 'Sair da tela cheia (Esc)',
+
+  // conexão
+  'conn.title': 'Conexão',
+  'conn.setup': 'Preparar', 'conn.setup.sub': 'Primeira vez neste PC',
+  'conn.off': 'Desligado', 'conn.off.sub': 'Nada ligado sem você pedir',
+  'conn.starting': 'Ligando…', 'conn.starting.sub': 'Iniciando o Sunshine',
+  'conn.waiting': 'Esperando', 'conn.waiting.sub': 'Escaneie o código com {dev}',
+  'conn.connected': 'Conectado', 'conn.mirroring': 'Espelhando {m}', 'conn.extra': 'Mais uma tela',
+  'stat.resolution': 'resolução', 'stat.rate': 'taxa', 'stat.connection': 'conexão', 'stat.remote': 'Remota', 'stat.local': 'Local',
+  'stat.monitor': 'monitor', 'stat.monitors': 'monitores', 'stat.mode': 'modo', 'stat.sound': 'som',
+  'stat.mirror': 'Espelho', 'stat.new': 'Nova',
+  'power.on': 'Ligar', 'power.off': 'Desligar',
+
+  // modo
+  'mode.title': 'Modo', 'mode.extend': 'Nova tela', 'mode.extend.hint': 'Um monitor a mais',
+  'mode.mirror': 'Espelhar', 'mode.mirror.hint': 'Mostra um monitor',
+
+  // pareamento
+  'pair.title': 'Parear', 'pair.hint': 'App OpenAlt → “Parear” → aponte para o código',
+  'pair.qrAria': 'Código QR de pareamento', 'pair.expired': 'Código vencido',
+  'pair.validFor': 'Vale por {t} · uma vez só', 'pair.newCode': 'Gerar outro',
+  'pair.network': 'Mesmo Wi-Fi deste PC, ou Tailscale para fora de casa.',
+  'pair.pinLabel': 'Usando o Moonlight? Digite o PIN que ele mostra:',
+  'pair.namePlaceholder': 'Nome (ex.: Tablet)', 'pair.nameAria': 'Nome do aparelho (opcional)', 'pair.submit': 'Parear',
+  'pair.address': 'Endereço deste PC: {a}',
+  'pin.format': 'O PIN tem 4 números.', 'pin.turnOn': 'Ligue o OpenAlt primeiro.',
+  'pin.noRequest': 'Nenhum pedido ainda. No Moonlight, toque neste PC para aparecer o PIN.',
+  'pin.ok': 'Pareado! No Moonlight, toque em “OpenAlt”.', 'pin.rejected': 'PIN não aceito. Confira e tente de novo.',
+
+  // vitrine do aparelho
+  'show.connected': 'Conectado', 'show.preview': 'Prévia', 'show.pairedAria': 'Ver aparelhos pareados',
+  'show.none': 'Nenhum aparelho', 'show.estimated': '(estimado)', 'show.kindAria': 'Tipo de aparelho na prévia',
+
+  // preferências
+  'prefs.title': 'Como {dev} fica', 'prefs.hint': 'A orientação vale a partir da próxima conexão.',
+  'prefs.orientation': 'Orientação', 'prefs.uiScale': 'Tamanho das coisas na Nova tela', 'prefs.audio': 'Onde sai o som',
+  'prefs.audioReconnect': 'Para o som ir para {dev}, desconecte e conecte de novo.',
+  'prefs.maximize': 'Maximizar janelas em {dev}', 'prefs.maximize.hint': 'Ao levar uma janela para a Nova tela',
+  'prefs.remember': 'Lembrar o arranjo', 'prefs.remember.hint': 'Menos piscadas; grava no GNOME',
+
+  // posição
+  'place.mirrorTitle': 'O que {dev} espelha', 'place.title': 'Onde {dev} fica',
+  'place.mirrorHint': 'Escolha o monitor; ele aparece igualzinho no aparelho.',
+  'place.liveHint': 'Muda na hora, sem senha. Clique num monitor e escolha o lado.',
+  'place.hint': 'Clique num monitor e escolha o lado. Vale para a próxima conexão.',
+  'place.mirrorOf': 'Monitor espelhado', 'place.anchor': 'Ao lado de qual monitor',
+  'place.stageAria': 'Prévia da área de trabalho', 'place.side': 'Lado', 'place.align': 'Alinhar',
+  'place.mirrorMsg': '{Dev} vai mostrar {m}.', 'place.tryOther': '{err}. Tente outro lado ou alinhamento.',
+  'place.estimated': ' · tamanho estimado; o certo vem do aparelho ao conectar',
+  'place.tileAria': '{name}, {w} por {h}', 'place.tilePrimaryAria': '{name}, principal, {w} por {h}',
+  'place.deviceAria': '{kind}, {w} por {h}',
+
+  // aparelhos pareados
+  'devs.title': 'Aparelhos pareados', 'devs.hint': 'Celulares e tablets que já escanearam o código deste PC.',
+  'devs.device': 'Aparelho', 'devs.resolution': 'Resolução', 'devs.orientation': 'Orientação', 'devs.network': 'Rede',
+  'devs.lastSeen': 'Última vez', 'devs.actions': 'Ações', 'devs.now': 'Agora', 'devs.forget': 'Esquecer', 'devs.forgetAria': 'Esquecer {name}',
+  'devs.empty': 'Nenhum ainda. Ligue e escaneie o código com o app OpenAlt.',
+
+  // painel
+  'home.off': 'Celular ou tablet como mais uma tela — ou espelho deste PC.',
+  'home.starting': 'Ligando…', 'home.waiting': 'Ligado · esperando {dev}', 'home.connected': '{name} conectado · {mode}',
+
+  // primeira vez
+  'setup.title': 'Vamos preparar <em>este PC</em>', 'setup.sub': 'Dois passos, uma vez só. Nada muda sem você apertar o botão.',
+  'setup.sunshine.ok': 'Instalado. O OpenAlt usa uma configuração só dele; a sua fica intacta.',
+  'setup.sunshine.todo': 'O programa que transmite a tela. Pelo Flathub, sem senha.',
+  'setup.helper': 'Permissão do sistema', 'setup.helper.ok': 'Instalada. Ligar e desligar não pede mais senha.',
+  'setup.helper.todo': 'Para criar o monitor do aparelho. Pede sua senha uma vez. “Espelhar” funciona sem ela.',
+  'setup.away': 'Fora de casa', 'setup.away.text': 'Opcional: Tailscale no PC e no aparelho. Dá para fazer depois.',
+  'setup.install': 'Instalar', 'setup.seePc': 'Ver este PC', 'setup.continue': 'Continuar',
+
+  // aparelhos / este PC
+  'devices.title': '<em>Aparelhos</em>', 'devices.sub': 'Celulares e tablets pareados com este PC.',
+  'pc.title': 'Este <em>PC</em>', 'pc.sub': 'O OpenAlt é para qualquer PC, mas cada um é de um jeito. Isto vale para este.',
+  'pc.summary': 'Resumo', 'pc.summary.text': '“Nova tela” e “Espelhar” funcionam aqui',
+  'check.session': 'Sessão', 'check.desktop': 'Área de trabalho', 'check.gpu': 'Placa de vídeo', 'check.multi-gpu': 'Várias placas',
+  'check.free-output': 'Saída de vídeo livre', 'check.connector': 'Identificação da saída', 'check.helper': 'Permissão do sistema',
+  'env.session.ok': 'Sessão X11.',
+  'env.session.bad': 'Sessão "{session}": por enquanto o OpenAlt funciona só em X11 (Wayland está nos planos).',
+  'env.desktop.ok': 'Área de trabalho GNOME.', 'env.desktop.mute': 'GNOME detectado, mas ele não respondeu sobre os monitores.',
+  'env.desktop.bad': 'Área de trabalho "{desktop}": a "Nova tela" por enquanto só funciona no GNOME.',
+  'env.gpu.unknown': 'Placa de vídeo não identificada.',
+  'env.gpu.untested': 'Placa de vídeo ({drivers}) ainda não testada com o OpenAlt; pode funcionar.',
+  'env.gpu.ok': 'Placa de vídeo testada ({drivers}).',
+  'env.multi-gpu.untested': 'Mais de uma placa de vídeo: combinação ainda não testada.',
+  'env.free-output.ok': 'Saída de vídeo livre: {output}.',
+  'env.free-output.bad': 'Nenhuma saída de vídeo livre (todas em uso). Um adaptador "dummy" HDMI/DisplayPort resolve.',
+  'env.connector.ok': 'Saída livre identificada no sistema.',
+  'env.connector.bad': 'Não foi possível identificar com segurança a saída livre no sistema.',
+  'env.helper.ok': 'Permissão do sistema instalada.',
+  'env.helper.missing': 'Falta instalar a permissão do sistema (pedida uma vez, na instalação).',
+
+  // sobre
+  'about.title': 'Sobre o <em>OpenAlt</em>',
+  'about.sub': 'Celular ou tablet como monitor extra, espelho ou tela de jogo. Código aberto (GPL-3.0).',
+  'about.catta': 'Feito com carinho, para qualquer pessoa.', 'about.cattaSite': 'Site da Catta Studios',
+  'about.ours': 'OpenAlt', 'about.ours.text': 'O código deste app e do app do celular. Este é o nosso repositório.',
+  'about.sunshine': 'Transmissão da tela, por LizardByte (GPL-3.0). Usado sem modificações.',
+  'about.moonlight': 'O app do celular e do tablet é um fork do Moonlight Android (GPL-3.0).',
+  'about.common': 'Protocolo de transmissão usado pelo Moonlight (GPL-3.0).',
+  'about.tailscale': 'Acesso fora de casa, com a sua conta.',
+  'about.repo': 'Repositório', 'about.openAria': 'Abrir {name} no navegador',
+  'about.language': 'Idioma', 'about.language.hint': 'O padrão é o idioma do sistema.', 'lang.system': 'Do sistema',
+
+  // erros que vêm do processo principal
+  'err.sunshineExited': 'O Sunshine fechou sozinho.',
+  'err.pairRejected': 'O pareamento não foi aceito. Gere outro código e tente de novo.',
+  'err.forget': 'Não deu para esquecer o aparelho: {detail}',
+  'err.helperLater': 'A permissão do sistema é instalada pelo instalador do OpenAlt (próximo marco).',
+  'layout.noMonitors': 'O GNOME não informou os monitores', 'layout.badRequest': 'Pedido inválido',
+  'layout.no-anchor': 'Monitor de referência não encontrado: {monitor}', 'layout.duplicate': 'Já existe um monitor chamado {monitor}',
+  'layout.overlap': 'Não cabe aí: ficaria por cima de {monitor}', 'layout.overlap-pair': 'Os monitores {a} e {b} ficariam sobrepostos',
+  'layout.loose': 'O monitor {monitor} ficaria solto, sem encostar em nenhum outro', 'layout.impossible': 'Arranjo impossível de resolver',
+};
+
+const ES: Dict = {
+  'nav.label': 'Navegación', 'nav.home': 'Panel', 'nav.devices': 'Dispositivos', 'nav.pc': 'Este PC', 'nav.about': 'Acerca de',
+  'theme.label': 'Tema', 'theme.light': 'Tema claro', 'theme.system': 'Tema automático', 'theme.dark': 'Tema oscuro',
+
+  'dev.generic': 'el dispositivo', 'dev.phone': 'el celular', 'dev.tablet': 'la tableta',
+  'kind.phone': 'Celular', 'kind.tablet': 'Tableta',
+  'orient.auto': 'Automática', 'orient.portrait': 'Vertical', 'orient.landscape': 'Horizontal',
+  'orient.portrait.lc': 'vertical', 'orient.landscape.lc': 'horizontal',
+  'side.right': 'A la derecha', 'side.left': 'A la izquierda', 'side.above': 'Arriba', 'side.below': 'Abajo',
+  'place.at.right': 'A la derecha de {m}', 'place.at.left': 'A la izquierda de {m}', 'place.at.above': 'Encima de {m}', 'place.at.below': 'Debajo de {m}',
+  'align.top': 'Arriba', 'align.middle': 'Centro', 'align.bottom': 'Abajo', 'align.left': 'Izquierda', 'align.right': 'Derecha',
+  'audio.device': 'Dispositivo', 'audio.pc': 'PC', 'audio.both': 'Ambos',
+
+  'net.local': 'Red local', 'net.away': 'Fuera de casa',
+  'top.pcChecks': 'Qué funciona en este PC', 'top.fullscreen': 'Pantalla completa (F11)', 'top.exitFullscreen': 'Salir de pantalla completa (Esc)',
+
+  'conn.title': 'Conexión',
+  'conn.setup': 'Preparar', 'conn.setup.sub': 'Primera vez en este PC',
+  'conn.off': 'Apagado', 'conn.off.sub': 'Nada se enciende sin que lo pidas',
+  'conn.starting': 'Encendiendo…', 'conn.starting.sub': 'Iniciando Sunshine',
+  'conn.waiting': 'Esperando', 'conn.waiting.sub': 'Escanea el código con {dev}',
+  'conn.connected': 'Conectado', 'conn.mirroring': 'Duplicando {m}', 'conn.extra': 'Una pantalla más',
+  'stat.resolution': 'resolución', 'stat.rate': 'frecuencia', 'stat.connection': 'conexión', 'stat.remote': 'Remota', 'stat.local': 'Local',
+  'stat.monitor': 'monitor', 'stat.monitors': 'monitores', 'stat.mode': 'modo', 'stat.sound': 'sonido',
+  'stat.mirror': 'Espejo', 'stat.new': 'Nueva',
+  'power.on': 'Encender', 'power.off': 'Apagar',
+
+  'mode.title': 'Modo', 'mode.extend': 'Nueva pantalla', 'mode.extend.hint': 'Un monitor más',
+  'mode.mirror': 'Duplicar', 'mode.mirror.hint': 'Muestra un monitor',
+
+  'pair.title': 'Vincular', 'pair.hint': 'App OpenAlt → “Vincular” → apunta al código',
+  'pair.qrAria': 'Código QR para vincular', 'pair.expired': 'Código vencido',
+  'pair.validFor': 'Válido por {t} · un solo uso', 'pair.newCode': 'Generar otro',
+  'pair.network': 'La misma Wi-Fi de este PC, o Tailscale fuera de casa.',
+  'pair.pinLabel': '¿Usas Moonlight? Escribe el PIN que muestra:',
+  'pair.namePlaceholder': 'Nombre (ej.: Tableta)', 'pair.nameAria': 'Nombre del dispositivo (opcional)', 'pair.submit': 'Vincular',
+  'pair.address': 'Dirección de este PC: {a}',
+  'pin.format': 'El PIN tiene 4 números.', 'pin.turnOn': 'Primero enciende OpenAlt.',
+  'pin.noRequest': 'Aún no hay solicitudes. En Moonlight, toca este PC para que aparezca el PIN.',
+  'pin.ok': '¡Vinculado! En Moonlight, toca “OpenAlt”.', 'pin.rejected': 'PIN no aceptado. Revísalo e inténtalo de nuevo.',
+
+  'show.connected': 'Conectado', 'show.preview': 'Vista previa', 'show.pairedAria': 'Ver dispositivos vinculados',
+  'show.none': 'Ningún dispositivo', 'show.estimated': '(estimado)', 'show.kindAria': 'Tipo de dispositivo en la vista previa',
+
+  'prefs.title': 'Cómo queda {dev}', 'prefs.hint': 'La orientación se aplica desde la próxima conexión.',
+  'prefs.orientation': 'Orientación', 'prefs.uiScale': 'Tamaño de las cosas en la Nueva pantalla', 'prefs.audio': 'Dónde sale el sonido',
+  'prefs.audioReconnect': 'Para que el sonido vaya a {dev}, desconecta y vuelve a conectar.',
+  'prefs.maximize': 'Maximizar ventanas en {dev}', 'prefs.maximize.hint': 'Al llevar una ventana a la Nueva pantalla',
+  'prefs.remember': 'Recordar la disposición', 'prefs.remember.hint': 'Menos parpadeos; se guarda en GNOME',
+
+  'place.mirrorTitle': 'Qué duplica {dev}', 'place.title': 'Dónde queda {dev}',
+  'place.mirrorHint': 'Elige el monitor; aparece igualito en el dispositivo.',
+  'place.liveHint': 'Cambia al instante, sin contraseña. Haz clic en un monitor y elige el lado.',
+  'place.hint': 'Haz clic en un monitor y elige el lado. Se aplica en la próxima conexión.',
+  'place.mirrorOf': 'Monitor duplicado', 'place.anchor': 'Junto a qué monitor',
+  'place.stageAria': 'Vista previa del escritorio', 'place.side': 'Lado', 'place.align': 'Alinear',
+  'place.mirrorMsg': '{Dev} va a mostrar {m}.', 'place.tryOther': '{err}. Prueba otro lado u otra alineación.',
+  'place.estimated': ' · tamaño estimado; el real llega del dispositivo al conectar',
+  'place.tileAria': '{name}, {w} por {h}', 'place.tilePrimaryAria': '{name}, principal, {w} por {h}',
+  'place.deviceAria': '{kind}, {w} por {h}',
+
+  'devs.title': 'Dispositivos vinculados', 'devs.hint': 'Celulares y tabletas que ya escanearon el código de este PC.',
+  'devs.device': 'Dispositivo', 'devs.resolution': 'Resolución', 'devs.orientation': 'Orientación', 'devs.network': 'Red',
+  'devs.lastSeen': 'Última vez', 'devs.actions': 'Acciones', 'devs.now': 'Ahora', 'devs.forget': 'Olvidar', 'devs.forgetAria': 'Olvidar {name}',
+  'devs.empty': 'Ninguno todavía. Enciende y escanea el código con la app OpenAlt.',
+
+  'home.off': 'Celular o tableta como una pantalla más — o como espejo de este PC.',
+  'home.starting': 'Encendiendo…', 'home.waiting': 'Encendido · esperando {dev}', 'home.connected': '{name} conectado · {mode}',
+
+  'setup.title': 'Preparemos <em>este PC</em>', 'setup.sub': 'Dos pasos, una sola vez. Nada cambia sin que presiones el botón.',
+  'setup.sunshine.ok': 'Instalado. OpenAlt usa una configuración propia; la tuya queda intacta.',
+  'setup.sunshine.todo': 'El programa que transmite la pantalla. Desde Flathub, sin contraseña.',
+  'setup.helper': 'Permiso del sistema', 'setup.helper.ok': 'Instalado. Encender y apagar ya no pide contraseña.',
+  'setup.helper.todo': 'Para crear el monitor del dispositivo. Pide tu contraseña una vez. “Duplicar” funciona sin él.',
+  'setup.away': 'Fuera de casa', 'setup.away.text': 'Opcional: Tailscale en el PC y en el dispositivo. Se puede hacer después.',
+  'setup.install': 'Instalar', 'setup.seePc': 'Ver este PC', 'setup.continue': 'Continuar',
+
+  'devices.title': '<em>Dispositivos</em>', 'devices.sub': 'Celulares y tabletas vinculados con este PC.',
+  'pc.title': 'Este <em>PC</em>', 'pc.sub': 'OpenAlt es para cualquier PC, pero cada uno es distinto. Esto vale para este.',
+  'pc.summary': 'Resumen', 'pc.summary.text': '“Nueva pantalla” y “Duplicar” funcionan aquí',
+  'check.session': 'Sesión', 'check.desktop': 'Escritorio', 'check.gpu': 'Tarjeta gráfica', 'check.multi-gpu': 'Varias tarjetas',
+  'check.free-output': 'Salida de video libre', 'check.connector': 'Identificación de la salida', 'check.helper': 'Permiso del sistema',
+  'env.session.ok': 'Sesión X11.',
+  'env.session.bad': 'Sesión "{session}": por ahora OpenAlt solo funciona en X11 (Wayland está en los planes).',
+  'env.desktop.ok': 'Escritorio GNOME.', 'env.desktop.mute': 'GNOME detectado, pero no respondió sobre los monitores.',
+  'env.desktop.bad': 'Escritorio "{desktop}": por ahora la "Nueva pantalla" solo funciona en GNOME.',
+  'env.gpu.unknown': 'Tarjeta gráfica no identificada.',
+  'env.gpu.untested': 'Tarjeta gráfica ({drivers}) aún no probada con OpenAlt; puede funcionar.',
+  'env.gpu.ok': 'Tarjeta gráfica probada ({drivers}).',
+  'env.multi-gpu.untested': 'Más de una tarjeta gráfica: combinación aún no probada.',
+  'env.free-output.ok': 'Salida de video libre: {output}.',
+  'env.free-output.bad': 'No hay ninguna salida de video libre (todas en uso). Un adaptador "dummy" HDMI/DisplayPort lo resuelve.',
+  'env.connector.ok': 'Salida libre identificada en el sistema.',
+  'env.connector.bad': 'No se pudo identificar con seguridad la salida libre en el sistema.',
+  'env.helper.ok': 'Permiso del sistema instalado.',
+  'env.helper.missing': 'Falta instalar el permiso del sistema (se pide una vez, en la instalación).',
+
+  'about.title': 'Acerca de <em>OpenAlt</em>',
+  'about.sub': 'Celular o tableta como monitor extra, espejo o pantalla de juego. Código abierto (GPL-3.0).',
+  'about.catta': 'Hecho con cariño, para cualquier persona.', 'about.cattaSite': 'Sitio de Catta Studios',
+  'about.ours': 'OpenAlt', 'about.ours.text': 'El código de esta app y de la app del celular. Este es nuestro repositorio.',
+  'about.sunshine': 'Transmisión de la pantalla, por LizardByte (GPL-3.0). Usado sin modificaciones.',
+  'about.moonlight': 'La app del celular y de la tableta es un fork de Moonlight Android (GPL-3.0).',
+  'about.common': 'Protocolo de transmisión que usa Moonlight (GPL-3.0).',
+  'about.tailscale': 'Acceso fuera de casa, con tu propia cuenta.',
+  'about.repo': 'Repositorio', 'about.openAria': 'Abrir {name} en el navegador',
+  'about.language': 'Idioma', 'about.language.hint': 'Por defecto, el idioma del sistema.', 'lang.system': 'Del sistema',
+
+  'err.sunshineExited': 'Sunshine se cerró solo.',
+  'err.pairRejected': 'No se aceptó la vinculación. Genera otro código e inténtalo de nuevo.',
+  'err.forget': 'No se pudo olvidar el dispositivo: {detail}',
+  'err.helperLater': 'El permiso del sistema lo instala el instalador de OpenAlt (próxima etapa).',
+  'layout.noMonitors': 'GNOME no informó los monitores', 'layout.badRequest': 'Solicitud no válida',
+  'layout.no-anchor': 'No se encontró el monitor de referencia: {monitor}', 'layout.duplicate': 'Ya existe un monitor llamado {monitor}',
+  'layout.overlap': 'No cabe ahí: quedaría encima de {monitor}', 'layout.overlap-pair': 'Los monitores {a} y {b} quedarían superpuestos',
+  'layout.loose': 'El monitor {monitor} quedaría suelto, sin tocar ningún otro', 'layout.impossible': 'Disposición imposible de resolver',
+};
+
+const EN: Dict = {
+  'nav.label': 'Navigation', 'nav.home': 'Dashboard', 'nav.devices': 'Devices', 'nav.pc': 'This PC', 'nav.about': 'About',
+  'theme.label': 'Theme', 'theme.light': 'Light theme', 'theme.system': 'Automatic theme', 'theme.dark': 'Dark theme',
+
+  'dev.generic': 'the device', 'dev.phone': 'the phone', 'dev.tablet': 'the tablet',
+  'kind.phone': 'Phone', 'kind.tablet': 'Tablet',
+  'orient.auto': 'Automatic', 'orient.portrait': 'Portrait', 'orient.landscape': 'Landscape',
+  'orient.portrait.lc': 'portrait', 'orient.landscape.lc': 'landscape',
+  'side.right': 'Right', 'side.left': 'Left', 'side.above': 'Above', 'side.below': 'Below',
+  'place.at.right': 'Right of {m}', 'place.at.left': 'Left of {m}', 'place.at.above': 'Above {m}', 'place.at.below': 'Below {m}',
+  'align.top': 'Top', 'align.middle': 'Center', 'align.bottom': 'Bottom', 'align.left': 'Left', 'align.right': 'Right',
+  'audio.device': 'Device', 'audio.pc': 'PC', 'audio.both': 'Both',
+
+  'net.local': 'Local network', 'net.away': 'Away from home',
+  'top.pcChecks': 'What works on this PC', 'top.fullscreen': 'Full screen (F11)', 'top.exitFullscreen': 'Exit full screen (Esc)',
+
+  'conn.title': 'Connection',
+  'conn.setup': 'Set up', 'conn.setup.sub': 'First time on this PC',
+  'conn.off': 'Off', 'conn.off.sub': 'Nothing turns on unless you ask',
+  'conn.starting': 'Starting…', 'conn.starting.sub': 'Starting Sunshine',
+  'conn.waiting': 'Waiting', 'conn.waiting.sub': 'Scan the code with {dev}',
+  'conn.connected': 'Connected', 'conn.mirroring': 'Mirroring {m}', 'conn.extra': 'One more screen',
+  'stat.resolution': 'resolution', 'stat.rate': 'refresh', 'stat.connection': 'connection', 'stat.remote': 'Remote', 'stat.local': 'Local',
+  'stat.monitor': 'monitor', 'stat.monitors': 'monitors', 'stat.mode': 'mode', 'stat.sound': 'sound',
+  'stat.mirror': 'Mirror', 'stat.new': 'New',
+  'power.on': 'Turn on', 'power.off': 'Turn off',
+
+  'mode.title': 'Mode', 'mode.extend': 'New screen', 'mode.extend.hint': 'One more monitor',
+  'mode.mirror': 'Mirror', 'mode.mirror.hint': 'Shows one monitor',
+
+  'pair.title': 'Pair', 'pair.hint': 'OpenAlt app → “Pair” → point at the code',
+  'pair.qrAria': 'Pairing QR code', 'pair.expired': 'Code expired',
+  'pair.validFor': 'Valid for {t} · single use', 'pair.newCode': 'New code',
+  'pair.network': 'Same Wi-Fi as this PC, or Tailscale when away from home.',
+  'pair.pinLabel': 'Using Moonlight? Type the PIN it shows:',
+  'pair.namePlaceholder': 'Name (e.g. Tablet)', 'pair.nameAria': 'Device name (optional)', 'pair.submit': 'Pair',
+  'pair.address': 'This PC’s address: {a}',
+  'pin.format': 'The PIN has 4 digits.', 'pin.turnOn': 'Turn OpenAlt on first.',
+  'pin.noRequest': 'No request yet. In Moonlight, tap this PC to get the PIN.',
+  'pin.ok': 'Paired! In Moonlight, tap “OpenAlt”.', 'pin.rejected': 'PIN not accepted. Check it and try again.',
+
+  'show.connected': 'Connected', 'show.preview': 'Preview', 'show.pairedAria': 'See paired devices',
+  'show.none': 'No device', 'show.estimated': '(estimated)', 'show.kindAria': 'Device type in the preview',
+
+  'prefs.title': 'How {dev} looks', 'prefs.hint': 'Orientation applies from the next connection.',
+  'prefs.orientation': 'Orientation', 'prefs.uiScale': 'Size of things on the New screen', 'prefs.audio': 'Where sound plays',
+  'prefs.audioReconnect': 'For sound to play on {dev}, disconnect and connect again.',
+  'prefs.maximize': 'Maximize windows on {dev}', 'prefs.maximize.hint': 'When you move a window to the New screen',
+  'prefs.remember': 'Remember the arrangement', 'prefs.remember.hint': 'Less flicker; saved in GNOME',
+
+  'place.mirrorTitle': 'What {dev} mirrors', 'place.title': 'Where {dev} goes',
+  'place.mirrorHint': 'Pick the monitor; it shows up exactly the same on the device.',
+  'place.liveHint': 'Changes right away, no password. Click a monitor and pick a side.',
+  'place.hint': 'Click a monitor and pick a side. Applies to the next connection.',
+  'place.mirrorOf': 'Mirrored monitor', 'place.anchor': 'Next to which monitor',
+  'place.stageAria': 'Desktop preview', 'place.side': 'Side', 'place.align': 'Align',
+  'place.mirrorMsg': '{Dev} will show {m}.', 'place.tryOther': '{err}. Try another side or alignment.',
+  'place.estimated': ' · estimated size; the real one comes from the device when it connects',
+  'place.tileAria': '{name}, {w} by {h}', 'place.tilePrimaryAria': '{name}, primary, {w} by {h}',
+  'place.deviceAria': '{kind}, {w} by {h}',
+
+  'devs.title': 'Paired devices', 'devs.hint': 'Phones and tablets that have scanned this PC’s code.',
+  'devs.device': 'Device', 'devs.resolution': 'Resolution', 'devs.orientation': 'Orientation', 'devs.network': 'Network',
+  'devs.lastSeen': 'Last seen', 'devs.actions': 'Actions', 'devs.now': 'Now', 'devs.forget': 'Forget', 'devs.forgetAria': 'Forget {name}',
+  'devs.empty': 'None yet. Turn on and scan the code with the OpenAlt app.',
+
+  'home.off': 'A phone or tablet as one more screen — or a mirror of this PC.',
+  'home.starting': 'Starting…', 'home.waiting': 'On · waiting for {dev}', 'home.connected': '{name} connected · {mode}',
+
+  'setup.title': 'Let’s set up <em>this PC</em>', 'setup.sub': 'Two steps, just once. Nothing changes until you press the button.',
+  'setup.sunshine.ok': 'Installed. OpenAlt uses its own configuration; yours stays untouched.',
+  'setup.sunshine.todo': 'The program that streams the screen. From Flathub, no password.',
+  'setup.helper': 'System permission', 'setup.helper.ok': 'Installed. Turning on and off no longer asks for a password.',
+  'setup.helper.todo': 'To create the device’s monitor. Asks for your password once. “Mirror” works without it.',
+  'setup.away': 'Away from home', 'setup.away.text': 'Optional: Tailscale on the PC and on the device. You can do it later.',
+  'setup.install': 'Install', 'setup.seePc': 'See this PC', 'setup.continue': 'Continue',
+
+  'devices.title': '<em>Devices</em>', 'devices.sub': 'Phones and tablets paired with this PC.',
+  'pc.title': 'This <em>PC</em>', 'pc.sub': 'OpenAlt is for any PC, but every PC is different. This is about this one.',
+  'pc.summary': 'Summary', 'pc.summary.text': '“New screen” and “Mirror” work here',
+  'check.session': 'Session', 'check.desktop': 'Desktop', 'check.gpu': 'Graphics card', 'check.multi-gpu': 'Several cards',
+  'check.free-output': 'Free video output', 'check.connector': 'Output identification', 'check.helper': 'System permission',
+  'env.session.ok': 'X11 session.',
+  'env.session.bad': '"{session}" session: for now OpenAlt only works on X11 (Wayland is planned).',
+  'env.desktop.ok': 'GNOME desktop.', 'env.desktop.mute': 'GNOME found, but it did not report the monitors.',
+  'env.desktop.bad': '"{desktop}" desktop: for now the "New screen" only works on GNOME.',
+  'env.gpu.unknown': 'Graphics card not identified.',
+  'env.gpu.untested': 'Graphics card ({drivers}) not yet tested with OpenAlt; it may work.',
+  'env.gpu.ok': 'Tested graphics card ({drivers}).',
+  'env.multi-gpu.untested': 'More than one graphics card: combination not yet tested.',
+  'env.free-output.ok': 'Free video output: {output}.',
+  'env.free-output.bad': 'No free video output (all in use). An HDMI/DisplayPort "dummy" adapter solves it.',
+  'env.connector.ok': 'Free output identified in the system.',
+  'env.connector.bad': 'Could not safely identify the free output in the system.',
+  'env.helper.ok': 'System permission installed.',
+  'env.helper.missing': 'The system permission still needs installing (asked once, during installation).',
+
+  'about.title': 'About <em>OpenAlt</em>',
+  'about.sub': 'A phone or tablet as an extra monitor, a mirror or a game screen. Open source (GPL-3.0).',
+  'about.catta': 'Made with care, for everyone.', 'about.cattaSite': 'Catta Studios website',
+  'about.ours': 'OpenAlt', 'about.ours.text': 'The code of this app and of the phone app. This is our repository.',
+  'about.sunshine': 'Screen streaming, by LizardByte (GPL-3.0). Used unmodified.',
+  'about.moonlight': 'The phone and tablet app is a fork of Moonlight Android (GPL-3.0).',
+  'about.common': 'Streaming protocol used by Moonlight (GPL-3.0).',
+  'about.tailscale': 'Access away from home, with your own account.',
+  'about.repo': 'Repository', 'about.openAria': 'Open {name} in the browser',
+  'about.language': 'Language', 'about.language.hint': 'The default is the system language.', 'lang.system': 'System',
+
+  'err.sunshineExited': 'Sunshine closed by itself.',
+  'err.pairRejected': 'Pairing was not accepted. Generate another code and try again.',
+  'err.forget': 'Could not forget the device: {detail}',
+  'err.helperLater': 'The system permission is installed by the OpenAlt installer (next milestone).',
+  'layout.noMonitors': 'GNOME did not report the monitors', 'layout.badRequest': 'Invalid request',
+  'layout.no-anchor': 'Reference monitor not found: {monitor}', 'layout.duplicate': 'There is already a monitor called {monitor}',
+  'layout.overlap': 'Doesn’t fit there: it would cover {monitor}', 'layout.overlap-pair': 'Monitors {a} and {b} would overlap',
+  'layout.loose': 'Monitor {monitor} would be left loose, not touching any other', 'layout.impossible': 'Arrangement impossible to solve',
+};
+
+const DICTS: Record<Lang, Dict> = { pt: PT, es: ES, en: EN };
+
+/** O idioma do sistema entre os três; se não for nenhum, inglês. */
+function systemLang(): Lang {
+  for (const l of navigator.languages?.length ? navigator.languages : [navigator.language]) {
+    const base = (l || '').slice(0, 2).toLowerCase() as Lang;
+    if (LANGS.includes(base)) return base;
+  }
+  return 'en';
+}
+
+function langPref(): LangPref {
+  try {
+    const v = localStorage.getItem('openalt-lang');
+    return v === 'pt' || v === 'es' || v === 'en' ? v : 'system';
+  } catch { return 'system'; }
+}
+
+let lang: Lang = langPref() === 'system' ? systemLang() : (langPref() as Lang);
+
+function setLangPref(p: LangPref) {
+  try {
+    if (p === 'system') localStorage.removeItem('openalt-lang');
+    else localStorage.setItem('openalt-lang', p);
+  } catch { /* sem armazenamento: vale só nesta abertura */ }
+  lang = p === 'system' ? systemLang() : p;
+  applyStaticTexts();
+}
+
+/** Texto no idioma atual. Chave sem tradução: português; nem em português: a própria chave. */
+function t(key: string, vars: Record<string, string | number> = {}): string {
+  const s = DICTS[lang][key] ?? PT[key] ?? key;
+  return s.replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m));
+}
+
+/** Os textos fixos do index.html (trilho, tema): data-i18n-aria e data-i18n-tip. */
+function applyStaticTexts() {
+  document.documentElement.lang = HTML_LANG[lang];
+  document.querySelectorAll<HTMLElement>('[data-i18n-aria]').forEach((el) => el.setAttribute('aria-label', t(el.dataset.i18nAria!)));
+  document.querySelectorAll<HTMLElement>('[data-i18n-tip]').forEach((el) => { el.dataset.tip = t(el.dataset.i18nTip!); });
+}

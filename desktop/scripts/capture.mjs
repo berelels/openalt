@@ -20,12 +20,20 @@ const shots = [
   { name: '08-tres-monitores', theme: 'dark', clicks: ['[data-m="tres"]', '[data-dev="celular"]', '.seg [data-anchor="DP-1"]'] },
   { name: '09-espelhar', theme: 'light', clicks: ['[data-dev="tablet"]', '[data-mode="mirror"]'] },
   { name: '10-aparelhos', theme: 'light', clicks: ['[data-p="off"]', '.rail-btn[data-view="devices"]'] },
+  { name: '11-sobre', theme: 'light', clicks: ['[data-p="off"]', '.rail-btn[data-view="about"]'] },
+  { name: '12-sobre-es-escuro', theme: 'dark', lang: 'es', clicks: ['[data-p="off"]', '.rail-btn[data-view="about"]'] },
+  { name: '13-pronto-en', theme: 'light', lang: 'en', clicks: ['[data-p="off"]'] },
+  { name: '14-qr-es', theme: 'light', lang: 'es', clicks: ['[data-p="waiting"]'] },
+  { name: '15-tablet-en', theme: 'dark', lang: 'en', clicks: ['[data-dev="tablet"]'] },
 ];
 
 app.whenReady().then(async () => {
   mkdirSync(out, { recursive: true });
   const win = new BrowserWindow({ width: 1366, height: 900, show: false, webPreferences: { offscreen: true } });
   for (const shot of shots) {
+    await win.loadURL(page.href);
+    // idioma: o do sistema, ou o escolhido (como na aba Sobre); recarrega para valer desde o início
+    await win.webContents.executeJavaScript(shot.lang ? `localStorage.setItem('openalt-lang', '${shot.lang}')` : `localStorage.removeItem('openalt-lang')`);
     await win.loadURL(page.href);
     await win.webContents.executeJavaScript(`document.querySelector('[data-theme-opt="${shot.theme}"]').click()`);
     for (const sel of shot.clicks) {
