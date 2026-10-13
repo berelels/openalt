@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>19 Editorial com aparelhos</title>
+<link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="../devices.css">
+<style>
+body { background: var(--paper); }
+body::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(38,33,27,.07) 1px, transparent 1px); background-size: 22px 22px; }
+nav { position: absolute; top: 36px; left: 90px; right: 90px; display: flex; align-items: center; justify-content: space-between; padding-bottom: 24px; border-bottom: 1px solid var(--line); z-index: 5; }
+nav ul { display: flex; gap: 40px; list-style: none; font-size: 15px; font-weight: 500; color: var(--muted); }
+nav .r { display: flex; gap: 22px; align-items: center; font-size: 15px; font-weight: 500; }
+nav .dl { display: inline-flex; gap: 8px; align-items: center; background: var(--ink); color: var(--paper); padding: 13px 22px; border-radius: 999px; font-weight: 600; }
+h1 { position: absolute; left: 90px; top: 140px; font-family: 'Newsreader'; font-weight: 400; font-size: 92px; line-height: .95; letter-spacing: -0.035em; z-index: 3; }
+h1 em { font-style: italic; color: var(--red-ink); }
+.panels i { position: absolute; top: 330px; width: 190px; height: 470px; z-index: 1; }
+.lede { position: absolute; left: 90px; top: 480px; width: 250px; font-size: 15px; font-weight: 600; line-height: 1.5; z-index: 3; }
+.lede::after { content: ''; display: block; width: 46px; height: 3px; background: var(--red); margin-top: 14px; }
+.ctas { position: absolute; left: 90px; top: 610px; display: flex; flex-direction: column; gap: 10px; z-index: 3; }
+.ctas > span { display: inline-flex; gap: 8px; align-items: center; padding: 15px 24px; border-radius: 999px; font-weight: 600; font-size: 15px; width: max-content; }
+.ctas .red { background: var(--red); } .ctas .out { border: 1.5px solid var(--ink); }
+.L { position: absolute; left: 380px; top: 470px; z-index: 3; }
+.P { position: absolute; left: 790px; top: 450px; z-index: 4; transform: rotate(5deg); }
+.b1 { position: absolute; left: 400px; top: 330px; z-index: 4; }
+.b2 { position: absolute; left: 820px; top: 300px; z-index: 4; }
+.note { position: absolute; font-family: 'Newsreader'; font-style: italic; font-size: 22px; color: var(--red-ink); z-index: 4; }
+.card { position: absolute; right: 90px; top: 150px; width: 270px; background: #F2B9B4; z-index: 3; }
+.card div { padding: 22px; } .card div:first-child { font-family: 'Newsreader'; font-size: 26px; color: #6B1F1A; line-height: 1.1; border-bottom: 2px dashed rgba(107,31,26,.25); }
+.card div:last-child { font-size: 13px; line-height: 1.5; color: #6B1F1A; display: flex; justify-content: space-between; gap: 16px; align-items: end; }
+.diamond { position: absolute; right: 400px; top: 210px; width: 46px; height: 46px; background: var(--ink); transform: rotate(45deg); border-radius: 6px; display: grid; place-items: center; z-index: 3; }
+.diamond span { transform: rotate(-45deg); color: #fff; font-family: 'Newsreader'; font-size: 22px; }
+.quote { position: absolute; right: 90px; top: 430px; width: 290px; font-size: 18px; font-weight: 600; line-height: 1.5; z-index: 3; }
+.quote u { text-decoration-color: var(--red); text-decoration-thickness: 3px; text-underline-offset: 4px; }
+.stats { position: absolute; right: 90px; top: 580px; width: 290px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; z-index: 3; }
+.stats b { display: block; font-family: 'Newsreader'; font-weight: 400; font-size: 42px; letter-spacing: -0.02em; }
+.stats small { font-size: 12px; color: var(--muted); }
+.foot { position: absolute; right: 90px; bottom: 54px; width: 290px; border-top: 1px solid var(--line); padding-top: 18px; display: flex; gap: 14px; align-items: center; font-size: 13px; z-index: 3; }
+.foot .dot { width: 42px; height: 42px; border-radius: 50%; background: var(--sage); display: grid; place-items: center; color: #fff; flex: none; }
+.scroll { position: absolute; left: 90px; bottom: 50px; font-size: 12px; font-weight: 700; letter-spacing: .08em; display: flex; gap: 6px; align-items: center; z-index: 3; }
+</style></head><body>
+<nav>{{LOGO}}<ul><li>How it works</li><li>Modes</li><li>Away from home</li><li>Open source</li></ul><div class="r"><span>GitHub</span><span class="dl"><span class="ms">download</span>Download</span></div></nav>
+<h1>Freedom to stream<br><em>anywhere,</em> for anyone.</h1>
+<div class="panels"><i style="left:400px;background:#F3E2DE"></i><i style="left:620px;background:#E3EDE0"></i></div>
+<p class="lede">Phone or tablet, standing or lying down — on any side of any monitor.</p>
+<div class="ctas"><span class="red"><span class="ms">download</span>Get it for Linux</span><span class="out">See how it works</span></div>
+<div class="b1">{{BUBBLE:monitor:120}}</div>
+<div class="b2">{{BUBBLE:pad:130:flip}}</div>
+<div class="L"><div class="lap" style="--w:470px"><div class="lid"><div class="scr"><img src="../img/app-claro.png" alt=""></div></div><div class="deck"></div><div class="shadow"></div></div></div>
+<div class="P">{{PHONE:130}}</div>
+<span class="note" style="left:520px;top:760px">your PC… one more screen</span>
+<div class="diamond"><span>&amp;</span></div>
+<div class="card"><div>Streaming made simple.</div><div><span>Scan one QR code on your phone. No PIN, no settings, no account.</span><span class="ms">north_east</span></div></div>
+<p class="quote">Your PC follows you <u>anywhere</u> — the sofa, the café, the train — on <u>any</u> phone or tablet.</p>
+<div class="stats"><span><b>3 modes</b><small>new screen · mirror · game</small></span><span><b>Free</b><small>open source, GPL-3.0</small></span></div>
+<div class="foot"><span class="dot"><span class="ms">public</span></span>Away from home with Tailscale — your account, your network.</div>
+<span class="scroll">SCROLL DOWN <span class="ms" style="font-size:16px">south</span></span>
+</body></html>

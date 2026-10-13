@@ -99,3 +99,43 @@ personagem.
 **Combinações sem o boneco:**
 - 15 ou 17 como abertura e 18 para explicar a "Nova tela";
 - ou só a 16, para uma página mais leve e calorosa.
+
+## 01 + 03 sem o boneco (19–22), com as referências gsap.com · huyml.co · illoca.unseen.co
+
+O que vem de cada favorita:
+- **Da 01:** a manchete com serifa e o "anywhere" itálico vermelho, os aparelhos de verdade, a nota à mão "your PC… one more screen" e os números grandes.
+- **Da 03:** a grade editorial, os painéis pastel, os balões (monitor e controle), o cartão rosa, o losango "&" e as palavras sublinhadas.
+
+**19 · Editorial com aparelhos** (a mistura mais direta)
+- **Imagem:** o layout da 03 com o notebook e o celular no lugar do boneco, e os balões saindo deles.
+- **Rolagem:**
+  1. os painéis pastel sobem;
+  2. o notebook entra;
+  3. o celular encaixa ao lado;
+  4. os balões "estouram" (escala de 0 a 1, com uma curva elástica);
+  5. o cartão rosa vira, mostrando o verso.
+
+**20 · Papel quadriculado** (inspirada no illoca)
+- **Imagem:** fundo de planta baixa e um mosaico de blocos geométricos nas cores da marca (wi-fi, casa, controle, QR), com anotações de medida ("side: right · align: top") e um carimbo.
+- **Rolagem:**
+  1. os blocos do mosaico giram e trocam de lugar, como peças que se encaixam;
+  2. as linhas de medida se desenham;
+  3. o celular "encaixa" ao lado do notebook, como numa planta.
+
+**21 · Rabiscos** (inspirada no gsap.com)
+- **Imagem:** a manchete com um círculo feito à mão em volta de "anywhere" e uma seta até o notebook.
+- **Rolagem:**
+  1. as palavras da manchete "acendem" uma a uma (cinza → tinta) com a rolagem;
+  2. o círculo e a seta se desenham;
+  3. os sublinhados do texto aparecem em sequência.
+
+  Fica a cara do site do GSAP, mas com o papel e a serifa do OpenAlt.
+
+**22 · Colagem** (inspirada no huyml.co)
+- **Imagem:** aparelhos, balões e selos como adesivos com borda branca e sombra; uma faixa preta correndo com o slogan.
+- **Rolagem:**
+  1. os adesivos se espalham e giram um pouco (*parallax*: cada um numa velocidade);
+  2. a faixa corre na direção da rolagem;
+  3. ao passar o mouse, um adesivo "descola".
+
+**Sugestão:** a 21 ou a 19 como topo da página, e a 20 ou a 22 numa seção logo abaixo (ex.: "como funciona").

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>21 Rabiscos</title>
+<link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="../devices.css">
+<style>
+body { background: #FBF6EE; }
+nav { position: absolute; top: 34px; left: 80px; right: 80px; display: flex; align-items: center; justify-content: space-between; z-index: 6; }
+nav ul { display: flex; gap: 34px; list-style: none; font-size: 15px; font-weight: 500; color: var(--muted); }
+nav .dl { display: inline-flex; gap: 8px; align-items: center; background: var(--ink); color: var(--paper); padding: 13px 22px; border-radius: 999px; font-weight: 600; font-size: 15px; }
+h1 { position: absolute; left: 80px; top: 130px; width: 900px; font-family: 'Newsreader'; font-weight: 400; font-size: 104px; line-height: .98; letter-spacing: -0.035em; z-index: 3; }
+h1 .dim { color: rgba(38,33,27,.22); }
+h1 em { font-style: italic; color: var(--red-ink); position: relative; }
+svg.scrib { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.lede { position: absolute; left: 84px; top: 520px; width: 470px; font-size: 18px; line-height: 1.55; color: var(--muted); z-index: 3; }
+.lede u { color: var(--ink); text-decoration-color: var(--red); text-decoration-thickness: 3px; text-underline-offset: 4px; }
+.ctas { position: absolute; left: 80px; top: 640px; display: flex; gap: 12px; z-index: 3; }
+.ctas > span { display: inline-flex; gap: 8px; align-items: center; padding: 16px 26px; border-radius: 999px; font-weight: 600; font-size: 16px; }
+.ctas .red { background: var(--red); } .ctas .out { border: 1.5px solid var(--ink); }
+.L { position: absolute; left: 780px; top: 470px; z-index: 3; }
+.P { position: absolute; left: 1210px; top: 400px; z-index: 4; transform: rotate(6deg); }
+.b1 { position: absolute; left: 1060px; top: 120px; z-index: 4; transform: rotate(-6deg); }
+.b2 { position: absolute; left: 1250px; top: 200px; z-index: 4; transform: rotate(8deg); }
+.card { position: absolute; left: 600px; top: 730px; width: 300px; background: #F2B9B4; padding: 16px 18px; font-size: 13px; line-height: 1.45; color: #6B1F1A; z-index: 5; transform: rotate(-2deg); }
+.card b { display: block; font-family: 'Newsreader'; font-weight: 400; font-size: 22px; margin-bottom: 4px; }
+.prog { position: absolute; left: 80px; bottom: 44px; font-family: 'JetBrains Mono'; font-size: 12px; color: var(--muted); z-index: 3; display: flex; gap: 12px; align-items: center; }
+.prog i { width: 140px; height: 3px; border-radius: 3px; background: var(--line); position: relative; } .prog i::after { content: ''; position: absolute; inset: 0 55% 0 0; background: var(--red); border-radius: 3px; }
+</style></head><body>
+<nav>{{LOGO}}<ul><li>How it works</li><li>Modes</li><li>Away</li><li>Open source</li></ul><span class="dl"><span class="ms">download</span>Download</span></nav>
+<h1>Freedom to stream <em>anywhere,</em> <span class="dim">for anyone.</span></h1>
+<svg class="scrib" viewBox="0 0 1440 900" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- círculo à mão em volta de "anywhere," -->
+  <path d="M110 236c90-34 300-38 390-8 52 18 44 70-18 86-120 30-310 26-392-6-52-20-40-64 32-78 54-10 140-14 214-8" stroke="#FF746C" stroke-width="5"/>
+  <!-- seta até o notebook -->
+  <path d="M520 318c150 -10 330 40 410 140" stroke="#26211B" stroke-width="3"/><path d="M906 452l26 10 2-28" stroke="#26211B" stroke-width="3"/>
+  <!-- risquinhos de destaque -->
+  <path d="M90 470c120-12 260-10 380 4" stroke="#8FBF92" stroke-width="6"/>
+  <path d="M1180 120l14-22M1204 132l22-12M1170 150l-24 4" stroke="#26211B" stroke-width="3"/>
+</svg>
+<p class="lede">Turn the phone or tablet you already have into <u>a second monitor</u>, <u>a mirror</u> of your PC or <u>a game screen</u>. Scan one QR code. That’s the setup.</p>
+<div class="ctas"><span class="red"><span class="ms">download</span>Get it for Linux</span><span class="out">See how it works</span></div>
+<div class="b1">{{BUBBLE:monitor:120}}</div><div class="b2">{{BUBBLE:pad:110:flip}}</div>
+<div class="L"><div class="lap" style="--w:460px"><div class="lid"><div class="scr"><img src="../img/app-claro.png" alt=""></div></div><div class="deck"></div><div class="shadow"></div></div></div>
+<div class="P">{{PHONE:130}}</div>
+<div class="card"><b>Streaming made simple.</b>Scan one QR code on your phone. No PIN, no settings, no account.</div>
+<div class="prog">scroll<i></i>the words light up as you read</div>
+</body></html>
