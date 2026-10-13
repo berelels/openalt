@@ -362,7 +362,8 @@ public class SettingsActivity extends Activity {
         ((TextView) row.findViewById(R.id.oaRowTitle)).setText(it.title);
         TextView hint = row.findViewById(R.id.oaRowHint);
         if (it.summary != null) {
-            hint.setText(it.summary);
+            // resumos de lista do Android usam %s para o valor; aqui o valor já aparece ao lado
+            hint.setText(it.summary.toString().replace(": %s", "").replace("%s", "").trim());
         }
         else {
             hint.setVisibility(View.GONE);

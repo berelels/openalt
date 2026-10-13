@@ -87,7 +87,7 @@
     <string name="openalt_pad_settings">Ajustes</string>
     <string name="openalt_intro_skip">Toca para saltar</string>
     <string name="openalt_pref_controller_title">Estilo de los botones del mando</string>
-    <string name="openalt_pref_controller_summary" formatted="false">Los nombres de los botones en OpenAlt: %s</string>
+    <string name="openalt_pref_controller_summary">Los nombres de los botones que muestra OpenAlt.</string>
     <string name="openalt_controller_auto">Igual que el mando</string>
     <string name="openalt_controller_xbox">Xbox (A B X Y)</string>
     <string name="openalt_controller_playstation">PlayStation (✕ ○ □ △)</string>

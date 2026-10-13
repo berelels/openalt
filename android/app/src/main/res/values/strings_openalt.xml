@@ -90,7 +90,7 @@
     <string name="openalt_pad_settings">Settings</string>
     <string name="openalt_intro_skip">Tap to skip</string>
     <string name="openalt_pref_controller_title">Controller button style</string>
-    <string name="openalt_pref_controller_summary" formatted="false">The button names shown in OpenAlt: %s</string>
+    <string name="openalt_pref_controller_summary">The button names shown in OpenAlt.</string>
     <string name="openalt_controller_auto">Match the controller</string>
     <string name="openalt_controller_xbox">Xbox (A B X Y)</string>
     <string name="openalt_controller_playstation">PlayStation (✕ ○ □ △)</string>
