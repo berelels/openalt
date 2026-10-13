@@ -6,6 +6,9 @@
         <item name="android:textColorSecondary">@color/oa_muted</item>
     </style>
 
+    <!-- base vazia: os estilos "OpenAlt.X" herdam dela pelo nome -->
+    <style name="OpenAlt" />
+
     <style name="OpenAlt.Wordmark">
         <item name="android:fontFamily">serif</item>
         <item name="android:textSize">34sp</item>
