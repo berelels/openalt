@@ -21,6 +21,8 @@ import {
   drmConnectorFor,
   findSunshine,
   isUiScale,
+  reloadMonitorSensitiveExtensions,
+  restoreExtensions,
   chooseOutput,
   windowMaximizer,
   forgetPairedDevice,
@@ -128,6 +130,7 @@ export class Controller extends EventEmitter {
     // sobras de uma execução que caiu: nosso Sunshine e a "Nova tela"
     await stopLeftoverSunshine(join(sunshineDir(this.paths), 'sunshine.conf')).catch(() => {});
     await clearConnection(this.paths.runtime).catch(() => {});
+    await restoreExtensions({ run, runtimeDir: this.paths.runtime }).catch(() => {});
     await this.refreshSystem();
     this.phase = this.sunshineInstalled ? 'off' : 'setup';
     this.emitState();
@@ -358,6 +361,9 @@ export class Controller extends EventEmitter {
       this.connection = c;
       if (this.phase === 'waiting' || this.phase === 'connected') this.phase = c ? 'connected' : 'waiting';
       this.mutter = await getMutterState(run).catch(() => this.mutter);
+      // monitor do aparelho entrou ou saiu: extensões que guardam o monitor pelo número se perdem
+      // (ArcMenu abria o Super no tablet); recarregar só elas
+      if (c?.mode !== 'mirror') void reloadMonitorSensitiveExtensions({ run, runtimeDir: this.paths.runtime }).catch(() => {});
       this.updateMaximizer();
       this.emitState();
     };

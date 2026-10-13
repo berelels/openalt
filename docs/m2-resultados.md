@@ -77,3 +77,45 @@ Decisões: ADR-0012. Código: `android/`, com o fork do Moonlight Android 12.2 e
 4. Tocar no PC na lista. Esperado: abre direto no modo escolhido no PC (atenção: "Nova tela" mexe nos
    monitores).
 5. Testar também um QR vencido (esperar 2 min) e um QR de outro PC/certificado, se houver.
+
+## 1º teste real no tablet (12/10, Galaxy Tab S6 Lite SM-P619, Android 14)
+
+### Funcionou
+- **O APK instala ao lado do Moonlight.** Cada build do CI assinava com uma chave nova e o tablet
+  recusava atualizar, então agora existe uma chave de debug fixa no projeto,
+  `android/openalt-debug.keystore`. Ela é só para testes e não é a de release.
+- **Parear com QR:**
+  - Funcionou de ponta a ponta, sem digitar o PIN.
+  - O tablet ficou salvo no Sunshine como "SM-P619", o modelo.
+  - Exigiu duas correções:
+    1. **O leitor fechava ao abrir a câmera:** `ClassNotFoundException: androidx.core.content.ContextCompat`
+       (o zxing-android-embedded 4.x não traz o androidx.core). Agora o projeto inclui
+       `androidx.core:core:1.13.1` e liga `android.useAndroidX=true`.
+    2. **O PC não confirmava sozinho:** o Sunshine guarda o `devicename` sem decodificar, e o pedido
+       chegou como `OpenAlt-3bf6e2b6d6a0%20SM-P619`. O `matchPending` e o `friendlyName` agora
+       decodificam (`decodeName`).
+- **Tocar no PC:**
+  - Entra direto no app "OpenAlt", sem a grade.
+  - Na "Nova tela", o monitor criado foi de 1328×800 (2000×1200 a 150%), abaixo do 27″, em
+    DisplayPort-1.
+  - O cursor aparece.
+  - A 10 Mbps ficou fluido.
+  - A janela arrastada para o tablet maximizou sozinha.
+
+### Problemas
+- **O Super abria no tablet, e o papel de parede ficava preto nele:**
+  - O ArcMenu guarda o monitor pelo número. No X11, o GNOME ordena os monitores pelo nome da saída
+    (`DisplayPort-1` vem antes de `DisplayPort-2`), então o tablet virava o nº 0.
+  - Reiniciar o GNOME (Alt+F2 → r) resolvia as duas coisas; foi a pessoa que descobriu.
+  - Agora, ao conectar e ao desconectar, o app recarrega as extensões ligadas
+    (`reloadMonitorSensitiveExtensions`), com religação automática se cair no meio.
+  - **Não testado ainda.**
+- **Vídeo do YouTube (Brave) cheio de artefatos e travado ao ir para o tablet:**
+  - O processo de GPU do Brave caiu: `GPU state invalid after WaitForGetOffsetInRange`, depois
+    `GPU process exited unexpectedly: exit_code=512`, às 23:20:49.
+  - O travamento das 19:24 (M1) teve o mesmo sinal, e a janela do Claude desktop estava no tablet.
+    Então a culpa provavelmente **não** era o `xrandr`.
+  - Hipótese: o conector forçado não tem monitor de verdade, e as apps com GL/vsync (Chromium,
+    Electron) travam no monitor dele. **Investigar** (ADR-0009).
+- **Cursor:** continua a captura X11, com o cursor duplicado na borda quando está em outro monitor.
+  A pessoa preferiu isso a não ter cursor.

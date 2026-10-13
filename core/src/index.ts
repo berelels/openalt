@@ -3,6 +3,7 @@ export * from './layout.ts';
 export * from './paths.ts';
 export * from './settings.ts';
 export { windowMaximizer } from './linux-x11/windows.ts';
+export { reloadMonitorSensitiveExtensions, restoreExtensions } from './linux-x11/shell-extensions.ts';
 export { drmConnectorFor, listDrmConnectors, parseConnectorIds } from './linux-x11/drm.ts';
 export * from './connection.ts';
 export * from './pairing.ts';
