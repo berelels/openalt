@@ -17,7 +17,7 @@ app.whenReady().then(async () => {
     await win.webContents.executeJavaScript('document.fonts.ready.then(() => true)');
     await new Promise((r) => setTimeout(r, 600));
     const img = await win.webContents.capturePage({ x: 0, y: 0, width: 1440, height: 900 });
-    writeFileSync(join(here, 'png', p.replace('.html', '.png')), img.toPNG());
+    writeFileSync(join(here, 'png', p.split('/').pop().replace('.html', '.png')), img.toPNG());
     console.log('ok', p);
   }
   app.quit();

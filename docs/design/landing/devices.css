@@ -67,3 +67,22 @@
 .desk .win .body { padding: 5% 6%; display: grid; grid-template-columns: 1fr 1fr; gap: 5%; height: 91%; }
 .desk .win .body div { border-radius: 6px; background: #EFE8DA; }
 .desk .win .body div:first-child { grid-row: span 2; background: linear-gradient(160deg, #26211B, #4a4038); }
+
+/* ── personagem (personagem.snippet.html): cores por variável, para claro e escuro ── */
+.char { --ln: #26211B; --body: #F2B33D; --face: #FBF6EE; --hair: #26211B; --b1: #8FBF92; --b2: #FF746C; --in: #FBF6EE;
+  position: absolute; width: 600px; height: 560px; }
+.char svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.char .ln { stroke: var(--ln); } .char .ft { stroke: var(--ft, var(--ln)); } .char .f-ln { fill: var(--ln); }
+.char .f-body { fill: var(--body); } .char .f-face { fill: var(--face); } .char .f-hair { fill: var(--hair); }
+.char .f-b1 { fill: var(--b1); } .char .f-b2 { fill: var(--b2); } .char .f-in { fill: var(--in); }
+.char .intab { position: absolute; left: 150px; top: 368px; transform: rotate(-8deg); }
+
+.char.nobubbles .bubbles { display: none; }
+.char .inphone { position: absolute; left: 267px; top: 350px; transform: rotate(-6deg); }
+/* cena de jogo (sem marca de jogo nenhum) */
+.game { position: absolute; inset: 0; background: linear-gradient(180deg, #2a1d4a 0%, #8b3a62 45%, #ff746c 62%, #f2b33d 75%); overflow: hidden; }
+.game .sun { position: absolute; left: 50%; top: 34%; width: 26%; aspect-ratio: 1; border-radius: 50%; transform: translateX(-50%); background: repeating-linear-gradient(180deg, #ffd27a 0 6px, transparent 6px 9px); }
+.game .mt { position: absolute; left: 0; right: 0; bottom: 0; height: 50%; background-color: #1a1030; clip-path: polygon(0 40%, 18% 10%, 34% 38%, 52% 0, 70% 32%, 86% 8%, 100% 30%, 100% 100%, 0 100%); }
+.game .car { position: absolute; left: 44%; bottom: 12%; width: 12%; height: 10%; border-radius: 4px 4px 2px 2px; background: #F4EFE8; box-shadow: 0 0 14px rgba(255,255,255,.6); }
+/* celular deitado: o conteúdo gira de volta, para ficar em pé na tela deitada */
+.phn.land .scr > .game, .phn.land .scr > .desk { inset: auto; left: 50%; top: 50%; width: calc(var(--w) * 2.038); height: calc(var(--w) * .894); transform: translate(-50%, -50%) rotate(90deg); }

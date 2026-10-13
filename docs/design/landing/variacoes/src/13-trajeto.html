@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>13 Trajeto</title>
+<link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="../devices.css">
+<style>
+body { background: #FBF6EE; font-family: 'Inter', sans-serif; }
+.glow { position: absolute; border-radius: 50%; filter: blur(90px); }
+.g1 { width: 640px; height: 460px; right: -100px; top: 300px; background: radial-gradient(circle, rgba(255,116,108,.4), transparent 70%); }
+.g2 { width: 560px; height: 420px; left: -140px; top: 420px; background: radial-gradient(circle, rgba(143,191,146,.45), transparent 70%); }
+nav { position: absolute; top: 36px; left: 100px; right: 100px; display: flex; align-items: center; justify-content: space-between; z-index: 5; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+nav ul { display: flex; gap: 40px; list-style: none; font-size: 15px; font-weight: 500; }
+.dl { background: var(--ink); color: #fff; padding: 13px 24px; font-weight: 600; font-size: 14px; }
+h1 { position: absolute; left: 100px; top: 140px; font-size: 76px; font-weight: 700; letter-spacing: -0.05em; line-height: 1; z-index: 3; width: 820px; }
+h1 span { font-family: 'Newsreader'; font-weight: 400; font-style: italic; color: var(--red-ink); letter-spacing: -0.03em; }
+.lede { position: absolute; right: 100px; top: 160px; width: 360px; font-size: 17px; line-height: 1.55; color: var(--muted); z-index: 3; }
+.lede b { color: var(--ink); }
+svg.path { position: absolute; inset: 0; z-index: 1; }
+.place { position: absolute; z-index: 3; text-align: center; width: 160px; }
+.place .ic { margin: 0 auto; width: 74px; height: 74px; border-radius: 22px; display: grid; place-items: center; background: #fff; border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+.place .ic .ms { font-size: 34px; }
+.place b { display: block; margin-top: 14px; font-size: 15px; }
+.place small { display: block; margin-top: 2px; font-family: 'JetBrains Mono'; font-size: 11px; color: var(--muted); }
+.place.now .ic { background: var(--red); }
+.char { left: 470px; top: 330px; transform: scale(.66); transform-origin: top center; z-index: 2; }
+.char .bubbles { display: none; }
+.bub { position: absolute; z-index: 4; left: 760px; top: 370px; padding: 12px 16px; border-radius: 18px 18px 18px 4px; background: #fff; border: 2.5px solid var(--ink); font-size: 14px; font-weight: 600; box-shadow: 4px 4px 0 var(--ink); }
+.bub small { display: block; font-family: 'JetBrains Mono'; font-size: 11px; font-weight: 400; color: var(--sage); margin-top: 3px; }
+.prog { position: absolute; left: 100px; right: 100px; bottom: 44px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; z-index: 3; }
+.prog .bar { flex: 1; margin: 0 24px; height: 4px; border-radius: 4px; background: var(--line); position: relative; }
+.prog .bar::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 42%; border-radius: 4px; background: var(--red); }
+</style></head><body>
+<div class="glow g1"></div><div class="glow g2"></div>
+<nav>{{LOGO}}<ul><li>The day</li><li>Features</li><li>Devices</li><li>Open source</li></ul><span class="dl">Download</span></nav>
+<h1>Freedom to stream <span>anywhere,</span><br>for anyone.</h1>
+<p class="lede">Follow one day with OpenAlt: <b>the game starts at home</b>, keeps going on the bus and <b>becomes a second monitor</b> at the café.</p>
+<svg class="path" viewBox="0 0 1440 900" fill="none">
+  <path d="M190 560C330 440 420 760 640 640S900 420 1060 560 1250 700 1260 560" stroke="#26211B" stroke-width="3" stroke-dasharray="2 14" stroke-linecap="round"/>
+  <path d="M190 560C330 440 420 760 640 640S820 520 870 500" stroke="#FF746C" stroke-width="6" stroke-linecap="round"/>
+</svg>
+<div class="place" style="left:110px;top:400px"><div class="ic"><span class="ms">home</span></div><b>Home</b><small>07:55 · Wi-Fi</small></div>
+<div class="place now" style="left:450px;top:690px"><div class="ic"><span class="ms">directions_bus</span></div><b>On the bus</b><small>08:30 · 4G</small></div>
+<div class="place" style="left:1180px;top:430px"><div class="ic"><span class="ms">local_cafe</span></div><b>Café</b><small>09:10 · new screen</small></div>
+{{CHAR:phone-game}}
+<div class="bub">Still racing<small>PC at home · over 4G</small></div>
+<div class="prog"><span>07:55</span><div class="bar"></div><span>09:10</span></div>
+</body></html>
