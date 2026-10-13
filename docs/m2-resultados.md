@@ -137,3 +137,21 @@ Decisões: ADR-0012. Código: `android/`, com o fork do Moonlight Android 12.2 e
   - Simular Alt+F2 → r pelo teclado não é seguro, porque não dá para saber se a caixa abriu.
   - Ficou a recarga das extensões ligadas. Teste ao vivo: o Super abriu no principal e o papel de
     parede apareceu no tablet.
+
+### Som e reinício automático do GNOME (12/10, 23:5x)
+- **Som:**
+  - O "Som também no PC" não fazia nada, porque a escolha de tocar no PC é do cliente e não chegava.
+  - Virou uma opção com três escolhas:
+    - **Aparelho:** padrão do Sunshine.
+    - **PC:** `stream_audio = disabled`; o Sunshine nem transmite.
+    - **Os dois:** o app liga um `module-loopback` da saída do Sunshine para a saída real do PC
+      (`audio.ts`).
+  - A configuração antiga `audioOnHost: true` vira "Os dois".
+  - Não testado ao vivo.
+- **Reinício do GNOME:**
+  - Só recarregar as extensões trazia o Super de volta, mas não o papel de parede, que só volta com
+    Alt+F2 → r.
+  - O app agora digita isso sozinho. Antes, foca a própria janela sem trazê-la para a frente e bloqueia
+    teclas por 5 s.
+  - 1ª tentativa: a caixa abriu, mas o `xdotool type r` não chegou, porque o `type` remapeia o teclado.
+    Trocado por `xdotool key r`. Não testado de novo.

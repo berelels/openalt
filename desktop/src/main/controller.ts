@@ -21,6 +21,10 @@ import {
   drmConnectorFor,
   findSunshine,
   isUiScale,
+  isAudioOut,
+  realSink,
+  startHostEcho,
+  stopHostEcho,
   reloadMonitorSensitiveExtensions,
   restoreExtensions,
   chooseOutput,
@@ -78,7 +82,7 @@ export interface UiState {
   placement: { anchor: string; side: Settings['placement']['side']; align: Settings['placement']['align']; offset: number };
   mode: Settings['mode'];
   mirrorOf: string;
-  audioOnHost: boolean;
+  audio: Settings['audio'];
   rememberLayout: boolean;
   orientation: Settings['orientation'];
   previewKind: Kind;
@@ -174,7 +178,7 @@ export class Controller extends EventEmitter {
       placement: { anchor, side: s.placement.side, align: s.placement.align, offset: s.placement.offset ?? 0 },
       mode: s.mode,
       mirrorOf,
-      audioOnHost: s.audioOnHost,
+      audio: s.audio,
       rememberLayout: s.rememberLayout,
       orientation: s.orientation,
       previewKind: s.previewKind,
@@ -224,6 +228,7 @@ export class Controller extends EventEmitter {
         outputIndex: Math.max(0, outputIndex),
         kmsConnector,
         outputName: output,
+        streamAudio: this.settings.audio !== 'pc',
         name: hostname(),
         prep: {
           runner: this.opts.cli.runner,
@@ -237,6 +242,7 @@ export class Controller extends EventEmitter {
           },
         },
       });
+      this.pcSink = await realSink(run); // antes de o Sunshine trocar a saída padrão
       this.sunshine = await startSunshine(setup.confPath, { kind: this.sunshineKind ?? 'flatpak' });
       const mine = this.sunshine;
       // só é "fechou sozinho" se não fomos nós que mandamos parar
@@ -250,6 +256,30 @@ export class Controller extends EventEmitter {
       await this.desligar();
       this.fail(e);
     }
+  }
+
+  /** Sem reiniciar o GNOME (Wayland, sem xdotool, janela fechada): recarrega as extensões. */
+  async reloadExtensions(): Promise<void> {
+    await reloadMonitorSensitiveExtensions({ run, runtimeDir: this.paths.runtime }).catch(() => {});
+  }
+
+  private pcSink: string | null = null;
+  private echoId: string | null = null;
+
+  /** "Nos dois": com o aparelho conectado, devolve o som da saída do Sunshine para a saída do PC. */
+  private async updateHostEcho() {
+    const want = !!this.connection && this.settings.audio === 'both' && !!this.pcSink;
+    if (want && !this.echoId) this.echoId = await startHostEcho(this.pcSink!, { run }).catch(() => null);
+    if (!want && this.echoId) { await stopHostEcho(this.echoId, run); this.echoId = null; }
+  }
+
+  async setAudio(v: unknown) {
+    if (!isAudioOut(v) || v === this.settings.audio) return;
+    const streamChanged = (v === 'pc') !== (this.settings.audio === 'pc');
+    await this.save({ audio: v });
+    void this.updateHostEcho();
+    // "no PC" liga/desliga a transmissão de som no Sunshine: sem aparelho conectado, religa já
+    if (streamChanged && this.phase === 'waiting') { await this.desligar(); await this.ligar(); }
   }
 
   private stopping = false;
@@ -277,6 +307,8 @@ export class Controller extends EventEmitter {
     this.stopPairing();
     if (this.maximizeTimer) clearInterval(this.maximizeTimer);
     this.maximizeTimer = null;
+    await stopHostEcho(this.echoId, run);
+    this.echoId = null;
     this.watcher?.close();
     this.watcher = null;
     if (this.connection) {
@@ -284,7 +316,7 @@ export class Controller extends EventEmitter {
       await retractDesktop().catch(() => {});
       await clearConnection(this.paths.runtime).catch(() => {});
       this.connection = null;
-      if (wasExtend) await reloadMonitorSensitiveExtensions({ run, runtimeDir: this.paths.runtime }).catch(() => {});
+      if (wasExtend) this.emit('monitors-changed');
     }
     this.mutter = await getMutterState(run).catch(() => this.mutter); // a lista de monitores sem o do aparelho
     await this.sunshine?.stop().catch(() => {});
@@ -366,13 +398,11 @@ export class Controller extends EventEmitter {
       this.mutter = await getMutterState(run).catch(() => this.mutter);
       // monitor do aparelho entrou ou saiu: extensões que guardam o monitor pelo número se perdem
       // (ArcMenu abria o Super no tablet); recarregar só elas
-      // O monitor do aparelho entrou ou saiu: recarrega as extensões do GNOME. Tem o mesmo efeito do
-      // Alt+F2 → r que resolvia o Super (ArcMenu) e o papel de parede no teste com o tablet — e foi
-      // confirmado ao vivo. Reiniciar o Shell não é possível: o serviço recusa (RefuseManualStop).
-      if ((c && c.mode !== 'mirror') || (!c && wasExtend)) {
-        void reloadMonitorSensitiveExtensions({ run, runtimeDir: this.paths.runtime }).catch(() => {});
-      }
+      // O monitor do aparelho entrou ou saiu: o processo principal reinicia o GNOME (Alt+F2 → r). Só
+      // recarregar as extensões resolvia o Super, mas não o papel de parede, que só volta reiniciando.
+      if ((c && c.mode !== 'mirror') || (!c && wasExtend)) this.emit('monitors-changed');
       this.updateMaximizer();
+      void this.updateHostEcho();
       this.emitState();
     };
     this.watcher = watch(this.paths.runtime, () => void update());
@@ -418,7 +448,7 @@ export class Controller extends EventEmitter {
   async setOrientation(o: unknown) { if (o === 'auto' || o === 'portrait' || o === 'landscape') await this.save({ orientation: o }); }
   async setPreviewKind(k: unknown) { if (k === 'phone' || k === 'tablet') await this.save({ previewKind: k }); }
   async setPref(key: unknown, value: unknown) {
-    if ((key === 'audioOnHost' || key === 'rememberLayout' || key === 'maximizeOnDevice') && typeof value === 'boolean') {
+    if ((key === 'rememberLayout' || key === 'maximizeOnDevice') && typeof value === 'boolean') {
       await this.save({ [key]: value });
       this.updateMaximizer();
     }

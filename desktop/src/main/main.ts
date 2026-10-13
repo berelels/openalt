@@ -2,6 +2,7 @@
 // com este processo só por IPC, e só por canais conhecidos vindos da nossa própria página.
 import { app, BrowserWindow, ipcMain, screen, type IpcMainInvokeEvent } from 'electron';
 import { Controller } from './controller.js';
+import { run } from '@openalt/core';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -75,6 +76,8 @@ function createWindow(): void {
 
   // F11 alterna a tela cheia (Esc é tratado na página: primeiro pula a abertura, depois sai).
   win.webContents.on('before-input-event', (e, input) => {
+    // enquanto o OpenAlt digita Alt+F2 → r, nenhuma tecla chega à página (ver restartShell)
+    if (Date.now() < keyGuardUntil) { e.preventDefault(); return; }
     if (input.type === 'keyDown' && input.key === 'F11') {
       e.preventDefault();
       win.setFullScreen(!win.isFullScreen());
@@ -93,11 +96,48 @@ function createWindow(): void {
   win.on('enter-full-screen', notify);
   win.on('leave-full-screen', notify);
 
+  const onMonitors = () => void restartShell(win).then((ok) => (ok ? undefined : controller.reloadExtensions()));
+  controller.on('monitors-changed', onMonitors);
+  win.on('closed', () => controller.off('monitors-changed', onMonitors));
+
   const push = (s: unknown) => { if (!win.isDestroyed()) win.webContents.send('openalt:state', s); };
   controller.on('state', push);
   win.on('closed', () => controller.off('state', push));
 
   void win.loadFile(RENDERER);
+}
+
+/**
+ * Reinicia o GNOME Shell como a pessoa faz à mão: Alt+F2 → r → Enter (X11). Depois que o monitor do
+ * aparelho entra ou sai, é o único jeito de o papel de parede voltar (o serviço do Shell recusa
+ * reiniciar por comando). Segurança: antes, a janela do OpenAlt vai para a frente e passa a ignorar
+ * teclas por alguns segundos — se a caixa do Alt+F2 não abrir, o "r" e o Enter caem no próprio
+ * OpenAlt e não fazem nada, em vez de irem para outro app da pessoa.
+ */
+let keyGuardUntil = 0;
+async function restartShell(win: BrowserWindow): Promise<boolean> {
+  if (process.env.XDG_SESSION_TYPE !== 'x11' || win.isDestroyed()) return false;
+  const id = String(win.getNativeWindowHandle().readUInt32LE(0));
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  try {
+    await run('xdotool', ['version']);
+    keyGuardUntil = Date.now() + 5000;
+    // foco no OpenAlt SEM trazer a janela para a frente (windowfocus, não windowactivate)
+    await run('xdotool', ['windowfocus', '--sync', id]).catch(() => {});
+    await sleep(200);
+    await run('xdotool', ['key', '--clearmodifiers', 'alt+F2']);
+    await sleep(700);
+    // "key r", não "type r": o type remapeia o teclado e o GNOME perdia a tecla (1º teste: a caixa
+    // abriu, mas o r e o Enter não chegaram)
+    await run('xdotool', ['key', '--clearmodifiers', 'r']);
+    await sleep(120);
+    await run('xdotool', ['key', '--clearmodifiers', 'Return']);
+    return true;
+  } catch {
+    return false;
+  } finally {
+    setTimeout(() => { keyGuardUntil = 0; }, 2000);
+  }
 }
 
 // ── canais da interface → controlador (todos conferem a origem; argumentos validados lá) ──
@@ -111,6 +151,7 @@ const actions: Record<string, (...args: unknown[]) => Promise<unknown>> = {
   setMode: (m) => controller.setMode(m),
   setMirrorOf: (id) => controller.setMirrorOf(id),
   setOrientation: (o) => controller.setOrientation(o),
+  setAudio: (v) => controller.setAudio(v),
   setUiScale: (v) => controller.setUiScale(v),
   setPreviewKind: (k) => controller.setPreviewKind(k),
   setPref: (k, v) => controller.setPref(k, v),

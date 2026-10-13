@@ -59,6 +59,8 @@ export interface SunshineConfOptions {
    * acaso quando o monitor virtual era a primeira saída). Sem nome, usa o índice (versões antigas).
    */
   outputName?: string;
+  /** false = o Sunshine não transmite som (som só no PC) */
+  streamAudio?: boolean;
 }
 
 /** Nome de conector no formato do Sunshine (tipo DRM + índice), ex.: "DP-1". */
@@ -80,6 +82,7 @@ export function sunshineConf(o: SunshineConfOptions): string {
     `cert = ${join(o.dir, 'credentials', 'cacert.pem')}`,
     `pkey = ${join(o.dir, 'credentials', 'cakey.pem')}`,
     `log_path = ${join(o.dir, 'sunshine.log')}`,
+    ...(o.streamAudio === false ? ['stream_audio = disabled'] : []),
     ...(process.env.OPENALT_SUNSHINE_DEBUG ? ['min_log_level = debug'] : []),
     '',
   ].join('\n');
@@ -154,7 +157,7 @@ export interface SetupResult {
  */
 export async function writeSunshineSetup(
   paths: Paths,
-  o: { outputIndex: number; name: string; kmsConnector?: string; outputName?: string; prep: PrepScriptOptions },
+  o: { outputIndex: number; name: string; kmsConnector?: string; outputName?: string; streamAudio?: boolean; prep: PrepScriptOptions },
 ): Promise<SetupResult> {
   const dir = sunshineDir(paths);
   await mkdir(join(dir, 'credentials'), { recursive: true, mode: 0o700 });
@@ -166,7 +169,7 @@ export async function writeSunshineSetup(
   await chmod(prepPath, 0o700);
 
   const confPath = join(dir, 'sunshine.conf');
-  await writeFile(confPath, sunshineConf({ dir, outputIndex: o.outputIndex, name: o.name, kmsConnector: o.kmsConnector, outputName: o.outputName }), { mode: 0o600 });
+  await writeFile(confPath, sunshineConf({ dir, outputIndex: o.outputIndex, name: o.name, kmsConnector: o.kmsConnector, outputName: o.outputName, streamAudio: o.streamAudio }), { mode: 0o600 });
   await writeFile(join(dir, 'apps.json'), appsJson(prepPath), { mode: 0o600 });
 
   let createdCredentials = false;

@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld('openalt', {
   setMode: call('setMode'),
   setMirrorOf: call('setMirrorOf'),
   setOrientation: call('setOrientation'),
+  setAudio: call('setAudio'),
   setUiScale: call('setUiScale'),
   setPreviewKind: call('setPreviewKind'),
   setPref: call('setPref'),
