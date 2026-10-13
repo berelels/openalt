@@ -200,6 +200,26 @@ export function buildApplyArgs(
   return args;
 }
 
+/**
+ * Argumentos para voltar ao arranjo de `before` (o de antes do monitor do aparelho): só os monitores
+ * da pessoa, nas posições, modos e escalas de antes. O monitor do aparelho fica de fora (desligado).
+ */
+export function buildRestoreArgs(now: MutterState, before: MutterState): string[] {
+  const layout = layoutFromMutter(before);
+  const args = [
+    '--user', 'call', ...DEST, 'ApplyMonitorsConfig', 'uua(iiduba(ssa{sv}))a{sv}',
+    String(now.serial), String(APPLY_METHOD.temporary), String(before.logical.length),
+  ];
+  for (const lm of before.logical) {
+    const rect = layout[lm.connectors[0]];
+    if (!rect) throw new Error(`O layout não inclui o monitor ${lm.connectors[0]}`);
+    args.push(String(rect.x), String(rect.y), String(lm.scale), String(lm.transform), String(lm.primary), String(lm.connectors.length));
+    for (const c of lm.connectors) args.push(c, currentMode(before, c).id, '0');
+  }
+  args.push('0');
+  return args;
+}
+
 export async function applyMonitorsConfig(run: Runner, args: string[]): Promise<void> {
   await run('busctl', args);
 }

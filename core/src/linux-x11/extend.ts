@@ -15,6 +15,7 @@ import { drmConnectorFor, isValidConnectorName, listDrmConnectors, parseConnecto
 import {
   applyMonitorsConfig,
   buildApplyArgs,
+  buildRestoreArgs,
   findMode,
   getMutterState,
   layoutFromMutter,
@@ -50,6 +51,22 @@ export function pkexecHelper(run: Runner, helperPath: string = process.env.OPENA
     // o pkexec espera a pessoa digitar a senha (até a política polkit estar instalada)
     await run('pkexec', args, { timeoutMs: 120_000, input: edid });
   };
+}
+
+/** A ação do polkit que libera o ajudante sem senha (core/helper/dev.cattastudios.openalt.policy). */
+export const HELPER_ACTION = 'dev.cattastudios.openalt.connector';
+
+/**
+ * O ajudante roda SEM pedir senha? Só o instalado (a política aponta para DEFAULT_HELPER), e só se o
+ * polkit autorizar sem interação (`pkcheck` sem --allow-user-interaction nunca mostra a caixa).
+ */
+export async function helperAuthorized(
+  run: Runner,
+  helperPath: string = process.env.OPENALT_HELPER ?? DEFAULT_HELPER,
+  pid: number = process.pid,
+): Promise<boolean> {
+  if (helperPath !== DEFAULT_HELPER) return false;
+  return run('pkcheck', ['--action-id', HELPER_ACTION, '--process', String(pid)]).then(() => true, () => false);
 }
 
 /**
@@ -318,6 +335,38 @@ export async function retractDesktop(
     );
   }
   return { released: forced, removed: await removeVirtualDisplays(run) };
+}
+
+/**
+ * Desfaz a "Nova tela" SEM pedir senha (o aparelho desconectou e a pessoa pode estar longe do PC):
+ * devolve os monitores ao arranjo de antes pelo GNOME, sem root. A saída forçada continua anotada e
+ * é devolvida ao automático pelo retractDesktop no "Desligar" do app (com a pessoa no PC).
+ */
+export async function releaseWithoutPassword(
+  opts: Pick<ExtendOptions, 'run' | 'session'> = {},
+): Promise<{ restored: boolean }> {
+  const { run = defaultRun, session = fileSessionStore() } = opts;
+  const current = await session.read();
+  if (!current) return { restored: false };
+  const now = await getMutterState(run);
+  await applyMonitorsConfig(run, buildRestoreArgs(now, current.before));
+  await session.write(null);
+  return { restored: true };
+}
+
+/**
+ * Ao desconectar (ponte do Sunshine): desfaz tudo se o ajudante roda sem senha; senão, só tira a
+ * tela do aparelho da área de trabalho (releaseWithoutPassword). Nunca mostra a caixa de senha.
+ */
+export async function retractOnDisconnect(
+  opts: Pick<ExtendOptions, 'run' | 'helper' | 'store' | 'session' | 'timeoutMs' | 'sleep'> & { authorized?: boolean } = {},
+): Promise<{ released: string[]; removed: string[]; pending: boolean }> {
+  const { run = defaultRun, store = fileForcedStore() } = opts;
+  const forced = await store.read();
+  const authorized = opts.authorized ?? await helperAuthorized(run);
+  if (!forced.length || authorized) return { ...(await retractDesktop(opts)), pending: false };
+  await releaseWithoutPassword(opts);
+  return { released: [], removed: [], pending: true };
 }
 
 export interface MoveResult {

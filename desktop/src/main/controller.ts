@@ -53,6 +53,7 @@ import {
   readSettings,
   resolvePlacement,
   retractDesktop,
+  fileForcedStore,
   run,
   startSunshine,
   stopLeftoverSunshine,
@@ -360,8 +361,10 @@ export class Controller extends EventEmitter {
     this.maximizeTimer = null;
     this.watcher?.close();
     this.watcher = null;
-    if (this.connection) {
-      const wasExtend = this.connection.mode === 'extend';
+    // também devolve uma saída que ficou forçada num desconectar sem senha (a pessoa está no PC agora)
+    const pending = (await fileForcedStore(this.paths.runtime).read().catch(() => [] as string[])).length > 0;
+    if (this.connection || pending) {
+      const wasExtend = this.connection?.mode === 'extend' || pending;
       await retractDesktop().catch(() => {});
       await clearConnection(this.paths.runtime).catch(() => {});
       this.connection = null;
@@ -449,7 +452,10 @@ export class Controller extends EventEmitter {
       // (ArcMenu abria o Super no tablet); recarregar só elas
       // O monitor do aparelho entrou ou saiu: o processo principal reinicia o GNOME (Alt+F2 → r). Só
       // recarregar as extensões resolvia o Super, mas não o papel de parede, que só volta reiniciando.
-      if ((c && c.mode !== 'mirror') || (!c && wasExtend)) this.emit('monitors-changed');
+      // Desconectou sem a permissão do sistema: a saída do aparelho ficou forçada (só fora da área de
+      // trabalho). Reiniciar o GNOME agora poderia religá-la; o "Desligar" a devolve e aí reinicia.
+      const pending = !c && wasExtend && (await fileForcedStore(this.paths.runtime).read().catch(() => [] as string[])).length > 0;
+      if ((c && c.mode !== 'mirror') || (!c && wasExtend && !pending)) this.emit('monitors-changed');
       this.updateMaximizer();
       this.emitState();
     };

@@ -4,7 +4,7 @@
 import { parseArgs } from 'node:util';
 import { isAlign, isSide, type Placement } from './layout.ts';
 import { assessEnvironment, gatherFacts } from './linux-x11/environment.ts';
-import { extendDesktop, moveDesktop, planExtend, retractDesktop } from './linux-x11/extend.ts';
+import { extendDesktop, moveDesktop, planExtend, retractDesktop, retractOnDisconnect } from './linux-x11/extend.ts';
 import {
   createMirrorDisplay,
   createVirtualDisplay,
@@ -148,7 +148,8 @@ async function main(argv: string[]): Promise<unknown> {
       return r;
     }
     case 'down': {
-      const r = await retractDesktop();
+      // Pela ponte do Sunshine o aparelho desconectou: nunca pedir senha (a pessoa pode estar longe)
+      const r = fromSunshine ? await retractOnDisconnect() : await retractDesktop();
       if (fromSunshine) await clearConnection(paths.runtime);
       return r;
     }

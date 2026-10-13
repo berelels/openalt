@@ -5,7 +5,7 @@ import { access, readdir, readlink } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import type { Runner } from '../proc.ts';
 import { drmConnectorFor, listDrmConnectors, parseConnectorIds } from './drm.ts';
-import { DEFAULT_HELPER } from './extend.ts';
+import { DEFAULT_HELPER, helperAuthorized } from './extend.ts';
 import { getMutterState } from './mutter.ts';
 import { pickOutput } from './virtual-display.ts';
 import { parseXrandrQuery } from './xrandr.ts';
@@ -147,6 +147,8 @@ export async function gatherFacts(run: Runner, env: NodeJS.ProcessEnv = process.
     }
   }
 
-  facts.helperInstalled = await access(process.env.OPENALT_HELPER ?? DEFAULT_HELPER).then(() => true, () => false);
+  // Instalada = o ajudante roda sem senha (a política do polkit libera), não só o arquivo existir
+  facts.helperInstalled = await access(process.env.OPENALT_HELPER ?? DEFAULT_HELPER).then(() => true, () => false)
+    && await helperAuthorized(run);
   return facts;
 }
