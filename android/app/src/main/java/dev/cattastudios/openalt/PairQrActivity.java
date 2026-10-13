@@ -335,6 +335,8 @@ public class PairQrActivity extends Activity {
             return getString(R.string.openalt_pair_save_failed);
         }
         stored.serverCert = pm.getPairedCert();
+        // Todos os endereços do QR, para achar o PC também fora de casa (pelo Tailscale)
+        KnownAddresses.save(this, details.uuid, uri.port, uri.hosts);
         binder.invalidateStateForComputer(details.uuid);
         return null;
     }
