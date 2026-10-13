@@ -258,6 +258,9 @@ public class SettingsActivity extends Activity {
     private void buildRows(SettingsModel.Category category) {
         rows.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(this);
+        if (category == SettingsModel.Category.CONTROLLER) {
+            addMappingRows(inflater);
+        }
         if (category == SettingsModel.Category.ABOUT) {
             addLinkRow(inflater, R.drawable.oa_ic_info, getString(R.string.openalt_app_name) + " " + versionName(),
                     getString(R.string.openalt_about_text), null);
@@ -273,6 +276,31 @@ public class SettingsActivity extends Activity {
         }
     }
 
+    /** "Mapear botões" e "Voltar ao padrão", para o controle conectado agora. */
+    private void addMappingRows(LayoutInflater inflater) {
+        android.view.InputDevice pad = ButtonMapActivity.firstGamepad(this);
+        final String key = ButtonMap.deviceKey(pad);
+        addLinkRow(inflater, R.drawable.oa_ic_gamepad, getString(R.string.openalt_map_title),
+                getString(R.string.openalt_map_summary), new Intent(this, ButtonMapActivity.class));
+        if (key != null && ButtonMap.has(this, key)) {
+            View row = inflater.inflate(R.layout.oa_setting_row, rows, false);
+            stackValueBelow(row);
+            ((ImageView) row.findViewById(R.id.oaRowIcon)).setImageResource(R.drawable.oa_ic_gamepad);
+            ((TextView) row.findViewById(R.id.oaRowTitle)).setText(R.string.openalt_map_reset);
+            ((TextView) row.findViewById(R.id.oaRowHint)).setText(R.string.openalt_map_reset_summary);
+            ((TextView) row.findViewById(R.id.oaRowValue)).setText(R.string.openalt_map_custom);
+            row.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ButtonMap.clear(SettingsActivity.this, key);
+                    android.widget.Toast.makeText(SettingsActivity.this, R.string.openalt_map_reset_done, android.widget.Toast.LENGTH_SHORT).show();
+                    showCategory(current, false);
+                }
+            });
+            rows.addView(row);
+        }
+    }
+
     private String versionName() {
         try {
             return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
@@ -283,6 +311,7 @@ public class SettingsActivity extends Activity {
 
     private void addLinkRow(LayoutInflater inflater, int icon, String title, String hint, final Intent intent) {
         View row = inflater.inflate(R.layout.oa_setting_row, rows, false);
+        stackValueBelow(row);
         ((ImageView) row.findViewById(R.id.oaRowIcon)).setImageResource(icon);
         ((TextView) row.findViewById(R.id.oaRowTitle)).setText(title);
         ((TextView) row.findViewById(R.id.oaRowHint)).setText(hint);
@@ -304,8 +333,31 @@ public class SettingsActivity extends Activity {
         rows.addView(row);
     }
 
+    /** Em pé não cabe tudo numa linha: o valor (e o - e +) desce para baixo do nome. */
+    private void stackValueBelow(View row) {
+        if (!portrait()) {
+            return;
+        }
+        LinearLayout root = (LinearLayout) row;
+        LinearLayout texts = (LinearLayout) row.findViewById(R.id.oaRowTitle).getParent();
+        LinearLayout line = new LinearLayout(this);
+        line.setOrientation(LinearLayout.HORIZONTAL);
+        line.setGravity(Gravity.CENTER_VERTICAL);
+        for (int id : new int[]{R.id.oaRowMinus, R.id.oaRowValue, R.id.oaRowPlus}) {
+            View v = row.findViewById(id);
+            root.removeView(v);
+            line.addView(v);
+        }
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = dp(10);
+        texts.addView(line, lp);
+        // no começo da linha, sem a margem da esquerda
+        ((LinearLayout.LayoutParams) row.findViewById(R.id.oaRowValue).getLayoutParams()).leftMargin = 0;
+    }
+
     private void addRow(LayoutInflater inflater, final SettingsModel.Item it, int icon) {
         final View row = inflater.inflate(R.layout.oa_setting_row, rows, false);
+        stackValueBelow(row);
         ((ImageView) row.findViewById(R.id.oaRowIcon)).setImageResource(icon);
         ((TextView) row.findViewById(R.id.oaRowTitle)).setText(it.title);
         TextView hint = row.findViewById(R.id.oaRowHint);

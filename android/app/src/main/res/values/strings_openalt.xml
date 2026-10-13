@@ -128,4 +128,21 @@
     <string name="openalt_settings_all">All Moonlight settings</string>
     <string name="openalt_settings_all_summary">The original list: language, help, on-screen control layout and the rest.</string>
     <string name="openalt_settings_open">Open</string>
+
+    <!-- Mapear botões (ButtonMapActivity) -->
+    <string name="openalt_map_title">Map buttons</string>
+    <string name="openalt_map_summary">For different controllers: press the button that will do each function. Saved for this controller.</string>
+    <string name="openalt_map_reset">Reset to default</string>
+    <string name="openalt_map_reset_summary">Removes the mapping of the connected controller.</string>
+    <string name="openalt_map_reset_done">Controller back to default.</string>
+    <string name="openalt_map_press">Press the button for %1$s</string>
+    <string name="openalt_map_hint">On %1$s. Use Skip (on the screen) for a button you don\'t have.</string>
+    <string name="openalt_map_step">Step %1$d of %2$d</string>
+    <string name="openalt_map_skip">Skip</string>
+    <string name="openalt_map_cancel">Cancel</string>
+    <string name="openalt_map_saved">Buttons saved for this controller.</string>
+    <string name="openalt_map_no_controller">No controller connected</string>
+    <string name="openalt_map_no_controller_hint">Connect a controller (USB or Bluetooth) and open this again.</string>
+    <string name="openalt_map_none">No mapping</string>
+    <string name="openalt_map_custom">Mapped</string>
 </resources>

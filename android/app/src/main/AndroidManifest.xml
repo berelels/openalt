@@ -106,6 +106,12 @@
             android:exported="false"
             android:resizeableActivity="true"
             android:screenOrientation="fullSensor" />
+        <!-- OpenAlt: assistente "Mapear botões" -->
+        <activity
+            android:name="dev.cattastudios.openalt.ButtonMapActivity"
+            android:exported="false"
+            android:resizeableActivity="true"
+            android:screenOrientation="fullSensor" />
         <!-- OpenAlt: tela de entrada com jeito de launcher (tela cheia, cartões, controle, abertura) -->
         <activity
             android:name="dev.cattastudios.openalt.StartActivity"

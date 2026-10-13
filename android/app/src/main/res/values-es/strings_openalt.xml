@@ -119,4 +119,21 @@
     <string name="openalt_settings_all">Todos los ajustes de Moonlight</string>
     <string name="openalt_settings_all_summary">La lista original: idioma, ayuda, posición de los controles en pantalla y lo demás.</string>
     <string name="openalt_settings_open">Abrir</string>
+
+    <!-- Mapear botões (ButtonMapActivity) -->
+    <string name="openalt_map_title">Mapear botones</string>
+    <string name="openalt_map_summary">Para mandos diferentes: pulsa el botón que hará cada función. Se guarda para este mando.</string>
+    <string name="openalt_map_reset">Volver a lo predeterminado</string>
+    <string name="openalt_map_reset_summary">Borra el mapeo del mando conectado.</string>
+    <string name="openalt_map_reset_done">Mando de vuelta a lo predeterminado.</string>
+    <string name="openalt_map_press">Pulsa el botón para %1$s</string>
+    <string name="openalt_map_hint">En %1$s. Usa Saltar (en la pantalla) para un botón que no existe.</string>
+    <string name="openalt_map_step">Paso %1$d de %2$d</string>
+    <string name="openalt_map_skip">Saltar</string>
+    <string name="openalt_map_cancel">Cancelar</string>
+    <string name="openalt_map_saved">Botones guardados para este mando.</string>
+    <string name="openalt_map_no_controller">Ningún mando conectado</string>
+    <string name="openalt_map_no_controller_hint">Conecta un mando (USB o Bluetooth) y vuelve a abrir esto.</string>
+    <string name="openalt_map_none">Sin mapeo</string>
+    <string name="openalt_map_custom">Mapeado</string>
 </resources>
