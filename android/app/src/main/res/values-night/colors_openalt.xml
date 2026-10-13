@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="oa_bg">#1A1713</color>
+    <color name="oa_surface">#24201A</color>
+    <color name="oa_border">#3A332A</color>
+    <color name="oa_border_strong">#4A4136</color>
+    <color name="oa_text">#F4EDE1</color>
+    <color name="oa_muted">#A3F4EDE1</color>
+    <color name="oa_accent">#FF746C</color>
+    <color name="oa_accent_ink">#26211B</color>
+    <color name="oa_accent_text">#FF9A93</color>
+    <color name="oa_sage">#8FBF92</color>
+    <color name="oa_sage_ink">#14120F</color>
+    <color name="oa_pill">#F4EDE1</color>
+    <color name="oa_pill_ink">#1A1713</color>
+</resources>

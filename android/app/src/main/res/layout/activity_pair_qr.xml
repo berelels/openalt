@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Tela "Parear": serve em pé e deitado (ScrollView), botões grandes e texto lido pelo TalkBack -->
+<!-- Tela "Parear" no estilo do app do PC: cartão vermelho com o passo a passo, botão escuro em
+     pílula. Serve em pé e deitado (ScrollView); texto lido pelo TalkBack. Ids usados no PairQrActivity. -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/oa_bg"
     android:fillViewport="true"
+    android:fitsSystemWindows="true"
     tools:context="dev.cattastudios.openalt.PairQrActivity">
 
     <LinearLayout
@@ -13,55 +16,64 @@
         android:layout_gravity="center"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingLeft="24dp"
-        android:paddingTop="32dp"
-        android:paddingRight="24dp"
-        android:paddingBottom="32dp">
+        android:padding="20dp">
 
-        <TextView
-            android:id="@+id/pairTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:accessibilityHeading="true"
-            android:gravity="center"
-            android:text="@string/openalt_pair_title"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <ProgressBar
-            android:id="@+id/pairProgress"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_marginTop="24dp"
-            android:indeterminate="true"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/pairStatus"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:accessibilityLiveRegion="polite"
-            android:gravity="center"
-            android:lineSpacingMultiplier="1.2"
-            android:text="@string/openalt_pair_intro"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:maxWidth="560dp"
+            android:background="@drawable/oa_accent_card_bg"
+            android:orientation="vertical"
+            android:padding="28dp">
 
-        <Button
-            android:id="@+id/pairPrimaryButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:minHeight="56dp"
-            android:text="@string/openalt_pair_scan"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
+                android:id="@+id/pairTitle"
+                style="@style/OpenAlt.CardTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:accessibilityHeading="true"
+                android:text="@string/openalt_pair_title"
+                android:textColor="@color/oa_accent_ink" />
+
+            <ProgressBar
+                android:id="@+id/pairProgress"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="20dp"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/oa_accent_ink"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/pairStatus"
+                style="@style/OpenAlt.Hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:accessibilityLiveRegion="polite"
+                android:text="@string/openalt_pair_intro"
+                android:textColor="@color/oa_accent_ink"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/pairPrimaryButton"
+                style="@style/OpenAlt.PillButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/openalt_pair_scan" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/pairCancelButton"
             style="?android:attr/borderlessButtonStyle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:minHeight="56dp"
-            android:text="@string/openalt_pair_cancel" />
+            android:layout_marginTop="12dp"
+            android:minHeight="48dp"
+            android:text="@string/openalt_pair_cancel"
+            android:textAllCaps="false"
+            android:textColor="@color/oa_text"
+            android:textSize="16sp" />
     </LinearLayout>
 </ScrollView>

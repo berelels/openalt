@@ -3,6 +3,13 @@
 <resources>
     <string name="openalt_app_name" translatable="false">OpenAlt</string>
 
+    <!-- Tela inicial -->
+    <string name="openalt_home_subtitle">Seu celular ou tablet como tela do PC</string>
+    <string name="openalt_searching_short">Procurando PCs na rede…</string>
+    <string name="openalt_settings">Configurações</string>
+    <string name="openalt_help">Ajuda</string>
+    <string name="openalt_add_pc">Adicionar PC pelo endereço</string>
+
     <!-- Tela Parear -->
     <string name="openalt_pair_title">Parear com o PC</string>
     <string name="openalt_pair_button">Parear com QR</string>

@@ -1,118 +1,160 @@
-<!-- Portrait orientation only -->
+<?xml version="1.0" encoding="utf-8"?>
+<!-- OpenAlt: tela inicial no estilo do app do PC (papel claro, marca "Open" + "Alt" em itálico,
+     cartão vermelho para parear, PCs em cartões). Os ids são os do Moonlight (PcView.java). -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PcView" >
+    android:background="@color/oa_bg"
+    android:fitsSystemWindows="true"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:paddingTop="12dp"
+    tools:context="com.limelight.PcView">
 
-    <RelativeLayout
-        android:id="@+id/pcFragmentContainer"
-        android:layout_width="fill_parent"
+    <LinearLayout
+        android:id="@+id/oaHeader"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_below="@+id/settingsButton"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        >
+        android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="12dp">
 
-        <RelativeLayout
-            android:id="@+id/no_pc_found_layout"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:layout_centerInParent="true"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true">
-            <ProgressBar
-                android:id="@+id/pcs_loading"
-                android:layout_width="75dp"
-                android:layout_height="75dp"
-                android:indeterminate="true"/>
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:contentDescription="@string/openalt_app_name"
+                android:importantForAccessibility="yes">
+                <TextView
+                    style="@style/OpenAlt.Wordmark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="Open"
+                    tools:ignore="HardcodedText" />
+                <TextView
+                    style="@style/OpenAlt.Wordmark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="no"
+                    android:text="Alt"
+                    android:textColor="@color/oa_accent"
+                    android:textStyle="italic"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/pcs_loading"
-                android:layout_toEndOf="@+id/pcs_loading"
-                android:layout_marginLeft="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_centerVertical="true"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:gravity="center"
-                android:text="@string/searching_pc"/>
-            <!-- OpenAlt: o caminho principal para o primeiro PC é o QR -->
-            <Button
-                android:id="@+id/pairQrBigButton"
+                android:text="@string/openalt_home_subtitle"
+                android:textColor="@color/oa_muted"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- OpenAlt: parear com QR -->
+        <ImageButton
+            android:id="@+id/pairQrButton"
+            style="@style/OpenAlt.IconButton"
+            android:contentDescription="@string/openalt_pair_button_description"
+            android:preferKeepClear="true"
+            android:src="@drawable/ic_qr" />
+
+        <ImageButton
+            android:id="@+id/manuallyAddPc"
+            style="@style/OpenAlt.IconButton"
+            android:contentDescription="@string/openalt_add_pc"
+            android:preferKeepClear="true"
+            android:src="@drawable/ic_add" />
+
+        <ImageButton
+            android:id="@+id/helpButton"
+            style="@style/OpenAlt.IconButton"
+            android:contentDescription="@string/openalt_help"
+            android:preferKeepClear="true"
+            android:src="@drawable/ic_help" />
+
+        <ImageButton
+            android:id="@+id/settingsButton"
+            style="@style/OpenAlt.IconButton"
+            android:contentDescription="@string/openalt_settings"
+            android:preferKeepClear="true"
+            android:src="@drawable/ic_settings" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/pcFragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/oaHeader"
+        android:gravity="center">
+
+        <!-- Nenhum PC ainda: o cartão vermelho leva ao QR (como o cartão "Conexão" do app do PC) -->
+        <RelativeLayout
+            android:id="@+id/no_pc_found_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/oa_accent_card_bg"
+            android:padding="28dp">
+
+            <TextView
+                android:id="@+id/oaPairCardTitle"
+                style="@style/OpenAlt.CardTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/pcs_loading"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="24dp"
-                android:minHeight="56dp"
-                android:paddingLeft="24dp"
-                android:paddingRight="24dp"
-                android:text="@string/openalt_pair_button"
-                android:textAppearance="?android:attr/textAppearanceMedium"/>
+                android:text="@string/openalt_pair_title"
+                android:textColor="@color/oa_accent_ink" />
+
+            <TextView
+                android:id="@+id/oaPairCardHint"
+                style="@style/OpenAlt.Hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/oaPairCardTitle"
+                android:layout_marginTop="8dp"
+                android:text="@string/openalt_pair_intro"
+                android:textColor="@color/oa_accent_ink" />
+
+            <Button
+                android:id="@+id/pairQrBigButton"
+                style="@style/OpenAlt.PillButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/oaPairCardHint"
+                android:layout_marginTop="20dp"
+                android:text="@string/openalt_pair_button" />
+
+            <ProgressBar
+                android:id="@+id/pcs_loading"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_below="@+id/pairQrBigButton"
+                android:layout_marginTop="20dp"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/oa_accent_ink" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/pcs_loading"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@+id/pcs_loading"
+                android:layout_toRightOf="@+id/pcs_loading"
+                android:text="@string/openalt_searching_short"
+                android:textColor="@color/oa_accent_ink"
+                android:textSize="13sp" />
         </RelativeLayout>
 
     </RelativeLayout>
-
-    <ImageButton
-        android:id="@+id/settingsButton"
-        android:layout_width="70dp"
-        android:layout_height="65dp"
-        android:cropToPadding="false"
-        android:scaleType="fitXY"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/ic_settings"
-        android:preferKeepClear="true"
-        style="?android:attr/borderlessButtonStyle"/>
-
-    <ImageButton
-        android:id="@+id/helpButton"
-        android:layout_width="70dp"
-        android:layout_height="65dp"
-        android:cropToPadding="false"
-        android:scaleType="fitXY"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/settingsButton"
-        android:layout_toEndOf="@+id/settingsButton"
-        android:src="@drawable/ic_help"
-        android:preferKeepClear="true"
-        style="?android:attr/borderlessButtonStyle"/>
-    
-    <ImageButton
-        android:id="@+id/manuallyAddPc"
-        android:layout_width="70dp"
-        android:layout_height="65dp"
-        android:cropToPadding="false"
-        android:scaleType="fitXY"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:src="@drawable/ic_add"
-        android:preferKeepClear="true"
-        style="?android:attr/borderlessButtonStyle"/>
-
-    <!-- OpenAlt: parear com QR -->
-    <ImageButton
-        android:id="@+id/pairQrButton"
-        android:layout_width="70dp"
-        android:layout_height="65dp"
-        android:cropToPadding="false"
-        android:scaleType="fitXY"
-        android:padding="14dp"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/manuallyAddPc"
-        android:layout_toStartOf="@+id/manuallyAddPc"
-        android:src="@drawable/ic_qr"
-        android:contentDescription="@string/openalt_pair_button_description"
-        android:preferKeepClear="true"
-        style="?android:attr/borderlessButtonStyle"/>
 
 </RelativeLayout>

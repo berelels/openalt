@@ -21,6 +21,7 @@ import {
   drmConnectorFor,
   findSunshine,
   isUiScale,
+  restartGnomeShell,
   reloadMonitorSensitiveExtensions,
   restoreExtensions,
   chooseOutput,
@@ -280,9 +281,11 @@ export class Controller extends EventEmitter {
     this.watcher?.close();
     this.watcher = null;
     if (this.connection) {
+      const wasExtend = this.connection.mode === 'extend';
       await retractDesktop().catch(() => {});
       await clearConnection(this.paths.runtime).catch(() => {});
       this.connection = null;
+      if (wasExtend) await restartGnomeShell(run).catch(() => {});
     }
     this.mutter = await getMutterState(run).catch(() => this.mutter); // a lista de monitores sem o do aparelho
     await this.sunshine?.stop().catch(() => {});
@@ -358,12 +361,20 @@ export class Controller extends EventEmitter {
       const c = await readConnection(this.paths.runtime);
       const changed = JSON.stringify(c) !== JSON.stringify(this.connection);
       if (!changed) return;
+      const wasExtend = this.connection?.mode === 'extend';
       this.connection = c;
       if (this.phase === 'waiting' || this.phase === 'connected') this.phase = c ? 'connected' : 'waiting';
       this.mutter = await getMutterState(run).catch(() => this.mutter);
       // monitor do aparelho entrou ou saiu: extensões que guardam o monitor pelo número se perdem
       // (ArcMenu abria o Super no tablet); recarregar só elas
-      if (c?.mode !== 'mirror') void reloadMonitorSensitiveExtensions({ run, runtimeDir: this.paths.runtime }).catch(() => {});
+      // O monitor do aparelho entrou ou saiu: reinicia o GNOME, como o Alt+F2 → r que resolvia tudo no
+      // teste com o tablet (Super/ArcMenu e papel de parede). Com o aparelho conectado o stream só
+      // pisca. Sem reiniciar (Wayland, ou serviço não encontrado), recarrega as extensões.
+      if ((c && c.mode !== 'mirror') || (!c && wasExtend)) {
+        void restartGnomeShell(run)
+          .then((ok) => (ok ? undefined : reloadMonitorSensitiveExtensions({ run, runtimeDir: this.paths.runtime })))
+          .catch(() => {});
+      }
       this.updateMaximizer();
       this.emitState();
     };
