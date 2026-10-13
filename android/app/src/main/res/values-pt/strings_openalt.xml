@@ -39,6 +39,7 @@
     <string name="openalt_pair_in_progress">Outro aparelho está pareando com este PC agora. Espere um pouco e tente de novo.</string>
     <string name="openalt_pair_timeout">O PC não confirmou a tempo. O QR pode ter vencido ou já ter sido usado: gere outro no PC.</string>
     <string name="openalt_pair_error">Erro ao falar com o PC: %1$s</string>
+    <string name="openalt_pair_pending_elsewhere">O PC já tem um pedido de pareamento deste aparelho em aberto, provavelmente do Moonlight original. Feche-o por lá (ou espere vencer) e, no PC, toque em Desligar e Ligar no OpenAlt e leia o QR novo.</string>
     <string name="openalt_pair_save_failed">Pareou, mas não consegui guardar o PC na lista. Tente adicionar de novo pelo QR.</string>
     <string name="openalt_no_camera">Este aparelho não tem câmera para ler o QR. Adicione o PC pelo botão +, com o endereço dele.</string>
 

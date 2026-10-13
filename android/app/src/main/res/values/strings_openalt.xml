@@ -42,6 +42,7 @@
     <string name="openalt_pair_in_progress">Another device is pairing with this PC right now. Wait a moment and try again.</string>
     <string name="openalt_pair_timeout">The PC did not confirm in time. The QR code may have expired or already been used: generate another one on the PC.</string>
     <string name="openalt_pair_error">Error talking to the PC: %1$s</string>
+    <string name="openalt_pair_pending_elsewhere">The PC already has an unfinished pairing request from this device, probably from the original Moonlight app. Close it there (or wait for it to expire), then on the PC tap Turn off and Turn on in OpenAlt and scan the new QR code.</string>
     <string name="openalt_pair_save_failed">Paired, but could not save the PC to the list. Try adding it again with the QR code.</string>
     <string name="openalt_no_camera">This device has no camera to read the QR code. Add the PC with the + button, using its address.</string>
 

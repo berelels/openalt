@@ -39,6 +39,7 @@
     <string name="openalt_pair_in_progress">Otro dispositivo se está vinculando con este PC ahora. Espera un poco e inténtalo de nuevo.</string>
     <string name="openalt_pair_timeout">El PC no confirmó a tiempo. El QR puede haber vencido o ya se usó: genera otro en el PC.</string>
     <string name="openalt_pair_error">Error al hablar con el PC: %1$s</string>
+    <string name="openalt_pair_pending_elsewhere">El PC ya tiene una solicitud de vinculación de este dispositivo sin terminar, probablemente de la app Moonlight original. Ciérrala allí (o espera a que caduque) y, en el PC, toca Apagar y Encender en OpenAlt y escanea el QR nuevo.</string>
     <string name="openalt_pair_save_failed">Se vinculó, pero no pude guardar el PC en la lista. Intenta agregarlo de nuevo con el QR.</string>
     <string name="openalt_no_camera">Este dispositivo no tiene cámara para leer el QR. Agrega el PC con el botón +, usando su dirección.</string>
 

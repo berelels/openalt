@@ -25,6 +25,7 @@ import com.limelight.R;
 import com.limelight.binding.PlatformBinding;
 import com.limelight.computers.ComputerManagerService;
 import com.limelight.nvstream.http.ComputerDetails;
+import com.limelight.nvstream.http.HostHttpResponseException;
 import com.limelight.nvstream.http.NvHTTP;
 import com.limelight.nvstream.http.PairingManager;
 import com.limelight.nvstream.http.PairingManager.PairState;
@@ -201,6 +202,15 @@ public class PairQrActivity extends Activity {
         }
     }
 
+    /**
+     * 409: o Sunshine já tem um pedido de pareamento aberto com o mesmo uniqueid. Todos os clientes
+     * Moonlight do aparelho (este e o Moonlight original) usam o mesmo, então costuma ser um pedido
+     * por PIN deixado aberto no Moonlight original. Desligar e Ligar no PC limpa o pedido.
+     */
+    static int messageForHttpError(int code) {
+        return code == 409 ? R.string.openalt_pair_pending_elsewhere : R.string.openalt_pair_error;
+    }
+
     private String pcLabel(PairingUri uri) {
         return uri.pcName.isEmpty() ? getString(R.string.openalt_pc_unnamed) : uri.pcName;
     }
@@ -287,6 +297,9 @@ public class PairQrActivity extends Activity {
         PairState state;
         try {
             state = pm.pair(serverInfo, uri.pin);
+        } catch (HostHttpResponseException e) {
+            LimeLog.warning("OpenAlt: pairing error: " + e.getErrorCode() + " " + e.getMessage());
+            return getString(messageForHttpError(e.getErrorCode()), String.valueOf(e.getMessage()));
         } catch (IOException | XmlPullParserException e) {
             LimeLog.warning("OpenAlt: pairing error: " + e.getMessage());
             return getString(R.string.openalt_pair_error, String.valueOf(e.getMessage()));
