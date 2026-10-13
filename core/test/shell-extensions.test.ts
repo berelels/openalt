@@ -34,14 +34,3 @@ test('se a recarga foi interrompida, religa ao abrir (e ignora nomes inválidos)
   assert.deepEqual(await restoreExtensions({ run: fake([], []), runtimeDir: dir }), []);
 });
 
-test('reinicia o GNOME Shell só no X11 e só se o serviço existir', async () => {
-  const { restartGnomeShell } = await import('../src/linux-x11/shell-extensions.ts');
-  const calls: string[] = [];
-  const run: Runner = async (cmd, args) => { calls.push([cmd, ...args].join(' ')); return { stdout: 'active\n', stderr: '' }; };
-  assert.equal(await restartGnomeShell(run, { XDG_SESSION_TYPE: 'wayland' }), false);
-  assert.equal(calls.length, 0);
-  assert.equal(await restartGnomeShell(run, { XDG_SESSION_TYPE: 'x11' }), true);
-  assert.deepEqual(calls, ['systemctl --user is-active org.gnome.Shell@x11.service', 'systemctl --user restart org.gnome.Shell@x11.service']);
-  const inactive: Runner = async () => ({ stdout: 'inactive\n', stderr: '' });
-  assert.equal(await restartGnomeShell(inactive, { XDG_SESSION_TYPE: 'x11' }), false);
-});

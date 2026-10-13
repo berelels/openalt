@@ -21,7 +21,6 @@ import {
   drmConnectorFor,
   findSunshine,
   isUiScale,
-  restartGnomeShell,
   reloadMonitorSensitiveExtensions,
   restoreExtensions,
   chooseOutput,
@@ -285,7 +284,7 @@ export class Controller extends EventEmitter {
       await retractDesktop().catch(() => {});
       await clearConnection(this.paths.runtime).catch(() => {});
       this.connection = null;
-      if (wasExtend) await restartGnomeShell(run).catch(() => {});
+      if (wasExtend) await reloadMonitorSensitiveExtensions({ run, runtimeDir: this.paths.runtime }).catch(() => {});
     }
     this.mutter = await getMutterState(run).catch(() => this.mutter); // a lista de monitores sem o do aparelho
     await this.sunshine?.stop().catch(() => {});
@@ -367,13 +366,11 @@ export class Controller extends EventEmitter {
       this.mutter = await getMutterState(run).catch(() => this.mutter);
       // monitor do aparelho entrou ou saiu: extensões que guardam o monitor pelo número se perdem
       // (ArcMenu abria o Super no tablet); recarregar só elas
-      // O monitor do aparelho entrou ou saiu: reinicia o GNOME, como o Alt+F2 → r que resolvia tudo no
-      // teste com o tablet (Super/ArcMenu e papel de parede). Com o aparelho conectado o stream só
-      // pisca. Sem reiniciar (Wayland, ou serviço não encontrado), recarrega as extensões.
+      // O monitor do aparelho entrou ou saiu: recarrega as extensões do GNOME. Tem o mesmo efeito do
+      // Alt+F2 → r que resolvia o Super (ArcMenu) e o papel de parede no teste com o tablet — e foi
+      // confirmado ao vivo. Reiniciar o Shell não é possível: o serviço recusa (RefuseManualStop).
       if ((c && c.mode !== 'mirror') || (!c && wasExtend)) {
-        void restartGnomeShell(run)
-          .then((ok) => (ok ? undefined : reloadMonitorSensitiveExtensions({ run, runtimeDir: this.paths.runtime })))
-          .catch(() => {});
+        void reloadMonitorSensitiveExtensions({ run, runtimeDir: this.paths.runtime }).catch(() => {});
       }
       this.updateMaximizer();
       this.emitState();

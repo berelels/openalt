@@ -119,3 +119,21 @@ Decisões: ADR-0012. Código: `android/`, com o fork do Moonlight Android 12.2 e
     Electron) travam no monitor dele. **Investigar** (ADR-0009).
 - **Cursor:** continua a captura X11, com o cursor duplicado na borda quando está em outro monitor.
   A pessoa preferiu isso a não ter cursor.
+
+### Reconexão com a interface nova (12/10, 23:4x)
+- **Interface nova do app Android instalada:** chave de debug fixa. Desta vez foi preciso desinstalar
+  antes; das próximas, a atualização instala por cima.
+- **Erro 409 ao parear** ("pairing session with this uniqueid already exists"):
+  - Havia um pedido pendente do **Moonlight original** do mesmo tablet ("roth"). Os clientes Moonlight
+    se identificam do mesmo jeito para o Sunshine, que recusa um segundo pedido.
+  - Desligar e Ligar no PC limpou o pedido.
+  - A fazer: mensagem clara no app e limpeza de pedidos que não são do QR.
+- **App do PC travado em "Código vencido":**
+  - Laço infinito: `render` → `tickCountdown` → vencido → `render` (100% de CPU, 1,3 GB).
+  - Corrigido: só redesenha quando o QR vence durante a contagem.
+- **Pareamento por QR e conexão funcionaram de novo.**
+- **Reinício do GNOME ao conectar e desconectar:**
+  - Não é possível: o serviço `org.gnome.Shell@x11` tem `RefuseManualStop=yes`.
+  - Simular Alt+F2 → r pelo teclado não é seguro, porque não dá para saber se a caixa abriu.
+  - Ficou a recarga das extensões ligadas. Teste ao vivo: o Super abriu no principal e o papel de
+    parede apareceu no tablet.

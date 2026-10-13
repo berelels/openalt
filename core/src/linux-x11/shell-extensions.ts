@@ -44,18 +44,3 @@ export async function restoreExtensions({ run = defaultRun, runtimeDir }: Reload
   return targets;
 }
 
-const SHELL_UNIT = 'org.gnome.Shell@x11.service';
-
-/**
- * Reinicia o GNOME Shell (só no X11, onde as janelas sobrevivem): o mesmo que Alt+F2 → r, que a
- * pessoa descobriu que deixa tudo certo depois que o monitor do aparelho sai. No GNOME 46 o Shell
- * é um serviço do systemd (Restart=always); reiniciar o serviço é o caminho limpo. No Wayland não
- * existe reiniciar o Shell sem encerrar a sessão — aí não faz nada.
- */
-export async function restartGnomeShell(run: Runner = defaultRun, env: NodeJS.ProcessEnv = process.env): Promise<boolean> {
-  if (env.XDG_SESSION_TYPE !== 'x11') return false;
-  const active = await run('systemctl', ['--user', 'is-active', SHELL_UNIT]).then((r) => r.stdout.trim() === 'active', () => false);
-  if (!active) return false;
-  await run('systemctl', ['--user', 'restart', SHELL_UNIT], { timeoutMs: 30_000 });
-  return true;
-}
