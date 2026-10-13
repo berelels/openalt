@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- OpenAlt: um cartão do launcher (PC, ou "Parear um PC"). Tamanho e cores vêm de HomeActivity. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="@drawable/oa_focus_ring"
+    android:padding="6dp">
+
+    <LinearLayout
+        android:id="@+id/oaCardBody"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/oa_card_bg"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/oaCardIcon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:importantForAccessibility="no"
+                android:scaleType="fitCenter" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/oaCardStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/oa_status_pill_bg"
+                android:paddingLeft="14dp"
+                android:paddingTop="6dp"
+                android:paddingRight="14dp"
+                android:paddingBottom="6dp"
+                android:textColor="@color/oa_pill_ink"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/oaCardSpacer"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="16dp" />
+
+        <TextView
+            android:id="@+id/oaCardTitle"
+            style="@style/OpenAlt.CardTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/oa_text"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/oaCardDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textColor="@color/oa_text"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/oaCardAction"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/oa_status_pill_bg"
+            android:drawablePadding="10dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="22dp"
+            android:paddingRight="24dp"
+            android:textColor="@color/oa_accent"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </LinearLayout>
+</FrameLayout>

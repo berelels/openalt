@@ -96,6 +96,14 @@
 
             <meta-data android:name="WindowManagerPreference:FreeformWindowSize" android:value="system-default" />
             <meta-data android:name="WindowManagerPreference:FreeformWindowOrientation" android:value="landscape" />
+            <!-- OpenAlt: a entrada do app passou para StartActivity; esta lista abre pelas opções do PC -->
+        </activity>
+        <!-- OpenAlt: tela de entrada com jeito de launcher (tela cheia, cartões, controle, abertura) -->
+        <activity
+            android:name="dev.cattastudios.openalt.StartActivity"
+            android:exported="true"
+            android:resizeableActivity="true"
+            android:screenOrientation="fullSensor">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

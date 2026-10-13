@@ -57,6 +57,14 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/category_gamepad_settings"
         android:key="category_gamepad_settings">
+        <!-- OpenAlt: nomes dos botões no launcher (Xbox, PlayStation ou Nintendo) -->
+        <ListPreference
+            android:key="openalt_controller_style"
+            android:defaultValue="auto"
+            android:entries="@array/openalt_controller_style_names"
+            android:entryValues="@array/openalt_controller_style_values"
+            android:summary="@string/openalt_pref_controller_summary"
+            android:title="@string/openalt_pref_controller_title" />
         <com.limelight.preferences.SeekBarPreference
             android:key="seekbar_deadzone"
             android:defaultValue="7"

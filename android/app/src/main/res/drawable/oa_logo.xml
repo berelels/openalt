@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- OpenAlt: o traço do logo (o mesmo do app do PC), na cor do texto -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="38dp" android:height="30dp" android:viewportWidth="380" android:viewportHeight="300">
+    <group android:translateX="-64" android:translateY="-120">
+        <path android:pathData="M86,156c62,-2 108,-6 136,16 30,24 26,80 40,124 18,56 78,92 126,64 40,-24 30,-90 -14,-96 -50,-8 -72,52 -40,92 22,28 62,34 92,24"
+            android:strokeColor="@color/oa_text" android:strokeWidth="40" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" />
+        <path android:pathData="M270,152c50,-8 96,-10 144,-6"
+            android:strokeColor="@color/oa_text" android:strokeWidth="40" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" />
+    </group>
+</vector>

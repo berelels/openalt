@@ -60,4 +60,42 @@
     <string name="openalt_link_sunshine_summary">O servidor de transmissão no PC, da LizardByte (GPL-3.0)</string>
     <string name="openalt_link_catta">Catta Studios</string>
     <string name="openalt_link_catta_summary">O site de quem fez o OpenAlt</string>
+
+    <!-- Launcher (HomeActivity) -->
+    <string name="openalt_home_settings">Configurações</string>
+    <string name="openalt_home_your_pcs">Seus PCs</string>
+    <string name="openalt_home_touch_hint">Toque num cartão, ou use um controle</string>
+    <string name="openalt_home_status_home">Em casa</string>
+    <string name="openalt_home_status_away">Fora de casa</string>
+    <string name="openalt_home_status_offline">Desligado</string>
+    <string name="openalt_home_status_searching">Procurando…</string>
+    <string name="openalt_home_status_unpaired">Não pareado</string>
+    <string name="openalt_home_detail_home">Mesma rede</string>
+    <string name="openalt_home_detail_away">Pelo Tailscale · só espelhar</string>
+    <string name="openalt_home_detail_offline">Ligue o OpenAlt no PC</string>
+    <string name="openalt_home_detail_searching">Procurando este PC…</string>
+    <string name="openalt_home_detail_unpaired">Toque para parear com o QR</string>
+    <string name="openalt_home_connect">Conectar</string>
+    <string name="openalt_home_pair_title">Parear um PC</string>
+    <string name="openalt_home_pair_detail">Aponte a câmera para o QR do app do PC</string>
+    <string name="openalt_home_offline_toast">%1$s não foi encontrado. Ligue o OpenAlt no PC; fora de casa, o Tailscale precisa estar ligado nos dois.</string>
+    <string name="openalt_home_net_wifi">Wi-Fi</string>
+    <string name="openalt_home_net_mobile">Dados móveis</string>
+    <string name="openalt_home_net_none">Sem rede</string>
+    <string name="openalt_pad_connect">Conectar</string>
+    <string name="openalt_pad_options">Opções do PC</string>
+    <string name="openalt_pad_settings">Configurações</string>
+    <string name="openalt_intro_skip">Toque para pular</string>
+    <string name="openalt_pref_controller_title">Estilo dos botões do controle</string>
+    <string name="openalt_pref_controller_summary" formatted="false">Os nomes dos botões no OpenAlt: %s</string>
+    <string name="openalt_controller_auto">Igual ao controle</string>
+    <string name="openalt_controller_xbox">Xbox (A B X Y)</string>
+    <string name="openalt_controller_playstation">PlayStation (✕ ○ □ △)</string>
+    <string name="openalt_controller_nintendo">Nintendo Switch (A e B trocados)</string>
+    <string-array name="openalt_controller_style_names">
+        <item>@string/openalt_controller_auto</item>
+        <item>@string/openalt_controller_xbox</item>
+        <item>@string/openalt_controller_playstation</item>
+        <item>@string/openalt_controller_nintendo</item>
+    </string-array>
 </resources>

@@ -63,4 +63,48 @@
     <string name="openalt_link_sunshine_summary">The streaming server on the PC, by LizardByte (GPL-3.0)</string>
     <string name="openalt_link_catta">Catta Studios</string>
     <string name="openalt_link_catta_summary">The website of the people who made OpenAlt</string>
+
+    <!-- Launcher (HomeActivity) -->
+    <string name="openalt_home_settings">Settings</string>
+    <string name="openalt_home_your_pcs">Your PCs</string>
+    <string name="openalt_home_touch_hint">Tap a card, or use a controller</string>
+    <string name="openalt_home_status_home">At home</string>
+    <string name="openalt_home_status_away">Away from home</string>
+    <string name="openalt_home_status_offline">Off</string>
+    <string name="openalt_home_status_searching">Looking…</string>
+    <string name="openalt_home_status_unpaired">Not paired</string>
+    <string name="openalt_home_detail_home">Same network</string>
+    <string name="openalt_home_detail_away">Through Tailscale · mirror only</string>
+    <string name="openalt_home_detail_offline">Turn OpenAlt on on the PC</string>
+    <string name="openalt_home_detail_searching">Looking for this PC…</string>
+    <string name="openalt_home_detail_unpaired">Tap to pair with the QR code</string>
+    <string name="openalt_home_connect">Connect</string>
+    <string name="openalt_home_pair_title">Pair a PC</string>
+    <string name="openalt_home_pair_detail">Point the camera at the QR code in the PC app</string>
+    <string name="openalt_home_offline_toast">%1$s was not found. Turn OpenAlt on on the PC; away from home, Tailscale must be on in both.</string>
+    <string name="openalt_home_net_wifi">Wi-Fi</string>
+    <string name="openalt_home_net_mobile">Mobile data</string>
+    <string name="openalt_home_net_none">No network</string>
+    <string name="openalt_pad_connect">Connect</string>
+    <string name="openalt_pad_options">PC options</string>
+    <string name="openalt_pad_settings">Settings</string>
+    <string name="openalt_intro_skip">Tap to skip</string>
+    <string name="openalt_pref_controller_title">Controller button style</string>
+    <string name="openalt_pref_controller_summary" formatted="false">The button names shown in OpenAlt: %s</string>
+    <string name="openalt_controller_auto">Match the controller</string>
+    <string name="openalt_controller_xbox">Xbox (A B X Y)</string>
+    <string name="openalt_controller_playstation">PlayStation (✕ ○ □ △)</string>
+    <string name="openalt_controller_nintendo">Nintendo Switch (A and B swapped)</string>
+    <string-array name="openalt_controller_style_values" translatable="false">
+        <item>auto</item>
+        <item>xbox</item>
+        <item>playstation</item>
+        <item>nintendo</item>
+    </string-array>
+    <string-array name="openalt_controller_style_names">
+        <item>@string/openalt_controller_auto</item>
+        <item>@string/openalt_controller_xbox</item>
+        <item>@string/openalt_controller_playstation</item>
+        <item>@string/openalt_controller_nintendo</item>
+    </string-array>
 </resources>
