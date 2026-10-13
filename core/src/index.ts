@@ -3,6 +3,7 @@ export * from './layout.ts';
 export * from './paths.ts';
 export * from './settings.ts';
 export * from './audio.ts';
+export * from './tailscale.ts';
 export { windowMaximizer } from './linux-x11/windows.ts';
 export { reloadMonitorSensitiveExtensions, restoreExtensions } from './linux-x11/shell-extensions.ts';
 export { installShellHelper, restartShellViaHelper, shellHelperVersion, SHELL_HELPER_UUID, type HelperInstall } from './linux-x11/shell-helper.ts';
