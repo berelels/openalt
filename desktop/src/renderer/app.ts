@@ -29,8 +29,6 @@ interface State {
   placement: Placement;
   mode: Mode;
   mirrorOf: string;
-  audio: 'device' | 'pc' | 'both';
-  audioAfterReconnect?: boolean;
   rememberLayout: boolean;
   orientation: Orientation;
   /** Tipo usado na prévia enquanto nenhum aparelho está conectado. */
@@ -71,7 +69,6 @@ interface OpenAltApi {
   setMode(m: Mode): Promise<void>;
   setMirrorOf(id: string): Promise<void>;
   setOrientation(o: Orientation): Promise<void>;
-  setAudio(v: 'device' | 'pc' | 'both'): Promise<void>;
   setUiScale(v: number): Promise<void>;
   setPreviewKind(k: Kind): Promise<void>;
   setPref(key: 'rememberLayout' | 'maximizeOnDevice', value: boolean): Promise<void>;
@@ -225,7 +222,6 @@ function mockApi(): OpenAltApi & { demo(patch: DemoPatch): void } {
     placement: { anchor: 'DisplayPort-2', side: 'right', align: 'start', offset: 0 },
     mode: 'extend',
     mirrorOf: 'DisplayPort-2',
-    audio: 'pc',
     rememberLayout: false,
     orientation: 'auto',
     previewKind: 'phone',
@@ -264,7 +260,6 @@ function mockApi(): OpenAltApi & { demo(patch: DemoPatch): void } {
     async setMode(m) { s.mode = m; emit(); },
     async setMirrorOf(id) { s.mirrorOf = id; emit(); },
     async setOrientation(o) { s.orientation = o; emit(); },
-    async setAudio(v) { s.audio = v; emit(); },
     async setUiScale(v) { s.uiScale = v; emit(); },
     async setPreviewKind(k) { s.previewKind = k; emit(); },
     async setPref(k, v) { s[k] = v; emit(); },
@@ -378,7 +373,6 @@ function topbar(title: string, sub: string, live = false): string {
     ${s.error ? `<p class="error-banner fade-up" role="alert"><span class="ms" aria-hidden="true">error</span>${uiText(s.error)}</p>` : ''}`;
 }
 
-const audioLabel = (a: string) => t(`audio.${a === 'device' || a === 'both' ? a : 'pc'}`);
 
 function seg(name: string, label: string, items: [string, string, string?][], current: string, attr: string): string {
   return `<div class="seg" role="radiogroup" aria-label="${label}" data-group="${name}">${items.map(([v, text, icon]) =>
@@ -397,7 +391,7 @@ function connectionCard(): string {
   }[s.phase];
   const stats = d
     ? [[`${d.width}×${d.height}`, t('stat.resolution')], [`${d.fps} Hz`, t('stat.rate')], [t(d.network === 'tailscale' ? 'stat.remote' : 'stat.local'), t('stat.connection')]]
-    : [[String(s.monitors.length), t(s.monitors.length === 1 ? 'stat.monitor' : 'stat.monitors')], [t(s.mode === 'mirror' ? 'stat.mirror' : 'stat.new'), t('stat.mode')], [audioLabel(s.audio), t('stat.sound')]];
+    : [[String(s.monitors.length), t(s.monitors.length === 1 ? 'stat.monitor' : 'stat.monitors')], [t(s.mode === 'mirror' ? 'stat.mirror' : 'stat.new'), t('stat.mode')]];
   const on = s.phase === 'waiting' || s.phase === 'connected';
   return `
     <section class="card accent c4 fade-up d1" aria-labelledby="connTitle">
@@ -486,11 +480,6 @@ function prefsCard(): string {
           ${seg('orient', t('prefs.orientation'), (['auto', 'portrait', 'landscape'] as Orientation[]).map((o) => [o, t(`orient.${o}`), ORIENT_ICON[o]] as [string, string, string]), s.orientation, 'data-orient')}
           <p class="mini-label">${t('prefs.uiScale')}</p>
           ${seg('uiscale', t('prefs.uiScale'), ([100, 125, 150, 200]).map((v) => [String(v), `${v}%`] as [string, string]), String(s.uiScale ?? 125), 'data-uiscale')}
-        </div>
-        <div>
-          <p class="mini-label">${t('prefs.audio')}</p>
-          ${seg('audio', t('prefs.audio'), [['device', audioLabel('device'), 'smartphone'], ['pc', audioLabel('pc'), 'computer'], ['both', audioLabel('both'), 'speaker_group']], s.audio ?? 'pc', 'data-audio')}
-          ${s.audioAfterReconnect ? `<p class="switch-hint audio-note" role="status">${t('prefs.audioReconnect', { dev: noun(s) })}</p>` : ''}
         </div>
         <label class="switch-row"><span><span class="switch-title">${t('prefs.maximize', { dev: noun(s) })}</span><span class="switch-hint">${t('prefs.maximize.hint')}</span></span>
           <input type="checkbox" class="switch" id="optMaximize" ${s.maximizeOnDevice !== false ? 'checked' : ''}></label>
@@ -863,7 +852,6 @@ function bindView() {
   on('#view [data-uiscale]', (b) => void api.setUiScale(Number(b.dataset.uiscale)));
   on('#view [data-kind]', (b) => void api.setPreviewKind(b.dataset.kind as Kind));
   on('#view [data-forget]', (b) => void api.esquecer(b.dataset.forget!));
-  on('#view [data-audio]', (b) => void api.setAudio(b.dataset.audio as State['audio']));
   $<HTMLInputElement>('#optRemember')?.addEventListener('change', (e) => void api.setPref('rememberLayout', (e.target as HTMLInputElement).checked));
   $<HTMLInputElement>('#optMaximize')?.addEventListener('change', (e) => void api.setPref('maximizeOnDevice', (e.target as HTMLInputElement).checked));
   // setas do teclado movem a seleção dentro de cada grupo de opções

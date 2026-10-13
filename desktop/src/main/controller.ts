@@ -21,10 +21,6 @@ import {
   drmConnectorFor,
   findSunshine,
   isUiScale,
-  isAudioOut,
-  realSink,
-  AudioRouter,
-  streamsAudio,
   reloadMonitorSensitiveExtensions,
   installShellHelper,
   restoreExtensions,
@@ -91,9 +87,6 @@ export interface UiState {
   placement: { anchor: string; side: Settings['placement']['side']; align: Settings['placement']['align']; offset: number };
   mode: Settings['mode'];
   mirrorOf: string;
-  audio: Settings['audio'];
-  /** a escolha de som só vale ao reconectar o aparelho (o Sunshine liga com ou sem som) */
-  audioAfterReconnect: boolean;
   rememberLayout: boolean;
   orientation: Settings['orientation'];
   previewKind: Kind;
@@ -197,8 +190,6 @@ export class Controller extends EventEmitter {
       placement: { anchor, side: s.placement.side, align: s.placement.align, offset: s.placement.offset ?? 0 },
       mode: s.mode,
       mirrorOf,
-      audio: s.audio,
-      audioAfterReconnect: !!this.connection && this.streamAudio !== null && this.streamAudio !== streamsAudio(this.settings.audio),
       rememberLayout: s.rememberLayout,
       orientation: s.orientation,
       previewKind: s.previewKind,
@@ -298,8 +289,7 @@ export class Controller extends EventEmitter {
         outputIndex: Math.max(0, outputIndex),
         kmsConnector,
         outputName: output,
-        // "som no PC": o Sunshine nem transmite som nem mexe na saída do PC (sem corrida nenhuma)
-        streamAudio: this.streamAudio = streamsAudio(this.settings.audio),
+        // o Sunshine sempre transmite o som; onde ele toca é a opção "Tocar áudio no PC" do app do aparelho
         name: hostname(),
         prep: {
           runner: this.opts.cli.runner,
@@ -317,7 +307,6 @@ export class Controller extends EventEmitter {
       if (process.env.XDG_SESSION_TYPE === 'x11' && /gnome/i.test(process.env.XDG_CURRENT_DESKTOP ?? '')) {
         await installShellHelper({ run }).catch(() => 'unavailable');
       }
-      this.audio = new AudioRouter(await realSink(run), run); // antes de o Sunshine trocar a saída padrão
       this.sunshine = await startSunshine(setup.confPath, { kind: this.sunshineKind ?? 'flatpak' });
       const mine = this.sunshine;
       // só é "fechou sozinho" se não fomos nós que mandamos parar
@@ -336,51 +325,6 @@ export class Controller extends EventEmitter {
   /** Sem reiniciar o GNOME (Wayland, sem xdotool, janela fechada): recarrega as extensões. */
   async reloadExtensions(): Promise<void> {
     await reloadMonitorSensitiveExtensions({ run, runtimeDir: this.paths.runtime }).catch(() => {});
-  }
-
-  private audio: AudioRouter | null = null;
-  private audioTimer: NodeJS.Timeout | null = null;
-  /** o Sunshine em execução transmite som? (null = desligado) */
-  private streamAudio: boolean | null = null;
-
-  /**
-   * Com o aparelho conectado, mantém o som onde a pessoa escolheu (settings.audio). Confere a cada
-   * segundo: o Sunshine troca a saída padrão um instante DEPOIS de conectar (ver core/src/audio.ts).
-   */
-  private audioBusy = false;
-  private updateAudio() {
-    const tick = async () => {
-      if (this.audioBusy || !this.audio) return;
-      this.audioBusy = true;
-      try { await this.audio.tick(this.settings.audio, !!this.connection); } catch { /* o próximo tick tenta de novo */ } finally { this.audioBusy = false; }
-    };
-    if (this.connection && !this.audioTimer) this.audioTimer = setInterval(() => void tick(), 1000);
-    if (!this.connection && this.audioTimer) { clearInterval(this.audioTimer); this.audioTimer = null; }
-    void tick();
-  }
-
-  async setAudio(v: unknown) {
-    if (!isAudioOut(v) || v === this.settings.audio) return;
-    await this.save({ audio: v });
-    this.updateAudio();
-    // sem aparelho conectado, religa o Sunshine com ou sem som já (o QR é renovado)
-    if (!this.connection) void this.restartForAudio();
-  }
-
-  /** O Sunshine liga com ou sem som. Se a escolha mudou, religa quando não há aparelho conectado. */
-  private restartingForAudio = false;
-  private async restartForAudio() {
-    if (this.restartingForAudio) return;
-    this.restartingForAudio = true;
-    try {
-      // em laço: a pessoa pode ter trocado de novo enquanto o Sunshine religava
-      while (this.phase === 'waiting' && !this.connection && this.streamAudio !== null && this.streamAudio !== streamsAudio(this.settings.audio)) {
-        await this.desligar();
-        await this.ligar();
-      }
-    } finally {
-      this.restartingForAudio = false;
-    }
   }
 
   private stopping = false;
@@ -408,12 +352,6 @@ export class Controller extends EventEmitter {
     this.stopPairing();
     if (this.maximizeTimer) clearInterval(this.maximizeTimer);
     this.maximizeTimer = null;
-    if (this.audioTimer) clearInterval(this.audioTimer);
-    this.audioTimer = null;
-    // a cópia do "os dois" some e a saída padrão volta para a do PC (o Sunshine também volta, ao desconectar)
-    await this.audio?.stop().catch(() => {});
-    this.audio = null;
-    this.streamAudio = null;
     this.watcher?.close();
     this.watcher = null;
     if (this.connection) {
@@ -507,10 +445,6 @@ export class Controller extends EventEmitter {
       // recarregar as extensões resolvia o Super, mas não o papel de parede, que só volta reiniciando.
       if ((c && c.mode !== 'mirror') || (!c && wasExtend)) this.emit('monitors-changed');
       this.updateMaximizer();
-      this.updateAudio();
-      // desconectou com uma escolha de som que pede o Sunshine com/sem som: religa (depois que ele
-      // terminar de desfazer a sessão)
-      if (!c) setTimeout(() => void this.restartForAudio(), 3000);
       this.emitState();
     };
     this.watcher = watch(this.paths.runtime, () => void update());

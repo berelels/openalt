@@ -25,7 +25,6 @@ const PT: Dict = {
   'side.right': 'À direita', 'side.left': 'À esquerda', 'side.above': 'Acima', 'side.below': 'Abaixo',
   'place.at.right': 'À direita de {m}', 'place.at.left': 'À esquerda de {m}', 'place.at.above': 'Acima de {m}', 'place.at.below': 'Abaixo de {m}',
   'align.top': 'Topo', 'align.middle': 'Centro', 'align.bottom': 'Base', 'align.left': 'Esquerda', 'align.right': 'Direita',
-  'audio.device': 'Aparelho', 'audio.pc': 'PC', 'audio.both': 'Os dois',
 
   // topo
   'net.local': 'Rede local', 'net.away': 'Fora de casa',
@@ -39,7 +38,7 @@ const PT: Dict = {
   'conn.waiting': 'Esperando', 'conn.waiting.sub': 'Escaneie o código com {dev}',
   'conn.connected': 'Conectado', 'conn.mirroring': 'Espelhando {m}', 'conn.extra': 'Mais uma tela',
   'stat.resolution': 'resolução', 'stat.rate': 'taxa', 'stat.connection': 'conexão', 'stat.remote': 'Remota', 'stat.local': 'Local',
-  'stat.monitor': 'monitor', 'stat.monitors': 'monitores', 'stat.mode': 'modo', 'stat.sound': 'som',
+  'stat.monitor': 'monitor', 'stat.monitors': 'monitores', 'stat.mode': 'modo',
   'stat.mirror': 'Espelho', 'stat.new': 'Nova',
   'power.on': 'Ligar', 'power.off': 'Desligar',
 
@@ -65,8 +64,7 @@ const PT: Dict = {
 
   // preferências
   'prefs.title': 'Como {dev} fica', 'prefs.hint': 'A orientação vale a partir da próxima conexão.',
-  'prefs.orientation': 'Orientação', 'prefs.uiScale': 'Tamanho das coisas na Nova tela', 'prefs.audio': 'Onde sai o som',
-  'prefs.audioReconnect': 'Para o som ir para {dev}, desconecte e conecte de novo.',
+  'prefs.orientation': 'Orientação', 'prefs.uiScale': 'Tamanho das coisas na Nova tela',
   'prefs.maximize': 'Maximizar janelas em {dev}', 'prefs.maximize.hint': 'Ao levar uma janela para a Nova tela',
   'prefs.remember': 'Lembrar o arranjo', 'prefs.remember.hint': 'Menos piscadas; grava no GNOME',
 
@@ -179,7 +177,6 @@ const ES: Dict = {
   'side.right': 'A la derecha', 'side.left': 'A la izquierda', 'side.above': 'Arriba', 'side.below': 'Abajo',
   'place.at.right': 'A la derecha de {m}', 'place.at.left': 'A la izquierda de {m}', 'place.at.above': 'Encima de {m}', 'place.at.below': 'Debajo de {m}',
   'align.top': 'Arriba', 'align.middle': 'Centro', 'align.bottom': 'Abajo', 'align.left': 'Izquierda', 'align.right': 'Derecha',
-  'audio.device': 'Dispositivo', 'audio.pc': 'PC', 'audio.both': 'Ambos',
 
   'net.local': 'Red local', 'net.away': 'Fuera de casa',
   'top.pcChecks': 'Qué funciona en este PC', 'top.fullscreen': 'Pantalla completa (F11)', 'top.exitFullscreen': 'Salir de pantalla completa (Esc)',
@@ -191,7 +188,7 @@ const ES: Dict = {
   'conn.waiting': 'Esperando', 'conn.waiting.sub': 'Escanea el código con {dev}',
   'conn.connected': 'Conectado', 'conn.mirroring': 'Duplicando {m}', 'conn.extra': 'Una pantalla más',
   'stat.resolution': 'resolución', 'stat.rate': 'frecuencia', 'stat.connection': 'conexión', 'stat.remote': 'Remota', 'stat.local': 'Local',
-  'stat.monitor': 'monitor', 'stat.monitors': 'monitores', 'stat.mode': 'modo', 'stat.sound': 'sonido',
+  'stat.monitor': 'monitor', 'stat.monitors': 'monitores', 'stat.mode': 'modo',
   'stat.mirror': 'Espejo', 'stat.new': 'Nueva',
   'power.on': 'Encender', 'power.off': 'Apagar',
 
@@ -213,8 +210,7 @@ const ES: Dict = {
   'show.none': 'Ningún dispositivo', 'show.estimated': '(estimado)', 'show.kindAria': 'Tipo de dispositivo en la vista previa',
 
   'prefs.title': 'Cómo queda {dev}', 'prefs.hint': 'La orientación se aplica desde la próxima conexión.',
-  'prefs.orientation': 'Orientación', 'prefs.uiScale': 'Tamaño de las cosas en la Nueva pantalla', 'prefs.audio': 'Dónde sale el sonido',
-  'prefs.audioReconnect': 'Para que el sonido vaya a {dev}, desconecta y vuelve a conectar.',
+  'prefs.orientation': 'Orientación', 'prefs.uiScale': 'Tamaño de las cosas en la Nueva pantalla',
   'prefs.maximize': 'Maximizar ventanas en {dev}', 'prefs.maximize.hint': 'Al llevar una ventana a la Nueva pantalla',
   'prefs.remember': 'Recordar la disposición', 'prefs.remember.hint': 'Menos parpadeos; se guarda en GNOME',
 
@@ -320,7 +316,6 @@ const EN: Dict = {
   'side.right': 'Right', 'side.left': 'Left', 'side.above': 'Above', 'side.below': 'Below',
   'place.at.right': 'Right of {m}', 'place.at.left': 'Left of {m}', 'place.at.above': 'Above {m}', 'place.at.below': 'Below {m}',
   'align.top': 'Top', 'align.middle': 'Center', 'align.bottom': 'Bottom', 'align.left': 'Left', 'align.right': 'Right',
-  'audio.device': 'Device', 'audio.pc': 'PC', 'audio.both': 'Both',
 
   'net.local': 'Local network', 'net.away': 'Away from home',
   'top.pcChecks': 'What works on this PC', 'top.fullscreen': 'Full screen (F11)', 'top.exitFullscreen': 'Exit full screen (Esc)',
@@ -332,7 +327,7 @@ const EN: Dict = {
   'conn.waiting': 'Waiting', 'conn.waiting.sub': 'Scan the code with {dev}',
   'conn.connected': 'Connected', 'conn.mirroring': 'Mirroring {m}', 'conn.extra': 'One more screen',
   'stat.resolution': 'resolution', 'stat.rate': 'refresh', 'stat.connection': 'connection', 'stat.remote': 'Remote', 'stat.local': 'Local',
-  'stat.monitor': 'monitor', 'stat.monitors': 'monitors', 'stat.mode': 'mode', 'stat.sound': 'sound',
+  'stat.monitor': 'monitor', 'stat.monitors': 'monitors', 'stat.mode': 'mode',
   'stat.mirror': 'Mirror', 'stat.new': 'New',
   'power.on': 'Turn on', 'power.off': 'Turn off',
 
@@ -354,8 +349,7 @@ const EN: Dict = {
   'show.none': 'No device', 'show.estimated': '(estimated)', 'show.kindAria': 'Device type in the preview',
 
   'prefs.title': 'How {dev} looks', 'prefs.hint': 'Orientation applies from the next connection.',
-  'prefs.orientation': 'Orientation', 'prefs.uiScale': 'Size of things on the New screen', 'prefs.audio': 'Where sound plays',
-  'prefs.audioReconnect': 'For sound to play on {dev}, disconnect and connect again.',
+  'prefs.orientation': 'Orientation', 'prefs.uiScale': 'Size of things on the New screen',
   'prefs.maximize': 'Maximize windows on {dev}', 'prefs.maximize.hint': 'When you move a window to the New screen',
   'prefs.remember': 'Remember the arrangement', 'prefs.remember.hint': 'Less flicker; saved in GNOME',
 

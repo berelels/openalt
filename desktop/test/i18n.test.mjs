@@ -39,7 +39,6 @@ test('toda chave fixa usada na interface e no processo principal existe', () => 
   for (const s of ['right', 'left', 'above', 'below']) used.add(`side.${s}`).add(`place.at.${s}`);
   for (const o of ['auto', 'portrait', 'landscape']) used.add(`orient.${o}`);
   for (const k of ['phone', 'tablet']) used.add(`kind.${k}`);
-  for (const a of ['device', 'pc', 'both']) used.add(`audio.${a}`);
   for (const id of ['session', 'desktop', 'gpu', 'multi-gpu', 'free-output', 'connector', 'helper']) used.add(`check.${id}`);
   for (const m of src('../../core/src/layout.ts').matchAll(/new LayoutError\('([\w-]+)'/g)) used.add(`layout.${m[1]}`);
   for (const m of src('../src/renderer/index.html').matchAll(/data-i18n-(?:aria|tip)="([\w.-]+)"/g)) used.add(m[1]);
