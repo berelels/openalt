@@ -123,6 +123,9 @@ dependencies {
 
     // OpenAlt: leitor de QR (Apache-2.0). Precisa do desugaring acima em API < 24.
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+    // O zxing-android-embedded 4.x não traz o androidx.core sozinho; sem ele, o leitor fecha ao abrir
+    // a câmera (ClassNotFoundException: androidx.core.content.ContextCompat — 1º teste no tablet).
+    implementation 'androidx.core:core:1.13.1'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 
