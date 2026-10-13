@@ -351,12 +351,6 @@ button.tile.compact small, button.tile.tiny span { display: none; }
 .rail-end { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .theme-toggle.vertical { flex-direction: column; }
 .theme-toggle.vertical button { width: 30px; height: 30px; }
-.rail-catta {
-  width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center;
-  font-family: var(--font-serif); font-style: italic; font-size: 20px; color: var(--accent-text);
-  border: 1.5px solid var(--border-strong); background: var(--card-solid);
-}
-
 .main { position: relative; min-width: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 .scroller { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 26px 34px 56px; }
 .scroller::-webkit-scrollbar { width: 12px; }
