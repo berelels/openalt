@@ -98,4 +98,25 @@
         <item>@string/openalt_controller_playstation</item>
         <item>@string/openalt_controller_nintendo</item>
     </string-array>
+
+    <!-- Configurações (SettingsActivity) -->
+    <string name="openalt_settings_back">Volver</string>
+    <string name="openalt_settings_next_connection">Se aplica desde la próxima conexión</string>
+    <string name="openalt_cat_video">Vídeo</string>
+    <string name="openalt_cat_audio">Sonido</string>
+    <string name="openalt_cat_controller">Mando</string>
+    <string name="openalt_cat_touch">Pantalla y toque</string>
+    <string name="openalt_cat_more">Más</string>
+    <string name="openalt_cat_about">Acerca de</string>
+    <string name="openalt_cat_video_sub">Resolución, calidad</string>
+    <string name="openalt_cat_audio_sub">Dónde suena</string>
+    <string name="openalt_cat_controller_sub">Botones, palancas</string>
+    <string name="openalt_cat_touch_sub">Ratón, controles en pantalla</string>
+    <string name="openalt_cat_more_sub">Avanzado y lo demás</string>
+    <string name="openalt_cat_about_sub">Versión, créditos</string>
+    <string name="openalt_settings_on">Activado</string>
+    <string name="openalt_settings_off">Desactivado</string>
+    <string name="openalt_settings_all">Todos los ajustes de Moonlight</string>
+    <string name="openalt_settings_all_summary">La lista original: idioma, ayuda, posición de los controles en pantalla y lo demás.</string>
+    <string name="openalt_settings_open">Abrir</string>
 </resources>

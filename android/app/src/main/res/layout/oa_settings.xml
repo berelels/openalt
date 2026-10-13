@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- OpenAlt: Configurações deitado. Trilho de categorias à esquerda, opções à direita. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/oa_bg"
+    android:orientation="horizontal">
+
+    <ScrollView
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="28dp"
+            android:paddingTop="28dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/oaBack"
+                    style="@style/OpenAlt.IconButton"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginLeft="0dp"
+                    android:contentDescription="@string/openalt_settings_back"
+                    android:src="@drawable/oa_ic_back" />
+
+                <TextView
+                    android:id="@+id/oaSettingsTitle"
+                    style="@style/OpenAlt.Wordmark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:text="@string/openalt_settings"
+                    android:textSize="28sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/oaRail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical" />
+        </LinearLayout>
+    </ScrollView>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@color/oa_border" />
+
+    <ScrollView
+        android:id="@+id/oaContentScroll"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:scrollbars="none"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="40dp"
+            android:paddingTop="28dp"
+            android:paddingRight="40dp"
+            android:paddingBottom="24dp">
+
+            <TextView
+                android:id="@+id/oaCategoryTitle"
+                style="@style/OpenAlt.Wordmark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:textSize="40sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="18dp"
+                android:text="@string/openalt_settings_next_connection"
+                android:textColor="@color/oa_text"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:id="@+id/oaRows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

@@ -27,8 +27,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -47,7 +45,6 @@ import com.limelight.computers.ComputerManagerService;
 import com.limelight.nvstream.http.ComputerDetails;
 import com.limelight.nvstream.http.PairingManager.PairState;
 import com.limelight.preferences.GlPreferences;
-import com.limelight.preferences.StreamSettings;
 import com.limelight.utils.UiHelper;
 
 import java.util.ArrayList;
@@ -118,11 +115,7 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         UiHelper.setLocale(this);
-        // tela cheia de verdade: desenha também atrás do recorte da câmera
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            getWindow().getAttributes().layoutInDisplayCutoutMode =
-                    android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
-        }
+        Immersive.prepare(this);
         setContentView(R.layout.oa_home);
 
         cards = findViewById(R.id.oaCards);
@@ -190,22 +183,8 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
 
     // ── tela cheia ─────────────────────────────────────────────────────────
 
-    @SuppressWarnings("deprecation")
     private void enterFullscreen() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            getWindow().setDecorFitsSystemWindows(false);
-            WindowInsetsController c = getWindow().getInsetsController();
-            if (c != null) {
-                c.hide(WindowInsets.Type.systemBars());
-                c.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-            }
-        }
-        else {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        }
+        Immersive.apply(this);
     }
 
     // ── abertura ───────────────────────────────────────────────────────────
@@ -529,7 +508,7 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
     }
 
     private void openSettings() {
-        startActivity(new Intent(this, StreamSettings.class));
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 
     // ── rede ───────────────────────────────────────────────────────────────

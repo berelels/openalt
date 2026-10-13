@@ -100,6 +100,12 @@
             <!-- OpenAlt: a entrada do app passou para StartActivity; esta lista abre pelas opções do PC.
                  fullSensor aqui e nas outras telas abertas pelo app: seguem o aparelho, como a StartActivity -->
         </activity>
+        <!-- OpenAlt: Configurações com jeito de console (as opções do Moonlight, outra tela) -->
+        <activity
+            android:name="dev.cattastudios.openalt.SettingsActivity"
+            android:exported="false"
+            android:resizeableActivity="true"
+            android:screenOrientation="fullSensor" />
         <!-- OpenAlt: tela de entrada com jeito de launcher (tela cheia, cartões, controle, abertura) -->
         <activity
             android:name="dev.cattastudios.openalt.StartActivity"
