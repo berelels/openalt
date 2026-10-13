@@ -18,6 +18,7 @@ import { run } from './proc.ts';
 import { clearConnection, writeConnection } from './connection.ts';
 import { openaltPaths } from './paths.ts';
 import { readSettings, settingsFor } from './settings.ts';
+import { sunshineClientViaTailscale } from './tailscale.ts';
 
 const USAGE = `uso:
   openalt-core display extend [tamanho] [posição] [--output SAIDA] [--remember]
@@ -65,8 +66,11 @@ async function main(argv: string[]): Promise<unknown> {
     },
   });
   const [group, asked] = positionals;
-  // "auto" (chamado pela ponte do Sunshine): o modo escolhido no app do PC
-  const action = asked === 'auto' ? (await readSettings(openaltPaths().config)).mode : asked;
+  // "auto" (chamado pela ponte do Sunshine): o modo escolhido no app do PC; pelo Tailscale
+  // (fora de casa) sempre "Espelhar", a "Nova tela" é só na mesma rede
+  const action = asked === 'auto'
+    ? (await sunshineClientViaTailscale(run) ? 'mirror' : (await readSettings(openaltPaths().config)).mode)
+    : asked;
   if (values.help || group !== 'display') throw new UsageError();
 
   const env = { ...process.env };

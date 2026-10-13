@@ -70,3 +70,16 @@ test('signInCommands: pkexec com argumentos em lista; usuário validado', () => 
   assert.deepEqual(signInCommands('needs-login', 'x --reset'), []);
   assert.deepEqual(signInCommands('needs-login', '-rf'), []);
 });
+
+test('clientViaTailscale: conexão no Sunshine vinda de 100.64.0.0/10', async () => {
+  const { clientViaTailscale } = await import('../src/tailscale.ts');
+  const casa = '0 0 192.168.1.100:47984 192.168.1.50:51234\n0 0 192.168.1.100:40522 206.247.34.141:443';
+  const fora = '0 0 100.101.102.103:47984 100.64.0.2:40001';
+  const v6 = '0 0 [::ffff:100.101.102.103]:47984 [::ffff:100.64.0.2]:40001';
+  const outraPorta = '0 0 100.101.102.103:22 100.64.0.2:40001';
+  assert.equal(clientViaTailscale(casa), false);
+  assert.equal(clientViaTailscale(fora), true);
+  assert.equal(clientViaTailscale(v6), true);
+  assert.equal(clientViaTailscale(outraPorta), false);
+  assert.equal(clientViaTailscale(''), false);
+});

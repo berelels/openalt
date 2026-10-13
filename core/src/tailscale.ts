@@ -139,3 +139,30 @@ export function runSignIn(c: Command, onUrl: (url: string) => void): Promise<{ o
     child.stdin?.end();
   });
 }
+
+/** Portas TCP do Sunshine em que o aparelho fala com o PC (HTTPS, HTTP e RTSP). */
+const SUNSHINE_TCP_PORTS = new Set([47984, 47989, 48010]);
+
+/**
+ * O aparelho que está conectando ao Sunshine veio pelo Tailscale (endereço 100.64.0.0/10)?
+ * Lê as conexões TCP abertas (`ss`); na hora do prep-cmd a do pedido de início ainda está aberta.
+ * Pelo Tailscale o OpenAlt só espelha: a "Nova tela" é para quem está na mesma rede.
+ */
+export function clientViaTailscale(ssOutput: string): boolean {
+  for (const line of ssOutput.split('\n')) {
+    const cols = line.trim().split(/\s+/);
+    // -H sem cabeçalho: Recv-Q Send-Q Local:Porta Remoto:Porta
+    if (cols.length < 4) continue;
+    const local = cols[2]!;
+    const peer = cols[3]!;
+    const port = Number(local.slice(local.lastIndexOf(':') + 1));
+    const host = peer.slice(0, peer.lastIndexOf(':')).replace(/^\[|\]$/g, '').replace(/^::ffff:/, '');
+    if (SUNSHINE_TCP_PORTS.has(port) && isTailscaleIPv4(host)) return true;
+  }
+  return false;
+}
+
+export async function sunshineClientViaTailscale(run: Runner = defaultRun): Promise<boolean> {
+  const out = await run('ss', ['-Htn', 'state', 'established']).catch(() => ({ stdout: '' }));
+  return clientViaTailscale(out.stdout);
+}
