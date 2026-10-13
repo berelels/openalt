@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>02 Brilho noturno</title>
+<link rel="stylesheet" href="base.css"><link rel="stylesheet" href="devices.css">
+<style>
+body { background: #0B0A09; color: #F3EEE6; }
+.frame { position: absolute; inset: 22px; border-radius: 30px; background: #0F0D0B; overflow: hidden; }
+nav { position: absolute; top: 26px; left: 40px; right: 40px; display: flex; align-items: center; justify-content: space-between; z-index: 3; }
+.logo { color: #F3EEE6; } .logo em { color: var(--red); }
+.pillnav { display: flex; align-items: center; gap: 4px; padding: 6px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); font-size: 14px; }
+.pillnav span { padding: 8px 14px; border-radius: 999px; color: rgba(243,238,230,.75); }
+.pillnav span.on { background: rgba(255,255,255,.1); color: #fff; }
+.acct { font-size: 14px; display: flex; gap: 8px; align-items: center; color: rgba(243,238,230,.85); }
+.hero { position: absolute; left: 26px; right: 26px; top: 92px; bottom: 120px; border-radius: 24px; overflow: hidden; background: #000; }
+.glow { position: absolute; border-radius: 50%; filter: blur(80px); }
+.g1 { width: 760px; height: 520px; right: -120px; top: -160px; background: radial-gradient(circle, rgba(255,116,108,.75), rgba(255,116,108,0) 70%); }
+.g2 { width: 620px; height: 460px; right: 120px; top: 60px; background: radial-gradient(circle, rgba(143,191,146,.55), rgba(143,191,146,0) 70%); }
+.g3 { width: 520px; height: 420px; left: -160px; bottom: -200px; background: radial-gradient(circle, rgba(246,241,231,.35), rgba(246,241,231,0) 70%); }
+.stars { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,.35) 1px, transparent 1.4px); background-size: 46px 46px; opacity: .25; }
+.center { position: absolute; left: 0; right: 0; top: 60px; text-align: center; z-index: 2; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1); font-size: 13px; color: rgba(243,238,230,.85); }
+.chip .ms { font-size: 16px; color: var(--red); }
+h1 { margin-top: 26px; font-size: 76px; font-weight: 500; letter-spacing: -0.04em; line-height: 1.02; }
+h1 .fade { background: linear-gradient(90deg, #fff 20%, rgba(255,255,255,.35)); -webkit-background-clip: text; color: transparent; }
+.sub { margin-top: 18px; font-size: 18px; color: rgba(243,238,230,.7); }
+.ctas { margin-top: 34px; display: inline-flex; gap: 12px; }
+.b { display: inline-flex; align-items: center; gap: 8px; padding: 14px 22px; border-radius: 999px; font-size: 15px; font-weight: 600; }
+.b.ghost { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); }
+.b.solid { background: #F6F1E7; color: #14110E; }
+.node { position: absolute; z-index: 2; font-size: 15px; }
+.node .ic { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); }
+.node .ic .ms { font-size: 20px; }
+.node small { display: block; margin-top: 3px; font-size: 12px; color: rgba(243,238,230,.5); }
+.node b { font-weight: 500; }
+.node b::before { content: '•'; margin-right: 8px; color: var(--red); }
+svg.lines { position: absolute; inset: 0; z-index: 1; }
+.devs { position: absolute; left: 50%; top: 420px; transform: translateX(-50%); z-index: 2; }
+.devs .ph2 { position: absolute; right: -120px; top: 40px; }
+.beams { position: absolute; left: 50%; bottom: 0; width: 160px; height: 200px; transform: translateX(-50%); }
+.beams i { position: absolute; bottom: 0; width: 2px; border-radius: 2px; background: linear-gradient(transparent, rgba(255,255,255,.85)); }
+.scroll { position: absolute; left: 28px; bottom: 26px; display: flex; gap: 10px; align-items: center; font-size: 13px; color: rgba(243,238,230,.8); z-index: 2; }
+.scroll .ms { width: 34px; height: 34px; border-radius: 50%; background: #F6F1E7; color: #14110E; display: grid; place-items: center; font-size: 18px; }
+.modes { position: absolute; right: 30px; bottom: 30px; z-index: 2; font-size: 15px; color: var(--sage-l); }
+.modes .bar { margin-top: 12px; display: flex; gap: 6px; } .modes .bar i { width: 26px; height: 3px; border-radius: 2px; background: rgba(255,255,255,.15); } .modes .bar i:first-child { background: #fff; }
+.strip { position: absolute; left: 0; right: 0; bottom: 38px; display: flex; justify-content: center; gap: 70px; font-size: 19px; font-weight: 600; color: rgba(243,238,230,.45); letter-spacing: -0.01em; }
+.strip span { display: inline-flex; align-items: center; gap: 8px; } .strip .ms { font-size: 22px; }
+</style></head><body>
+<div class="frame">
+  <nav>
+    <span class="logo"><svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg><span>Open<em>Alt</em></span></span>
+    <div class="pillnav"><span class="on">Home</span><span>New screen</span><span>Mirror</span><span>Games</span><span>Away</span><span>FAQ</span></div>
+    <span class="acct"><span class="ms">code</span>GitHub</span>
+  </nav>
+  <div class="hero">
+    <div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div><div class="stars"></div>
+    <svg class="lines" viewBox="0 0 1336 666" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.4">
+      <path d="M0 150H170c40 0 60-60 110-60H330"/><path d="M0 380H120c40 0 70 50 120 50h60"/>
+      <path d="M1336 140H1180c-40 0-60-50-110-50h-50"/><path d="M1336 390h-140c-40 0-70 60-120 60h-60"/>
+    </svg>
+    <div class="node" style="left:130px;top:64px"><div class="ic"><span class="ms">tablet</span></div></div>
+    <div class="node" style="left:170px;top:120px"><b>Tablet</b><small>2560 × 1600 · 60 Hz</small></div>
+    <div class="node" style="left:90px;top:410px"><div class="ic"><span class="ms">smartphone</span></div></div>
+    <div class="node" style="left:84px;top:350px"><b>Phone</b><small>1080 × 2400 · 120 Hz</small></div>
+    <div class="node" style="right:300px;top:66px"><div class="ic"><span class="ms">add_to_queue</span></div></div>
+    <div class="node" style="right:150px;top:126px"><b>New screen</b><small>right of LG 27″</small></div>
+    <div class="node" style="right:120px;top:300px"><div class="ic"><span class="ms">sports_esports</span></div></div>
+    <div class="node" style="right:90px;top:370px"><b>Game screen</b><small>Steam Big Picture</small></div>
+    <div class="center">
+      <span class="chip"><span class="ms">qr_code_2</span>Pair with one QR code →</span>
+      <h1>Freedom to stream<br><span class="fade">anywhere, for anyone.</span></h1>
+      <p class="sub">Your phone or tablet becomes another screen for your PC — at home or far away.</p>
+      <div class="ctas"><span class="b ghost">How it works <span class="ms">north_east</span></span><span class="b solid"><span class="ms">download</span>Download free</span></div>
+    </div>
+    <div class="devs"><div class="lap" style="--w:640px"><div class="lid"><div class="scr"><img src="img/app-escuro.png" alt=""></div></div><div class="deck"></div></div>
+      <div class="ph2"><div class="phn dark" style="--w:150px"><i class="btn-l1"></i><i class="btn-l2"></i><i class="btn-r"></i><div class="bz"><div class="scr"><div class="island"></div><div class="status"><span>9:41</span><span><span class="ms">wifi</span> <span class="ms">battery_full</span></span></div><div class="app-oa"><div class="wm">Open<em>Alt</em></div><p class="sb">Your phone or tablet as a PC screen</p><div class="pc"><span class="ms">computer</span><div><b>my-pc</b><small>● Paired · tap to connect</small></div></div><div class="qr"><b>Pair a new PC</b><span><span class="ms">qr_code_scanner</span>Scan QR</span></div></div><div class="home"></div></div></div></div></div></div>
+    <div class="scroll"><span class="ms">south</span>01 / 03 · Scroll down</div>
+    <div class="modes">Stream horizons<div class="bar"><i></i><i></i><i></i><i></i></div></div>
+  </div>
+  <div class="strip"><span><span class="ms">wb_sunny</span>Sunshine</span><span><span class="ms">dark_mode</span>Moonlight</span><span><span class="ms">hub</span>Tailscale</span><span><span class="ms">desktop_windows</span>GNOME</span><span><span class="ms">android</span>Android</span><span><span class="ms">gavel</span>GPL-3.0</span></div>
+</div>
+</body></html>

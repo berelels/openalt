@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>06 Tipográfica</title>
+<link rel="stylesheet" href="base.css"><link rel="stylesheet" href="devices.css">
+<style>
+body { background: #F3EEE4; }
+.grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(38,33,27,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(38,33,27,.08) 1px, transparent 1px); background-size: 120px 120px; }
+nav { position: absolute; top: 0; left: 0; right: 0; height: 72px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; border-bottom: 2px solid var(--ink); font-family: 'JetBrains Mono'; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; background: #F3EEE4; z-index: 3; }
+nav .links { display: flex; gap: 36px; }
+nav .dl { background: var(--ink); color: #F3EEE4; padding: 12px 20px; }
+.w { position: absolute; left: 34px; font-weight: 800; letter-spacing: -0.065em; line-height: .82; font-size: 158px; text-transform: uppercase; z-index: 2; }
+.w1 { top: 130px; } .w2 { top: 268px; } .w3 { top: 406px; }
+.w3 span { -webkit-text-stroke: 3px var(--ink); color: transparent; }
+.anyone { position: absolute; left: 44px; top: 560px; font-family: 'Newsreader'; font-style: italic; font-size: 96px; color: var(--red-ink); letter-spacing: -0.03em; z-index: 2; }
+.block { position: absolute; right: 0; top: 72px; width: 470px; bottom: 0; background: var(--red); z-index: 1; }
+.ann { position: absolute; font-family: 'JetBrains Mono'; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; z-index: 3; }
+.devs { position: absolute; right: 40px; top: 470px; z-index: 3; transform: rotate(-4deg); }
+.devs .p { position: absolute; right: -10px; top: -40px; transform: rotate(10deg); }
+.box { position: absolute; right: 40px; top: 120px; width: 390px; z-index: 3; font-size: 17px; line-height: 1.5; color: #3a1210; }
+.box b { display: block; font-family: 'JetBrains Mono'; font-size: 12px; letter-spacing: .08em; margin-bottom: 10px; }
+.box .cta { margin-top: 22px; display: inline-flex; gap: 10px; align-items: center; background: var(--ink); color: #F3EEE4; padding: 16px 22px; font-weight: 600; font-size: 15px; }
+</style></head><body>
+<div class="grid"></div><div class="block"></div>
+<nav><span class="logo" style="font-family:'Jakarta';text-transform:none;letter-spacing:-0.02em;font-size:20px"><svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg><span>Open<em>Alt</em></span></span>
+  <div class="links"><span>[01] New screen</span><span>[02] Mirror</span><span>[03] Games</span><span>[04] Away</span></div><span class="dl">Download ↓</span></nav>
+<div class="w w1">Freedom</div>
+<div class="w w2">to stream</div>
+<div class="w w3"><span>anywhere</span></div>
+<div class="anyone">— for anyone.</div>
+<div class="box"><b>/ WHAT IT IS</b>A free, open source app that turns your phone or tablet into a second monitor, a mirror or a game screen for your PC. One QR code and you’re streaming.
+  <br><span class="cta"><span class="ms">download</span>Get OpenAlt for Linux</span></div>
+<div class="devs"><div class="lap" style="--w:430px"><div class="lid"><div class="scr"><img src="img/app-qr.png" alt=""></div></div><div class="deck"></div></div><div class="p"><div class="phn" style="--w:118px"><i class="btn-l1"></i><i class="btn-l2"></i><i class="btn-r"></i><div class="bz"><div class="scr"><div class="island"></div><div class="status"><span>9:41</span><span><span class="ms">wifi</span> <span class="ms">battery_full</span></span></div><div class="app-oa"><div class="wm">Open<em>Alt</em></div><p class="sb">Your phone or tablet as a PC screen</p><div class="pc"><span class="ms">computer</span><div><b>my-pc</b><small>● Paired · tap to connect</small></div></div><div class="qr"><b>Pair a new PC</b><span><span class="ms">qr_code_scanner</span>Scan QR</span></div></div><div class="home"></div></div></div></div></div></div>
+<span class="ann" style="left:40px;top:96px">↘ v0.1 · GPL-3.0</span>
+<span class="ann" style="left:40px;top:850px">Linux now · Windows next · Android app</span>
+</body></html>

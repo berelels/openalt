@@ -1,0 +1,69 @@
+/* Aparelhos realistas em CSS (sem imagem de terceiros): notebook, celular e tablet.
+   Tamanho pela variável --w (largura do aparelho). Conteúdo da tela vai dentro de .scr. */
+
+/* ── notebook ───────────────────────────────────────────────── */
+.lap { --w: 640px; position: relative; width: var(--w); }
+.lap .lid { position: relative; margin: 0 auto; width: calc(var(--w) * .84); aspect-ratio: 16 / 10.4; border-radius: calc(var(--w) * .028) calc(var(--w) * .028) 4px 4px;
+  background: #0b0b0c; padding: calc(var(--w) * .014) calc(var(--w) * .014) calc(var(--w) * .03);
+  box-shadow: 0 0 0 1.5px #b9bcc2, 0 0 0 3px #e6e7ea, inset 0 0 0 1px #2a2a2d; }
+.lap .lid::before { /* entalhe da câmera */ content: ''; position: absolute; left: 50%; top: 0; width: calc(var(--w) * .085); height: calc(var(--w) * .022); transform: translateX(-50%);
+  background: #0b0b0c; border-radius: 0 0 8px 8px; z-index: 2; }
+.lap .lid::after { content: ''; position: absolute; left: 50%; top: calc(var(--w) * .007); width: 5px; height: 5px; border-radius: 50%; background: #1d2a3a; box-shadow: inset 0 0 0 1px #33465e; transform: translateX(-50%); z-index: 3; }
+.lap .scr { width: 100%; height: 100%; border-radius: 4px; overflow: hidden; background: #000; position: relative; }
+.lap .scr > img { width: 100%; height: 100%; object-fit: cover; object-position: top left; display: block; }
+.lap .deck { position: relative; width: 100%; height: calc(var(--w) * .032); margin-top: -1px; border-radius: 2px 2px calc(var(--w) * .03) calc(var(--w) * .03) / 2px 2px calc(var(--w) * .022) calc(var(--w) * .022);
+  background: linear-gradient(#e9eaed 0%, #d4d6da 30%, #b4b7bd 80%, #8f9298 100%); box-shadow: 0 1px 0 #7d8086; }
+.lap .deck::before { content: ''; position: absolute; left: 50%; top: 0; width: 15%; height: 42%; transform: translateX(-50%); border-radius: 0 0 10px 10px; background: linear-gradient(#c3c5ca, #d8dade); }
+.lap .shadow { position: absolute; left: 4%; right: 4%; bottom: calc(var(--w) * -.03); height: calc(var(--w) * .04); background: radial-gradient(closest-side, rgba(0,0,0,.35), transparent); filter: blur(6px); z-index: -1; }
+
+/* ── celular ────────────────────────────────────────────────── */
+.phn { --w: 220px; position: relative; width: var(--w); aspect-ratio: 9 / 19.3; border-radius: calc(var(--w) * .19);
+  background: linear-gradient(135deg, #e8e9ec, #9a9da3 40%, #d9dbdf 60%, #8d9096); padding: calc(var(--w) * .018);
+  box-shadow: 0 30px 50px -24px rgba(0,0,0,.45), 0 8px 18px -10px rgba(0,0,0,.3); }
+.phn.dark { background: linear-gradient(135deg, #4a4a4f, #1c1c1f 40%, #3c3c41 60%, #18181a); }
+.phn .bz { width: 100%; height: 100%; border-radius: calc(var(--w) * .172); background: #050505; padding: calc(var(--w) * .035); }
+.phn .scr { position: relative; width: 100%; height: 100%; border-radius: calc(var(--w) * .14); overflow: hidden; background: #fff; }
+.phn .scr > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.phn .island { position: absolute; left: 50%; top: calc(var(--w) * .045); width: 32%; height: calc(var(--w) * .1); transform: translateX(-50%); border-radius: 999px; background: #000; z-index: 5; }
+.phn .island::after { content: ''; position: absolute; right: 14%; top: 50%; width: calc(var(--w) * .04); height: calc(var(--w) * .04); transform: translateY(-50%); border-radius: 50%; background: #10182a; }
+.phn .status { position: absolute; left: 0; right: 0; top: calc(var(--w) * .06); padding: 0 12%; display: flex; justify-content: space-between; font: 600 calc(var(--w) * .052)/1 'Inter', sans-serif; z-index: 4; }
+.phn .status .ms { font-size: calc(var(--w) * .06); }
+.phn .home { position: absolute; left: 50%; bottom: calc(var(--w) * .03); width: 36%; height: 4px; border-radius: 4px; background: currentColor; opacity: .8; transform: translateX(-50%); z-index: 4; }
+.phn .btn-r, .phn .btn-l1, .phn .btn-l2 { position: absolute; width: 3px; border-radius: 2px; background: #8a8d93; }
+.phn .btn-r { right: -2px; top: 30%; height: 12%; }
+.phn .btn-l1 { left: -2px; top: 22%; height: 8%; } .phn .btn-l2 { left: -2px; top: 33%; height: 8%; }
+/* deitado: gira o aparelho inteiro */
+.phn.land { transform: rotate(-90deg); }
+
+/* ── tablet ─────────────────────────────────────────────────── */
+.tab { --w: 520px; position: relative; width: var(--w); aspect-ratio: 16 / 10.6; border-radius: calc(var(--w) * .05);
+  background: linear-gradient(135deg, #e3e4e7, #a2a5ab 45%, #d6d8dc 60%, #94979d); padding: calc(var(--w) * .008);
+  box-shadow: 0 36px 60px -28px rgba(0,0,0,.45); }
+.tab.dark { background: linear-gradient(135deg, #47474c, #1d1d20 45%, #3a3a3f 60%, #19191b); }
+.tab .bz { width: 100%; height: 100%; border-radius: calc(var(--w) * .043); background: #050505; padding: calc(var(--w) * .022); position: relative; }
+.tab .bz::before { content: ''; position: absolute; left: 50%; top: calc(var(--w) * .008); width: 5px; height: 5px; border-radius: 50%; background: #18202e; transform: translateX(-50%); }
+.tab .scr { width: 100%; height: 100%; border-radius: calc(var(--w) * .022); overflow: hidden; position: relative; background: #fff; }
+.tab .scr > img { width: 100%; height: 100%; object-fit: cover; object-position: top left; display: block; }
+
+/* ── telas desenhadas (o app Android do OpenAlt e uma "Nova tela") ── */
+.app-oa { position: absolute; inset: 0; background: #F6F1E7; color: #26211B; font-family: 'Jakarta', sans-serif; padding: 26% 9% 0; }
+.app-oa .wm { font-weight: 700; font-size: calc(var(--w) * .1); letter-spacing: -0.03em; }
+.app-oa .wm em { font-family: 'Newsreader', serif; font-style: italic; font-weight: 500; color: #B8372F; }
+.app-oa .sb { margin-top: 3%; font-size: calc(var(--w) * .045); color: #6E655A; line-height: 1.35; }
+.app-oa .pc { margin-top: 9%; border-radius: calc(var(--w) * .07); background: #FFFDF8; border: 1px solid #E3DACB; padding: 8% 7%; display: flex; gap: 6%; align-items: center; }
+.app-oa .pc .ms { font-size: calc(var(--w) * .12); color: #4A7350; }
+.app-oa .pc b { display: block; font-size: calc(var(--w) * .055); }
+.app-oa .pc small { font-size: calc(var(--w) * .038); color: #4A7350; white-space: nowrap; }
+.app-oa .qr { margin-top: 6%; border-radius: calc(var(--w) * .07); background: #FF746C; padding: 10% 9%; }
+.app-oa .qr b { display: block; font-family: 'Newsreader', serif; font-weight: 500; font-size: calc(var(--w) * .075); line-height: 1.1; }
+.app-oa .qr span { display: inline-flex; gap: 6px; align-items: center; margin-top: 8%; padding: 6% 9%; border-radius: 999px; background: #26211B; color: #F6F1E7; font-size: calc(var(--w) * .045); font-weight: 600; white-space: nowrap; }
+.app-oa .qr .ms { font-size: calc(var(--w) * .06); }
+
+/* área de trabalho estendida: papel de parede + janela */
+.desk { position: absolute; inset: 0; background: radial-gradient(120% 90% at 20% 0%, #ffb3ad 0%, #ff746c 35%, #4A7350 100%); }
+.desk .win { position: absolute; left: 7%; top: 9%; right: 7%; bottom: 9%; border-radius: 8px; background: #FFFDF8; box-shadow: 0 10px 30px -10px rgba(0,0,0,.4); overflow: hidden; }
+.desk .win .tb { height: 9%; background: #EFE8DA; display: flex; gap: 5px; align-items: center; padding: 0 3%; }
+.desk .win .tb i { width: 7px; height: 7px; border-radius: 50%; background: #c9bfae; }
+.desk .win .body { padding: 5% 6%; display: grid; grid-template-columns: 1fr 1fr; gap: 5%; height: 91%; }
+.desk .win .body div { border-radius: 6px; background: #EFE8DA; }
+.desk .win .body div:first-child { grid-row: span 2; background: linear-gradient(160deg, #26211B, #4a4038); }
