@@ -3,7 +3,7 @@
 import { EventEmitter } from 'node:events';
 import { watch, type FSWatcher } from 'node:fs';
 import { mkdir, readFile } from 'node:fs/promises';
-import { hostname } from 'node:os';
+import { hostname, userInfo } from 'node:os';
 import { join } from 'node:path';
 import {
   assessEnvironment,
@@ -39,6 +39,8 @@ import {
   type SunshineKind,
   localAddresses,
   mobilePeers,
+  runSignIn,
+  signInCommands,
   tailscaleStatus,
   matchPending,
   moveDesktop,
@@ -108,6 +110,8 @@ export interface RemoteState {
   state: 'missing' | 'stopped' | 'needs-login' | 'running' | 'unknown';
   ip: string | null;
   devices: { name: string; os: string; online: boolean; path: 'direct' | 'relay' | null }[];
+  /** o "Entrar" está rodando (esperando a senha do sistema ou o login no navegador) */
+  signingIn: boolean;
 }
 
 /** A tela do aparelho é mais "quadrada" num tablet (~1,6) do que num celular (~2,2). */
@@ -221,7 +225,37 @@ export class Controller extends EventEmitter {
       state: s.state,
       ip: s.ip,
       devices: mobilePeers(s).slice(0, 8).map((p) => ({ name: p.name, os: p.os, online: p.online, path: p.path })),
+      signingIn: this.signingIn,
     };
+  }
+
+  private signingIn = false;
+
+  /**
+   * "Entrar" no Tailscale, só quando a pessoa toca no botão: pkexec pede a senha do sistema, e o
+   * endereço de login abre no navegador dela (evento 'open-url'). O OpenAlt nunca vê a senha da conta.
+   */
+  async tailscaleSignIn(): Promise<{ ok: boolean; message: UiText }> {
+    if (this.signingIn) return { ok: false, message: { key: 'remote.signin.busy' } };
+    const user = userInfo().username;
+    let cmds = signInCommands((await tailscaleStatus(run)).state, user);
+    if (!cmds.length) return { ok: true, message: { key: 'remote.signin.nothing' } };
+    this.signingIn = true;
+    try {
+      while (cmds.length) {
+        const r = await runSignIn(cmds[0], (url) => this.emit('open-url', url));
+        if (!r.ok) {
+          // 126/127 do pkexec = a pessoa cancelou a senha; o resto vira o texto do Tailscale
+          return { ok: false, message: /dismissed|not authorized|126|127/i.test(r.output) ? { key: 'remote.signin.cancelled' } : { key: 'remote.signin.failed' } };
+        }
+        // depois de ligar o serviço, ele pode já entrar sozinho (a pessoa já tinha entrado antes)
+        const state = (await tailscaleStatus(run)).state;
+        cmds = state === 'running' ? [] : cmds.slice(1);
+      }
+      return { ok: true, message: { key: 'remote.signin.ok' } };
+    } finally {
+      this.signingIn = false;
+    }
   }
 
   private emitState() {

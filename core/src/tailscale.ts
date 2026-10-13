@@ -1,6 +1,8 @@
-// Estado do Tailscale oficial no PC, só por leitura (`tailscale status --json`), para o "Fora de casa"
-// (M3, docs/m3-arquitetura.md). O OpenAlt nunca roda `tailscale up/login` nem lê chaves ou o estado
-// do tailscaled (ADR-0003, ADR-0006). Do JSON só sai o que a tela usa: nada de AuthURL ou chaves.
+// Estado do Tailscale oficial no PC (`tailscale status --json`), para o "Fora de casa" (M3,
+// docs/m3-arquitetura.md). O OpenAlt só roda `tailscale up` quando a pessoa toca em "Entrar" (com a
+// senha do sistema pelo pkexec); o login é no navegador, e o OpenAlt nunca lê chaves nem o estado do
+// tailscaled (ADR-0003, ADR-0006). Do JSON só sai o que a tela usa: nada de AuthURL ou chaves.
+import { execFile } from 'node:child_process';
 import { run as defaultRun, type Runner } from './proc.ts';
 
 export type TailscaleState = 'missing' | 'stopped' | 'needs-login' | 'running' | 'unknown';
@@ -82,4 +84,58 @@ export async function tailscaleStatus(run: Runner = defaultRun): Promise<Tailsca
     const out = str((e as { stdout?: unknown }).stdout);
     return out ? parseStatus(out) : { state: 'unknown', ip: null, peers: [] };
   }
+}
+
+/**
+ * O endereço de login que o `tailscale up` imprime, só se for do próprio Tailscale (https). Só conta
+ * o endereço já terminado (seguido de espaço ou quebra de linha): a saída chega em pedaços.
+ */
+export function authUrlFrom(text: string): string | null {
+  for (const m of text.matchAll(/https:\/\/[^\s"'<>]+(?=\s)/g)) {
+    try {
+      const u = new URL(m[0]);
+      if (u.hostname === 'tailscale.com' || u.hostname.endsWith('.tailscale.com')) return u.href;
+    } catch { /* não é endereço */ }
+  }
+  return null;
+}
+
+export const isUnixUser = (u: string): boolean => /^[a-z_][a-z0-9_.-]{0,31}$/i.test(u);
+
+export interface Command { cmd: string; args: string[] }
+
+/**
+ * Os comandos (cada um via pkexec, pedindo a senha do sistema) para sair do estado atual e entrar:
+ * - serviço parado: liga o tailscaled (e o deixa ligado ao reiniciar o PC), depois `up`;
+ * - falta entrar: `up --operator=<pessoa>`, para o OpenAlt e a pessoa usarem o tailscale sem sudo.
+ * Nada para "missing" (instalar é com a pessoa) nem para "running".
+ */
+export function signInCommands(state: TailscaleState, user: string): Command[] {
+  if (!isUnixUser(user)) return [];
+  const up: Command = { cmd: 'pkexec', args: ['tailscale', 'up', `--operator=${user}`] };
+  if (state === 'stopped') return [{ cmd: 'pkexec', args: ['systemctl', 'enable', '--now', 'tailscaled'] }, up];
+  if (state === 'needs-login' || state === 'unknown') return [up];
+  return [];
+}
+
+/**
+ * Roda um comando de `signInCommands` e chama `onUrl` quando o Tailscale mostra o endereço de login.
+ * Termina quando a pessoa entra, desiste ou após 10 min. A saída não vai para log.
+ */
+export function runSignIn(c: Command, onUrl: (url: string) => void): Promise<{ ok: boolean; output: string }> {
+  return new Promise((resolve) => {
+    let seen = false;
+    let output = '';
+    const child = execFile(c.cmd, c.args, { timeout: 600_000, env: { ...process.env, LC_ALL: 'C' } },
+      (e) => resolve({ ok: !e, output: output.slice(-2000) }));
+    const watch = (chunk: Buffer | string) => {
+      const s = String(chunk);
+      output += s;
+      const url = seen ? null : authUrlFrom(output);
+      if (url) { seen = true; onUrl(url); }
+    };
+    child.stdout?.on('data', watch);
+    child.stderr?.on('data', watch);
+    child.stdin?.end();
+  });
 }

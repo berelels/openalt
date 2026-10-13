@@ -49,11 +49,13 @@ interface State {
   error: UiText | string | null;
 }
 
-/** "Fora de casa": o Tailscale oficial, como o processo principal o leu (só leitura). */
+/** "Fora de casa": o Tailscale oficial, como o processo principal o leu. */
 interface Remote {
   state: 'missing' | 'stopped' | 'needs-login' | 'running' | 'unknown';
   ip: string | null;
   devices: { name: string; os: string; online: boolean; path: 'direct' | 'relay' | null }[];
+  /** o "Entrar" está rodando (senha do sistema ou login no navegador) */
+  signingIn?: boolean;
 }
 
 type Plan = { layout: Record<string, Rect>; error?: undefined } | { layout?: undefined; error: UiText | string };
@@ -79,6 +81,7 @@ interface OpenAltApi {
   plan(p: Placement, size: { width: number; height: number }): Promise<Plan>;
   openLink?(name: string): Promise<void>;
   remote?(): Promise<Remote>;
+  tailscaleSignIn?(): Promise<{ ok: boolean; message: UiText }>;
 }
 
 // ── utilidades ──────────────────────────────────────────────────────────────
@@ -273,6 +276,11 @@ function mockApi(): OpenAltApi & { demo(patch: DemoPatch): void } {
       emit();
     },
     async plan(p, size) { return placeBesideMock(s.monitors, size, p); },
+    async tailscaleSignIn() {
+      await new Promise((r) => setTimeout(r, 1500));
+      history.replaceState(null, '', location.search.replace(/remote=[\w-]+/, 'remote=running'));
+      return { ok: true, message: { key: 'remote.signin.ok' } };
+    },
     async remote() {
       const k = new URLSearchParams(location.search).get('remote') ?? 'needs-login';
       const devices = [{ name: 'galaxy-tab-s9', os: 'android', online: true, path: k === 'relay' ? 'relay' as const : 'direct' as const }, { name: 'moto-g84', os: 'android', online: false, path: null }];
@@ -597,7 +605,7 @@ function renderPc(): string {
       ${remoteCard()}</div>`;
 }
 
-/** Comando que a pessoa roda no terminal (o OpenAlt não entra na conta nem liga serviços por ela). */
+/** O mesmo que o botão "Entrar" faz, para quem prefere o terminal (ou se o pkexec faltar). */
 function remoteCommand(r: Remote): string {
   return r.state === 'stopped' ? 'sudo systemctl enable --now tailscaled' : 'sudo tailscale up';
 }
@@ -626,8 +634,12 @@ function remoteCard(): string {
   }
   const installed = r.state !== 'missing';
   const cmd = remoteCommand(r);
+  const busy = r.signingIn || signInPending;
+  const signIn = installed
+    ? `<button class="btn primary small" id="btnSignIn" ${busy ? 'disabled' : ''}><span class="ms" aria-hidden="true">${busy ? 'hourglass_top' : 'login'}</span>${t(busy ? 'remote.signin.waiting' : r.state === 'stopped' ? 'remote.signin.start' : 'remote.signin')}</button>`
+    : '';
   const step2 = installed
-    ? `<div class="remote-cmd"><code>${esc(cmd)}</code><button class="btn primary small" id="btnCopyCmd" data-cmd="${esc(cmd)}"><span class="ms" aria-hidden="true">content_copy</span>${t('remote.copy')}</button></div>`
+    ? `<div class="remote-cmd"><span class="card-hint">${t('remote.orTerminal')}</span><code>${esc(cmd)}</code><button class="btn outline small" id="btnCopyCmd" data-cmd="${esc(cmd)}"><span class="ms" aria-hidden="true">content_copy</span>${t('remote.copy')}</button></div>`
     : '';
   return `<section class="card c12 fade-up d4" aria-labelledby="remoteTitle">
     ${head(`<span class="pill wait">${t(installed ? (r.state === 'stopped' ? 'remote.pill.stopped' : 'remote.pill.login') : 'remote.pill.install')}</span>`)}
@@ -635,11 +647,25 @@ function remoteCard(): string {
     <ul class="checks">
       ${checkRow(installed ? 'ok' : 'todo', installed ? 'check' : 'download', t('remote.step.install'), t(installed ? 'remote.step.install.ok' : 'remote.step.install.todo'),
         installed ? '' : `<button class="btn primary small" data-link="tailscale-pc"><span class="ms" aria-hidden="true">open_in_new</span>${t('remote.howInstall')}</button>`)}
-      ${checkRow(installed ? 'todo' : 'warn', installed ? 'login' : 'more_horiz', t(r.state === 'stopped' ? 'remote.step.start' : 'remote.step.login'), t(r.state === 'stopped' ? 'remote.step.start.text' : 'remote.step.login.text'))}
+      ${checkRow(installed ? 'todo' : 'warn', installed ? 'login' : 'more_horiz', t(r.state === 'stopped' ? 'remote.step.start' : 'remote.step.login'), t(r.state === 'stopped' ? 'remote.step.start.text' : 'remote.step.login.text'), signIn)}
       ${step2 ? `<li class="remote-cmd-row">${step2}</li>` : ''}
       ${checkRow('warn', 'more_horiz', t('remote.step.device'), t('remote.step.device.text'), deviceLink)}
     </ul>
-    <p class="card-hint remote-auto" aria-live="polite">${t('remote.auto')}</p></section>`;
+    <p class="card-hint remote-auto" aria-live="polite">${signInMsg ? uiText(signInMsg) : t('remote.auto')}</p></section>`;
+}
+
+let signInPending = false;
+let signInMsg: UiText | null = null;
+async function signInTailscale() {
+  if (!api.tailscaleSignIn || signInPending) return;
+  signInPending = true;
+  signInMsg = { key: 'remote.signin.browser' };
+  render();
+  const r = await api.tailscaleSignIn().catch((e) => ({ ok: false, message: { text: String(e?.message ?? e) } as UiText }));
+  signInPending = false;
+  signInMsg = r.ok ? null : r.message;
+  await refreshRemote();
+  render();
 }
 
 // O cartão "Fora de casa" confere o Tailscale sozinho enquanto a tela "Este PC" está aberta
@@ -819,6 +845,7 @@ function bindView() {
   });
   on('#view [data-link]', (b) => void api.openLink?.(b.dataset.link!));
   on('#view [data-lang]', (b) => { setLangPref(b.dataset.lang as LangPref); render(); });
+  $('#btnSignIn')?.addEventListener('click', () => void signInTailscale());
   $('#btnCopyCmd')?.addEventListener('click', (e) => {
     const b = e.currentTarget as HTMLButtonElement;
     void navigator.clipboard.writeText(b.dataset.cmd ?? '').then(() => { b.lastChild!.textContent = t('remote.copied'); });

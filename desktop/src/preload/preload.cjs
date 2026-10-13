@@ -36,5 +36,6 @@ contextBridge.exposeInMainWorld('openalt', {
   instalarPermissao: call('instalarPermissao'),
   plan: call('plan'),
   remote: call('remote'),
+  tailscaleSignIn: call('tailscaleSignIn'),
   openLink: call('openLink'),
 });

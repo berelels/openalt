@@ -2,7 +2,7 @@
 // com este processo só por IPC, e só por canais conhecidos vindos da nossa própria página.
 import { app, BrowserWindow, ipcMain, screen, shell, type IpcMainInvokeEvent } from 'electron';
 import { Controller } from './controller.js';
-import { restartShellViaHelper, run } from '@openalt/core';
+import { authUrlFrom, restartShellViaHelper, run } from '@openalt/core';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -99,6 +99,11 @@ function createWindow(): void {
   const onMonitors = () => void restartShell(win).then((ok) => (ok ? undefined : controller.reloadExtensions()));
   controller.on('monitors-changed', onMonitors);
   win.on('closed', () => controller.off('monitors-changed', onMonitors));
+
+  // login do Tailscale: abre no navegador da pessoa, e só se o endereço for do próprio Tailscale
+  const openLogin = (url: string) => { const ok = authUrlFrom(`${url}\n`); if (ok) void shell.openExternal(ok); };
+  controller.on('open-url', openLogin);
+  win.on('closed', () => controller.off('open-url', openLogin));
 
   const push = (s: unknown) => { if (!win.isDestroyed()) win.webContents.send('openalt:state', s); };
   controller.on('state', push);
@@ -221,6 +226,7 @@ const actions: Record<string, (...args: unknown[]) => Promise<unknown>> = {
   instalarPermissao: () => controller.instalarPermissao(),
   plan: (p, size) => controller.plan(p, size),
   remote: () => controller.remote(),
+  tailscaleSignIn: () => controller.tailscaleSignIn(),
   openLink: async (name) => {
     const url = typeof name === 'string' && Object.hasOwn(LINKS, name) ? LINKS[name] : null;
     if (url) await shell.openExternal(url);

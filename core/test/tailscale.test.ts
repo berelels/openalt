@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { isTailscaleIPv4, mobilePeers, parseStatus, tailscaleStatus } from '../src/tailscale.ts';
+import { authUrlFrom, isTailscaleIPv4, mobilePeers, parseStatus, signInCommands, tailscaleStatus } from '../src/tailscale.ts';
 import { CommandError, type Runner } from '../src/proc.ts';
 
 const running = JSON.stringify({
@@ -50,4 +50,23 @@ test('tailscaleStatus: sem o programa, serviço parado, sucesso', async () => {
 test('isTailscaleIPv4: só 100.64.0.0/10', () => {
   for (const a of ['100.64.0.1', '100.100.100.100', '100.127.255.254']) assert.ok(isTailscaleIPv4(a), a);
   for (const a of ['100.63.0.1', '100.128.0.1', '10.0.0.1', '192.168.0.2']) assert.ok(!isTailscaleIPv4(a), a);
+});
+
+test('authUrlFrom: só endereços https do Tailscale, já completos', () => {
+  assert.equal(authUrlFrom('\nTo authenticate, visit:\n\n\thttps://login.tailscale.com/a/1a2b3c\n\n'), 'https://login.tailscale.com/a/1a2b3c');
+  assert.equal(authUrlFrom('\thttps://login.tailscale.com/a/1a2'), null, 'pedaço ainda incompleto');
+  assert.equal(authUrlFrom('visit http://login.tailscale.com/a/x\n'), null);
+  assert.equal(authUrlFrom('visit https://login.tailscale.com.evil.example/a/x\n'), null);
+  assert.equal(authUrlFrom('visit https://eviltailscale.com/a/x\n'), null);
+  assert.equal(authUrlFrom('nada aqui\n'), null);
+});
+
+test('signInCommands: pkexec com argumentos em lista; usuário validado', () => {
+  const up = (u: string) => ({ cmd: 'pkexec', args: ['tailscale', 'up', `--operator=${u}`] });
+  assert.deepEqual(signInCommands('needs-login', 'berelels'), [up('berelels')]);
+  assert.deepEqual(signInCommands('stopped', 'ana'), [{ cmd: 'pkexec', args: ['systemctl', 'enable', '--now', 'tailscaled'] }, up('ana')]);
+  assert.deepEqual(signInCommands('running', 'ana'), []);
+  assert.deepEqual(signInCommands('missing', 'ana'), []);
+  assert.deepEqual(signInCommands('needs-login', 'x --reset'), []);
+  assert.deepEqual(signInCommands('needs-login', '-rf'), []);
 });
