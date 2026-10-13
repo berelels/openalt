@@ -2,7 +2,7 @@
 // com este processo só por IPC, e só por canais conhecidos vindos da nossa própria página.
 import { app, BrowserWindow, ipcMain, screen, type IpcMainInvokeEvent } from 'electron';
 import { Controller } from './controller.js';
-import { run } from '@openalt/core';
+import { restartShellViaHelper, run } from '@openalt/core';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -108,29 +108,58 @@ function createWindow(): void {
 }
 
 /**
- * Reinicia o GNOME Shell como a pessoa faz à mão: Alt+F2 → r → Enter (X11). Depois que o monitor do
- * aparelho entra ou sai, é o único jeito de o papel de parede voltar (o serviço do Shell recusa
- * reiniciar por comando). Segurança: antes, a janela do OpenAlt recebe o foco (sem vir para a frente) e ignora
- * teclas por alguns segundos — se a caixa do Alt+F2 não abrir, o "r" e o Enter caem no próprio
- * OpenAlt e não fazem nada, em vez de irem para outro app da pessoa.
+ * Reinicia o GNOME Shell (X11). Depois que o monitor do aparelho entra ou sai, é o único jeito de o
+ * papel de parede voltar; o serviço do Shell recusa reiniciar por comando.
+ * 1º: pela extensão do OpenAlt (core/gnome-shell), sem caixa nenhuma e sem simular teclado.
+ * Reserva (a extensão ainda não carregou, ex.: 1ª vez, logo depois de instalada): como a pessoa faz
+ * à mão, Alt+F2 → r → Enter. Esse reinício já carrega a extensão para as próximas vezes.
  */
 let keyGuardUntil = 0;
 let restarting = false;
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function shellOwner(): Promise<string> {
   // o GNOME Shell ganha um nome novo no D-Bus quando reinicia: é assim que sabemos que deu certo
   const r = await run('busctl', ['--user', 'call', 'org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'GetNameOwner', 's', 'org.gnome.Shell']).catch(() => ({ stdout: '' }));
   return r.stdout.trim();
 }
+async function ownerChanged(before: string, ms: number): Promise<boolean> {
+  for (let t = 0; t < ms; t += 300) {
+    await sleep(300);
+    const now = await shellOwner();
+    if (now && now !== before) return true;
+  }
+  return false;
+}
 async function restartShell(win: BrowserWindow): Promise<boolean> {
   if (process.env.XDG_SESSION_TYPE !== 'x11' || win.isDestroyed() || restarting) return false;
   restarting = true;
-  const id = String(win.getNativeWindowHandle().readUInt32LE(0));
-  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
   try {
-    await run('xdotool', ['version']);
     const before = await shellOwner();
     if (!before) return false;
     await sleep(1500); // o GNOME ainda está arrumando os monitores logo depois da troca
+    if (await restartShellViaHelper(run)) {
+      if (await ownerChanged(before, 10_000)) return true;
+      // aceitou e não reiniciou em 10 s: o Shell travou? A caixa do Alt+F2 também não ajudaria.
+      return false;
+    }
+    return await restartWithAltF2(win, before);
+  } catch {
+    return false;
+  } finally {
+    restarting = false;
+  }
+}
+
+/**
+ * Alt+F2 → r → Enter. Segurança: antes, a janela do OpenAlt recebe o foco (sem vir para a frente) e
+ * ignora teclas por alguns segundos — se a caixa do Alt+F2 não abrir, o "r" e o Enter caem no
+ * próprio OpenAlt e não fazem nada, em vez de irem para outro app da pessoa.
+ */
+async function restartWithAltF2(win: BrowserWindow, before: string): Promise<boolean> {
+  if (win.isDestroyed()) return false;
+  const id = String(win.getNativeWindowHandle().readUInt32LE(0));
+  try {
+    await run('xdotool', ['version']);
     // Até 3 tentativas, cada uma esperando mais pela caixa do Alt+F2 (ao conectar ela demora).
     for (let attempt = 1; attempt <= 3; attempt++) {
       keyGuardUntil = Date.now() + 8000;
@@ -144,11 +173,7 @@ async function restartShell(win: BrowserWindow): Promise<boolean> {
       // com menos de ~0,4 s a caixa ainda não processou o "r" e o Enter não reinicia (teste ao vivo)
       await sleep(450);
       await run('xdotool', ['key', '--clearmodifiers', 'Return']);
-      for (let i = 0; i < 20; i++) {
-        await sleep(300);
-        const now = await shellOwner();
-        if (now && now !== before) return true;
-      }
+      if (await ownerChanged(before, 6000)) return true;
       // não reiniciou: fecha a caixa, se ficou aberta, e tenta de novo
       await run('xdotool', ['key', '--clearmodifiers', 'Escape']).catch(() => {});
       await sleep(400);
@@ -157,7 +182,6 @@ async function restartShell(win: BrowserWindow): Promise<boolean> {
   } catch {
     return false;
   } finally {
-    restarting = false;
     setTimeout(() => { keyGuardUntil = 0; }, 1500);
   }
 }

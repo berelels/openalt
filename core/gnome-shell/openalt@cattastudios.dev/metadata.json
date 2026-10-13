@@ -1,0 +1,8 @@
+{
+  "uuid": "openalt@cattastudios.dev",
+  "name": "OpenAlt",
+  "description": "Ajuda o OpenAlt (celular ou tablet como monitor extra) a arrumar o GNOME quando a tela do aparelho entra ou sai: reinicia o GNOME no X11 sem a caixa do Alt+F2.",
+  "shell-version": ["45", "46", "47", "48"],
+  "url": "https://github.com/berelels/openalt",
+  "version": 1
+}

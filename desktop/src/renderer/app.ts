@@ -28,6 +28,7 @@ interface State {
   mode: Mode;
   mirrorOf: string;
   audio: 'device' | 'pc' | 'both';
+  audioAfterReconnect?: boolean;
   rememberLayout: boolean;
   orientation: Orientation;
   /** Tipo usado na prévia enquanto nenhum aparelho está conectado. */
@@ -446,6 +447,7 @@ function prefsCard(): string {
         <div>
           <p class="mini-label">Onde sai o som</p>
           ${seg('audio', 'Onde sai o som', [['device', 'Aparelho', 'smartphone'], ['pc', 'PC', 'computer'], ['both', 'Os dois', 'speaker_group']], s.audio ?? 'pc', 'data-audio')}
+          ${s.audioAfterReconnect ? `<p class="switch-hint audio-note" role="status">Para o som ir ${s.previewKind === 'tablet' ? 'para o tablet' : 'para o aparelho'}, desconecte e conecte de novo.</p>` : ''}
         </div>
         <label class="switch-row"><span><span class="switch-title">Maximizar janelas ${s.previewKind === 'tablet' ? 'no tablet' : 'no aparelho'}</span><span class="switch-hint">Ao levar uma janela para a Nova tela</span></span>
           <input type="checkbox" class="switch" id="optMaximize" ${s.maximizeOnDevice !== false ? 'checked' : ''}></label>

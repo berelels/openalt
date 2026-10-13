@@ -5,6 +5,7 @@ export * from './settings.ts';
 export * from './audio.ts';
 export { windowMaximizer } from './linux-x11/windows.ts';
 export { reloadMonitorSensitiveExtensions, restoreExtensions } from './linux-x11/shell-extensions.ts';
+export { installShellHelper, restartShellViaHelper, shellHelperVersion, SHELL_HELPER_UUID, type HelperInstall } from './linux-x11/shell-helper.ts';
 export { drmConnectorFor, listDrmConnectors, parseConnectorIds } from './linux-x11/drm.ts';
 export * from './connection.ts';
 export * from './pairing.ts';
