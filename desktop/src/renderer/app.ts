@@ -733,13 +733,18 @@ function tickCountdown() {
   window.clearInterval(countdownTimer);
   const el = document.getElementById('countdown');
   if (!el || !state.pairing) return;
-  const update = () => {
+  const update = (first: boolean) => {
     const left = Math.max(0, Math.round((state.pairing!.expiresAt - Date.now()) / 1000));
     el.textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
-    if (left === 0) { window.clearInterval(countdownTimer); render(); }
+    if (left === 0) {
+      window.clearInterval(countdownTimer);
+      // redesenha UMA vez, ao vencer agora; se já estava vencido ao desenhar, não redesenha
+      // (o render chama tickCountdown de novo — antes isso virava um laço infinito e travava o app)
+      if (!first) render();
+    }
   };
-  update();
-  countdownTimer = window.setInterval(update, 1000);
+  update(true);
+  countdownTimer = window.setInterval(() => update(false), 1000);
 }
 
 function bindRail() {
