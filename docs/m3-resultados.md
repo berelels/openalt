@@ -41,13 +41,29 @@ Decisões: ADR-0003 (Tailscale oficial, atualizado), ADR-0013 (o que o M3 decidi
 - **Configurações de console** (SettingsActivity): categorias, cartões, valor abaixo do nome em pé.
   Capturas da grade, do Vídeo e do Controle no celular em pé.
 
+### Nova tela no tablet (Galaxy Tab S6 Lite, SM-P619, 13/10 à noite)
+- **Travamento ao desconectar (corrigido):** no modo de desenvolvimento o ajudante pede senha; ao
+  desconectar, a caixa de senha escureceu a tela e prendeu o teclado (foi preciso suspender o PC).
+  Correção: **desconectar nunca pede senha** (`retractOnDisconnect`). Sem a permissão do sistema, a
+  tela do aparelho sai pelo GNOME (sem root), a extensão refaz o papel de parede e a saída forçada fica
+  anotada para o "Desligar" ou a próxima conexão. A "Permissão do sistema" passou a ser conferida pelo
+  polkit (`pkcheck`), não só pela existência do arquivo.
+- **Segunda conexão em outra saída (corrigido):** a saída anotada parecia "conectada" e a escolha pulou
+  para outra, que o Sunshine não capturava (rastros de janela na área do tablet). Agora a saída anotada
+  é devolvida antes da escolha.
+- **Depois das correções:** conectar, desconectar (sem senha, papel de parede de volta) e conectar de
+  novo funcionaram; a tela do tablet ficou sempre na `DisplayPort-1` com H.264; **a tecla Super
+  funcionou** com o tablet conectado. A pessoa usou o tablet como tela extra (Spotify).
+- Som: durante a conexão o Sunshine põe a saída `sink-sunshine-stereo` como principal (é assim que o som
+  vai ao aparelho) e devolve a anterior ao desconectar.
+
 ## Não testado
 - Mapear botões com controle de verdade, e o mapeamento valendo na transmissão.
 - Configurações deitado e navegação por controle (LB/RB, esquerda/direita nos números).
 - Menu de opções do PC na tela de entrada (toque longo / X) e a orientação seguindo o sensor nas
   telas do Moonlight.
 - "Fora de casa só espelha" no 4G.
-- **Nova tela no tablet:** reinício do GNOME pela extensão (nunca rodou no GNOME de verdade), Nova
-  tela com H.264, Nova tela a partir da tela de entrada nova, e que em casa a Nova tela continua valendo.
+- Se o reinício do GNOME ao conectar foi pela extensão (sem a caixa do Alt+F2) a partir da 2ª vez.
+- O caminho com a permissão do sistema instalada (o ajudante em /usr/libexec): só existe depois do M4.
 - Itens antigos: vídeo do Chromium travando na tela virtual; cursor duplicado na borda.
 - Tablet, outras placas (Intel, NVIDIA) e outros aparelhos.
