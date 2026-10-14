@@ -6,6 +6,21 @@
   const i18n = window.OpenAltI18n;
   i18n.init();
 
+  // ── abertura (a mesma dos apps), sem pular; a página entra quando a cortina sobe ──
+  const introRoot = document.getElementById('intro');
+  const revealed = new Promise((resolve) => {
+    if (!introRoot || typeof window.playIntro !== 'function') {
+      introRoot?.remove();
+      document.body.classList.remove('intro-on');
+      resolve();
+      return;
+    }
+    window.playIntro(introRoot, resolve, { skippable: false }).then(() => {
+      introRoot.remove();
+      document.body.classList.remove('intro-on');
+    });
+  });
+
   // ── palavras da manchete em <span class="w"> (para entrarem uma a uma) ──
   function splitWords(root) {
     const walk = (node) => {
@@ -88,7 +103,8 @@
     const small = ctx.conditions.small;
 
     // 1) herói: palavras, texto, blocos do mosaico, aparelhos e as linhas de medida
-    const intro = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    const intro = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
+    revealed.then(() => intro.play());
     intro.from('.h1 .w', { yPercent: 60, autoAlpha: 0, duration: 0.8, stagger: 0.06 })
       .from('.hero .lede, .hero .ctas, .hero .stats', { y: 24, autoAlpha: 0, stagger: 0.1, duration: 0.7 }, '-=0.4')
       .from('.mosaic .tile', { scale: 0, rotation: () => gsap.utils.random([-90, 90, 180]), transformOrigin: '50% 50%', duration: 0.6, stagger: { each: 0.03, from: 'random' }, ease: 'back.out(1.6)' }, 0.2)

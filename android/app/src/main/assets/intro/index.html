@@ -20,9 +20,9 @@
     fill: none; stroke: #fff0e6; stroke-width: 30; stroke-linecap: round; stroke-linejoin: round;
     overflow: visible; will-change: transform, opacity;
   }
-  .intro-skip {
+  .intro-credit {
     position: absolute; left: 0; right: 0; bottom: 36px; text-align: center;
-    font-size: 14px; font-weight: 600; letter-spacing: 0.02em; color: rgba(38, 33, 27, 0.78);
+    font-family: monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; color: rgba(38, 33, 27, 0.82);
     opacity: 0; animation: introHint 0.6s var(--ease) 1.4s forwards; transition: opacity 0.2s;
   }
   @keyframes introHint { to { opacity: 1; } }
@@ -35,13 +35,11 @@
 <script src="intro.js"></script>
 <script>
   (function () {
-    var skip = new URLSearchParams(location.search).get('skip');
+    // ?music=0 quando os "Sons da interface" estão desligados
+    var music = new URLSearchParams(location.search).get('music') !== '0';
     var root = document.getElementById('intro');
     var done = function () { location.href = 'openalt-intro:done'; };
-    playIntro(root).then(done, done);
-    // o texto vem do app (idioma do aparelho); a abertura do PC fala de clique e tecla
-    var hint = root.querySelector('.intro-skip');
-    if (hint && skip) hint.textContent = skip;
+    playIntro(root, function () {}, { music: music }).then(done, done);
   })();
 </script>
 </body>

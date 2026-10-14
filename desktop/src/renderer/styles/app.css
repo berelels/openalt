@@ -549,9 +549,10 @@ button.tile.compact small, button.tile.tiny span { display: none; }
   fill: none; stroke: #fff0e6; stroke-width: 30; stroke-linecap: round; stroke-linejoin: round;
   overflow: visible; will-change: transform, opacity;
 }
-.intro-skip {
+.intro-credit {
   position: absolute; left: 0; right: 0; bottom: 36px; text-align: center;
-  font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em; color: rgba(38, 33, 27, 0.78);
+  font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500;
+  letter-spacing: 0.12em; color: rgba(38, 33, 27, 0.82);
   opacity: 0; animation: introHint 0.6s var(--ease) 1.4s forwards; transition: opacity 0.2s;
 }
 @keyframes introHint { to { opacity: 1; } }

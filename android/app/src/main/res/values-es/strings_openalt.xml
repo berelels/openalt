@@ -85,7 +85,6 @@
     <string name="openalt_pad_connect">Conectar</string>
     <string name="openalt_pad_options">Opciones del PC</string>
     <string name="openalt_pad_settings">Ajustes</string>
-    <string name="openalt_intro_skip">Toca para saltar</string>
     <string name="openalt_pref_controller_title">Estilo de los botones del mando</string>
     <string name="openalt_pref_controller_summary">Los nombres de los botones que muestra OpenAlt.</string>
     <string name="openalt_controller_auto">Igual que el mando</string>

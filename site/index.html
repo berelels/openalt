@@ -14,9 +14,12 @@
   <script src="vendor/gsap.min.js" defer></script>
   <script src="vendor/ScrollTrigger.min.js" defer></script>
   <script src="js/i18n.js" defer></script>
+  <script src="js/intro.js" defer></script>
   <script src="js/main.js" defer></script>
 </head>
-<body>
+<body class="intro-on">
+<!-- a abertura dos apps (js/intro.js, cópia de desktop/src/renderer/intro.ts); aqui não dá para pular -->
+<div class="intro boot" id="intro" aria-hidden="true"></div>
 <a class="skip" href="#main" data-i18n="skip">Skip to content</a>
 
 <!-- ícones (usados com <use href="#i-…">) -->

@@ -85,7 +85,6 @@
     <string name="openalt_pad_connect">Conectar</string>
     <string name="openalt_pad_options">Opções do PC</string>
     <string name="openalt_pad_settings">Configurações</string>
-    <string name="openalt_intro_skip">Toque para pular</string>
     <string name="openalt_pref_controller_title">Estilo dos botões do controle</string>
     <string name="openalt_pref_controller_summary">Os nomes dos botões mostrados no OpenAlt.</string>
     <string name="openalt_controller_auto">Igual ao controle</string>

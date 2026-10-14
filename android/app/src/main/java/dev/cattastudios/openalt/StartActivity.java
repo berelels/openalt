@@ -14,7 +14,6 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.os.Bundle;
@@ -204,7 +203,7 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
         ws.setAllowContentAccess(false);
         ws.setAllowFileAccess(true);
         ws.setBlockNetworkLoads(true);
-        ws.setMediaPlaybackRequiresUserGesture(true);
+        ws.setMediaPlaybackRequiresUserGesture(false); // a música da abertura toca sem toque
         // vermelho até a página carregar (a tela não pisca), transparente depois: a cortina revela o app
         intro.setBackgroundColor(getResources().getColor(R.color.oa_accent));
         intro.setWebViewClient(new WebViewClient() {
@@ -225,7 +224,8 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
             }
         });
         intro.setVisibility(View.VISIBLE);
-        intro.loadUrl("file:///android_asset/intro/index.html?skip=" + Uri.encode(getString(R.string.openalt_intro_skip)));
+        boolean music = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(UiSounds.PREF, true);
+        intro.loadUrl("file:///android_asset/intro/index.html?music=" + (music ? "1" : "0"));
     }
 
     private boolean handleIntroUrl(String url) {

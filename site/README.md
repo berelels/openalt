@@ -11,6 +11,9 @@ JavaScript feitos à mão, prontos para o GitHub Pages.
 - `js/main.js`: as animações (GSAP + ScrollTrigger).
   - Usa `gsap.matchMedia()`: com "reduzir movimento" ligado, nada anima e os modos ficam um embaixo do outro.
   - Seção "Modes": rolagem lateral (*pin* + `ease: "none"`), com as entradas de dentro feitas por `containerAnimation`.
+- `js/intro.js`: a abertura dos apps (cópia de `desktop/src/renderer/intro.ts`, por `scripts/sync-android-intro.mjs`).
+  - Aqui não dá para pular; com "reduzir movimento", só a logo por um instante.
+  - A música é feita no navegador (Web Audio). Sem um toque, o navegador não deixa tocar som: ela entra no primeiro toque ou tecla.
 - `vendor/`: GSAP 3.13.0 (`gsap.min.js`, `ScrollTrigger.min.js`), copiado do pacote oficial do npm.
 - `fonts/`: Newsreader, Plus Jakarta Sans e JetBrains Mono, todas locais.
 - `img/`: o ícone e o papel de parede que "atravessa" as telas na cena da Nova tela.

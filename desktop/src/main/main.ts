@@ -283,6 +283,9 @@ ipcMain.handle('window:to-tray', async (e, labels: unknown) => {
   return 'tray';
 });
 
+// a música da abertura toca ao abrir, sem esperar um clique (é o próprio app, não uma página da web)
+app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+
 app.whenReady().then(async () => {
   await controller.init();
   createWindow();

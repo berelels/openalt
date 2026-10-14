@@ -7,7 +7,10 @@
 // anterior. As linhas se movem; nada se deforma. O traço curto faz o mesmo no caminho dele.
 //
 // Depois, a cortina vermelha sobe como gelatina: borda ondulada, o meio na frente, um balanço.
-// Clique ou tecla pula. Com "reduzir movimento" do sistema, só a logo por um instante.
+// Clique ou tecla pula (no site não). Com "reduzir movimento" do sistema, só a logo por um instante.
+//
+// A música é feita aqui mesmo (Web Audio, sem arquivo): C → Lá menor → Fá → Sol, uma nota a cada
+// forma que fica pronta e o acorde final quando a cortina sobe. Pular corta a música e toca o final.
 /** Formas no espaço 512×512. "a" é o traço principal; "b", o traço curto. Comandos absolutos no começo. */
 const INTRO_SHAPES = [
     {
@@ -76,6 +79,162 @@ function introWindow(path, total, tail, head) {
     path.style.strokeDasharray = `${(h - t).toFixed(2)} ${(total + 50).toFixed(2)}`;
     path.style.strokeDashoffset = `${(-t).toFixed(2)}`;
 }
+const introHz = (midi) => 440 * 2 ** ((midi - 69) / 12);
+/** A partitura, presa à linha do tempo da abertura (ms). */
+function introScore(sectionStarts, arrivals, curtainStart) {
+    const chords = [[48, 55, 64], [45, 52, 60], [41, 48, 57], [43, 50, 59]]; // C, Am, F, G
+    const melody = [[76, 72], [81, 76], [84, 81], [86, 83]]; // nota de chegada e a de passagem antes dela
+    const notes = [];
+    chords.forEach((c, i) => {
+        const end = i + 1 < sectionStarts.length ? sectionStarts[i + 1] : curtainStart;
+        notes.push({ t: sectionStarts[i], kind: 'pad', f: c.slice(1).map((n) => introHz(n + 12)), d: end - sectionStarts[i] + 250 });
+        notes.push({ t: sectionStarts[i], kind: 'bass', f: [introHz(c[0] - 12)], d: 900 });
+    });
+    arrivals.forEach((t, i) => {
+        notes.push({ t: t - 140, kind: 'pluck', f: [introHz(melody[i][1])], d: 400 });
+        notes.push({ t, kind: 'pluck', f: [introHz(melody[i][0])], d: 900 });
+    });
+    notes.push({ t: curtainStart - 250, kind: 'whoosh', f: [], d: 1100 });
+    notes.push({ t: curtainStart, kind: 'bell', f: [72, 76, 79, 84, 88].map(introHz), d: 1900 });
+    notes.push({ t: curtainStart, kind: 'bass', f: [introHz(36)], d: 1700 });
+    return notes;
+}
+/** `clock` diz em que ponto (ms) a abertura está: o som pode ser liberado no meio dela. */
+function introMusic(score, clock) {
+    const AC = window.AudioContext ?? window.webkitAudioContext;
+    if (!AC)
+        return null;
+    let ctx;
+    try {
+        ctx = new AC();
+    }
+    catch {
+        return null;
+    }
+    let bus = null;
+    let wanted = false; // play() chamado com o som ainda preso
+    ctx.onstatechange = () => {
+        if (ctx.state === 'running' && wanted) {
+            wanted = false;
+            start(clock());
+        }
+    };
+    void ctx.resume().catch(() => { });
+    let noise = null;
+    const env = (g, when, peak, attack, dur) => {
+        g.gain.setValueAtTime(0.0001, when);
+        g.gain.exponentialRampToValueAtTime(peak, when + attack);
+        g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+    };
+    const osc = (type, f, when, dur, out, detune = 0) => {
+        const o = ctx.createOscillator();
+        o.type = type;
+        o.frequency.value = f;
+        o.detune.value = detune;
+        o.connect(out);
+        o.start(when);
+        o.stop(when + dur + 0.05);
+    };
+    function voice(n, when, dur, out) {
+        const g = ctx.createGain();
+        g.connect(out);
+        if (n.kind === 'pluck') {
+            env(g, when, 0.5, 0.005, dur);
+            osc('triangle', n.f[0], when, dur, g);
+            const h = ctx.createGain();
+            h.gain.value = 0.25;
+            h.connect(g);
+            osc('sine', n.f[0] * 2, when, dur, h);
+        }
+        else if (n.kind === 'bass') {
+            env(g, when, 0.55, 0.01, dur);
+            osc('sine', n.f[0], when, dur, g);
+            osc('triangle', n.f[0], when, dur, g);
+        }
+        else if (n.kind === 'pad') {
+            // dois dentes de serra levemente desafinados por nota, abafados: um colchão macio
+            const lp = ctx.createBiquadFilter();
+            lp.type = 'lowpass';
+            lp.frequency.value = 900;
+            lp.connect(g);
+            g.gain.setValueAtTime(0, when);
+            g.gain.linearRampToValueAtTime(0.05, when + Math.min(0.35, dur / 3));
+            g.gain.setValueAtTime(0.05, when + Math.max(0, dur - 0.3));
+            g.gain.linearRampToValueAtTime(0, when + dur);
+            for (const f of n.f) {
+                osc('sawtooth', f, when, dur, lp, -7);
+                osc('sawtooth', f, when, dur, lp, 7);
+            }
+        }
+        else if (n.kind === 'bell') {
+            env(g, when, 0.35, 0.004, dur);
+            n.f.forEach((f, i) => {
+                const v = ctx.createGain();
+                v.gain.value = i === n.f.length - 1 ? 0.5 : 1;
+                v.connect(g);
+                osc('sine', f, when + i * 0.035, dur, v); // um arpejo rapidinho
+                const p = ctx.createGain();
+                p.gain.value = 0.12;
+                p.connect(v);
+                osc('sine', f * 2.76, when + i * 0.035, dur * 0.4, p); // o brilho de sino
+            });
+        }
+        else {
+            // o vento da cortina: ruído num filtro que sobe
+            if (!noise) {
+                noise = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+                const ch = noise.getChannelData(0);
+                for (let i = 0; i < ch.length; i++)
+                    ch[i] = Math.random() * 2 - 1;
+            }
+            const src = ctx.createBufferSource();
+            src.buffer = noise;
+            src.loop = true;
+            const bp = ctx.createBiquadFilter();
+            bp.type = 'bandpass';
+            bp.Q.value = 1.2;
+            bp.frequency.setValueAtTime(350, when);
+            bp.frequency.exponentialRampToValueAtTime(4200, when + dur);
+            src.connect(bp);
+            bp.connect(g);
+            g.gain.setValueAtTime(0.0001, when);
+            g.gain.exponentialRampToValueAtTime(0.16, when + dur * 0.55);
+            g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+            src.start(when);
+            src.stop(when + dur + 0.05);
+        }
+    }
+    function start(at) {
+        if (ctx.state !== 'running') {
+            wanted = true;
+            return;
+        }
+        const b = ctx.createGain();
+        b.gain.value = 0.22;
+        b.connect(ctx.destination);
+        bus = b;
+        const t0 = ctx.currentTime + 0.03;
+        for (const n of score) {
+            if (n.t + n.d <= at || (n.t < at && n.kind !== 'pad'))
+                continue;
+            const from = Math.max(n.t, at);
+            voice(n, t0 + (from - at) / 1000, (n.t + n.d - from) / 1000, b);
+        }
+    }
+    return {
+        play: start,
+        cut() {
+            wanted = false;
+            bus?.gain.setTargetAtTime(0, ctx.currentTime, 0.04);
+            bus = null;
+        },
+        resume() { void ctx.resume().catch(() => { }); },
+        close(afterMs) {
+            wanted = false;
+            setTimeout(() => { void ctx.close().catch(() => { }); }, afterMs);
+        },
+    };
+}
 const introEase = {
     inOut: (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2),
     out: (t) => 1 - (1 - t) ** 3,
@@ -85,7 +244,8 @@ const clamp01 = (x) => Math.min(Math.max(x, 0), 1);
  * Toca a abertura dentro de `root` e resolve quando a cortina terminou de subir.
  * `onReveal` é chamado quando a cortina começa a subir (o painel entra junto).
  */
-function playIntro(root, onReveal = () => { }) {
+function playIntro(root, onReveal = () => { }, options = {}) {
+    const skippable = options.skippable !== false;
     let revealed = false;
     const reveal = () => { if (!revealed) {
         revealed = true;
@@ -98,12 +258,12 @@ function playIntro(root, onReveal = () => { }) {
     <svg class="intro-mark" viewBox="0 0 512 512" role="img" aria-label="OpenAlt">
       <path id="introA"/><path id="introB"/>
     </svg>
-    <p class="intro-skip">Clique ou aperte qualquer tecla para pular</p>`;
+    <p class="intro-credit">Made by Catta Studios</p>`;
     const mark = root.querySelector('.intro-mark');
     const pa = root.querySelector('#introA');
     const pb = root.querySelector('#introB');
     const curtain = root.querySelector('#introCurtain');
-    const skipHint = root.querySelector('.intro-skip');
+    const credit = root.querySelector('.intro-credit');
     const A = introTrack(mark, INTRO_SHAPES.map((s) => s.a));
     const B = introTrack(mark, INTRO_SHAPES.map((s) => s.b));
     pa.setAttribute('d', A.d);
@@ -117,6 +277,9 @@ function playIntro(root, onReveal = () => { }) {
     const CURTAIN = 1000;
     const runStart = (i) => DRAW + HOLD + i * (RUN + HOLD); // início da corrida da forma i para i+1
     const curtainStart = runStart(last - 1) + RUN + LOGO_HOLD;
+    // o relógio começa no PRIMEIRO QUADRO desenhado (ver abaixo); -1 = ainda não começou
+    let start = -1;
+    const music = options.music === false ? null : introMusic(introScore([0, ...INTRO_SHAPES.slice(1).map((_, i) => runStart(i))], [DRAW, ...INTRO_SHAPES.slice(1).map((_, i) => runStart(i) + RUN)], curtainStart), () => (start < 0 ? 0 : performance.now() - start));
     // imperfeições da borda da cortina, diferentes a cada abertura
     const ph = [Math.random() * 6.28, Math.random() * 6.28, Math.random() * 6.28];
     function drawCurtain(p) {
@@ -137,9 +300,9 @@ function playIntro(root, onReveal = () => { }) {
         mark.style.transform = `translateY(${Math.min(0, base - 100)}vh)`;
         mark.style.opacity = String(Math.max(0, 1 - p * 1.6));
         if (p > 0) {
-            // o painel entra enquanto a cortina sobe; o aviso de pular some
-            skipHint.style.animation = 'none';
-            skipHint.style.opacity = '0';
+            // o painel entra enquanto a cortina sobe; a assinatura some
+            credit.style.animation = 'none';
+            credit.style.opacity = '0';
             reveal();
         }
     }
@@ -162,7 +325,6 @@ function playIntro(root, onReveal = () => { }) {
     return new Promise((resolve) => {
         // o relógio começa no PRIMEIRO QUADRO desenhado: com a janela ainda escondida o navegador
         // não desenha, e contar desde o carregamento fazia a abertura "já ter acabado" ao aparecer
-        let start = -1;
         let raf = 0;
         let done = false;
         const finish = () => {
@@ -172,6 +334,9 @@ function playIntro(root, onReveal = () => { }) {
             cancelAnimationFrame(raf);
             removeEventListener('keydown', skip, true);
             root.removeEventListener('pointerdown', skip);
+            removeEventListener('pointerdown', unblockMusic, true);
+            removeEventListener('keydown', unblockMusic, true);
+            music?.close(2500); // deixa o acorde final soar
             root.hidden = true;
             root.innerHTML = '';
             reveal();
@@ -184,12 +349,25 @@ function playIntro(root, onReveal = () => { }) {
             const now = performance.now();
             if (start < 0)
                 start = now;
-            if (now - start < curtainStart)
+            if (now - start < curtainStart) {
                 start = now - curtainStart;
+                music?.cut();
+                music?.play(curtainStart);
+            }
         }
-        addEventListener('keydown', skip, true);
-        root.addEventListener('pointerdown', skip);
+        if (skippable) {
+            addEventListener('keydown', skip, true);
+            root.addEventListener('pointerdown', skip);
+        }
+        // sem gesto, o navegador (no site) segura o som: ele entra no primeiro toque, de onde a abertura estiver
+        function unblockMusic() {
+            if (!done)
+                music?.resume();
+        }
+        addEventListener('pointerdown', unblockMusic, true);
+        addEventListener('keydown', unblockMusic, true);
         if (reduce) {
+            music?.play(curtainStart); // só o acorde final
             introWindow(pa, A.total, A.starts[last], A.ends[last]);
             introWindow(pb, B.total, B.starts[last], B.ends[last]);
             root.classList.add('fade-out');
@@ -198,8 +376,10 @@ function playIntro(root, onReveal = () => { }) {
             return;
         }
         const frame = (now) => {
-            if (start < 0)
+            if (start < 0) {
                 start = now;
+                music?.play(0);
+            }
             const t = now - start;
             const [ta, ha] = lineAt(A, t);
             const [tb, hb] = lineAt(B, t, DRAW * 0.55); // o traço curto entra depois, como um segundo gesto
