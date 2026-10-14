@@ -20,6 +20,9 @@ genéricos, não só o do PC de testes.
 - **Não crie arquivos fora desta pasta** (`~/Documentos/Projetos/Apps/OpenAlt`). Nada em Downloads. Temporários vão para o scratchpad da sessão.
 - **Backup** antes de editar configs de terceiros (`apps.json`, `sunshine.conf` etc.) em `.backup/` (fora do git).
 - Avise o usuário sempre que usar uma skill.
+- **Respostas diretas:** mostre só o que mudou (trechos ou diffs), sem introdução nem recap do que foi feito.
+- **Sem resumos automáticos:** não crie `.md` de resumo, changelog ou relatório sem pedido explícito. Documentação só quando estiver prevista na seção Skills ou for pedida.
+- **Refatoração ampla:** liste o plano em até 5 itens e aguarde confirmação. Não altere código fora do escopo pedido.
 
 ## Segurança (obrigatório; ver ADR-0006)
 - Credenciais aleatórias, arquivos 0600, nunca em log, tela ou saída da CLI.
@@ -48,7 +51,7 @@ genéricos, não só o do PC de testes.
 - App: família Respiro/Pauca, em **painel de cartões** (trilho de ícones à esquerda, título grande + pílulas no topo, grade de cartões; aprovado pelo usuário em 2026-10-12). Papel #F6F1E7, tinta #26211B, Newsreader + Plus Jakarta Sans locais, raios 12/20/28, easing cubic-bezier(0.22,1,0.36,1), textura de papel, claro/escuro.
 - **Destaque vermelho #FF746C** (pedido do usuário). Contraste AA medido: #FF746C só como FUNDO com texto escuro; texto vermelho no papel claro = `--accent-text` #B8372F; erro = vinho (#8E2A47 / #F59BB0). Segundo cartão de destaque: sálvia (#4A7350 claro / #8FBF92 escuro).
 - **Logo:** traço feito à mão que se bifurca (o caminho do Alt) e termina na laçada do Respiro. Ícone: **traço escuro #26211B sobre #FF746C** (`docs/design/logo/`).
-- **Abertura toda vez que abre** (como o Big Picture): os mesmos dois traços pastel se redesenham controle → monitor → celular → logo; a cortina vermelha sobe como gelatina (borda ondulada, imperfeita) e o painel entra junto. Pula com clique/tecla; respeita "reduzir movimento". `desktop/src/renderer/intro.ts`.
+- **Abertura toda vez que abre** (como o Big Picture): os mesmos dois traços pastel se redesenham controle → monitor → celular → logo; a cortina vermelha sobe como gelatina (borda ondulada, imperfeita) e o painel entra junto. Pula com clique/tecla (no site não); respeita "reduzir movimento". Música curta feita em Web Audio, presa aos traços; embaixo, "Made by Catta Studios". `desktop/src/renderer/intro.ts`, copiada para o Android e o site por `scripts/sync-android-intro.mjs`.
 - **Abre em tela cheia**; Esc, F11 ou botão saem.
 - Aparelho = **celular ou tablet, em pé ou deitado** — nunca assumir celular em pé.
 - Catta Studios (site/créditos): `../berelels/css/style.css` (papel #F4F2EC, azul #3F6CA8, Inter + JetBrains Mono, gato); assinatura "\ catta studios".
