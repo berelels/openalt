@@ -1,7 +1,6 @@
 // Preferências do OpenAlt (settings.json, 0600). Lidas também pela ponte que o Sunshine chama,
 // então ficam num arquivo e não só na memória do app (ADR-0011).
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
-import { isAudioOut, type AudioOut } from './audio.ts';
 import { join } from 'node:path';
 import { isAlign, isSide, type Placement } from './layout.ts';
 
@@ -17,19 +16,12 @@ export interface Settings {
   /** monitor espelhado no modo "Espelhar" ("primary" = o principal) */
   mirrorOf: string;
   rememberLayout: boolean;
-  /** onde sai o som com o aparelho conectado (ver audio.ts) */
-  audio: AudioOut;
   orientation: Orientation;
   previewKind: Kind;
-  /**
-   * Tamanho da interface no aparelho, em %. No X11 a escala do GNOME é a mesma para todos os
-   * monitores; então a "Nova tela" é criada numa resolução menor e o Sunshine amplia a imagem.
-   */
-  uiScale: UiScale;
   /** Maximizar as janelas levadas para a "Nova tela" (o monitor do aparelho costuma ser pequeno). */
   maximizeOnDevice: boolean;
   /**
-   * Cada aparelho guarda o próprio lugar e tamanho (o celular pode ficar à esquerda e o tablet
+   * Cada aparelho guarda o próprio lugar (o celular pode ficar à esquerda e o tablet
    * embaixo). A chave é o nome do aparelho; quem ainda não tem entrada usa o padrão acima.
    */
   perDevice: Record<string, DeviceSettings>;
@@ -37,7 +29,6 @@ export interface Settings {
 
 export interface DeviceSettings {
   placement: Placement & { anchorName?: string };
-  uiScale: UiScale;
 }
 
 const MAX_DEVICES = 32;
@@ -46,12 +37,8 @@ export const deviceKey = (name: string): string => name.replace(/[^\p{L}\p{N} ._
 /** As preferências que valem para este aparelho (as dele, se já tiver; senão o padrão). */
 export function settingsFor(s: Settings, deviceName: string | undefined): Settings {
   const d = deviceName ? s.perDevice[deviceKey(deviceName)] : undefined;
-  return d ? { ...s, placement: d.placement, uiScale: d.uiScale } : s;
+  return d ? { ...s, placement: d.placement } : s;
 }
-
-export const UI_SCALES = [100, 125, 150, 200] as const;
-export type UiScale = (typeof UI_SCALES)[number];
-export const isUiScale = (v: unknown): v is UiScale => UI_SCALES.includes(v as UiScale);
 
 export const DEFAULT_SETTINGS: Settings = {
   version: 1,
@@ -59,10 +46,8 @@ export const DEFAULT_SETTINGS: Settings = {
   mode: 'extend',
   mirrorOf: 'primary',
   rememberLayout: false,
-  audio: 'pc',
   orientation: 'auto',
   previewKind: 'phone',
-  uiScale: 125,
   maximizeOnDevice: true,
   perDevice: {},
 };
@@ -83,19 +68,15 @@ export function sanitizeSettings(raw: unknown): Settings {
   if (r.mode === 'extend' || r.mode === 'mirror') s.mode = r.mode;
   if (typeof r.mirrorOf === 'string' && SAFE_NAME.test(r.mirrorOf)) s.mirrorOf = r.mirrorOf;
   if (typeof r.rememberLayout === 'boolean') s.rememberLayout = r.rememberLayout;
-  if (isAudioOut(r.audio)) s.audio = r.audio;
-  else if (r.audioOnHost === true) s.audio = 'both'; // configuração antiga ("som também no PC")
   if (r.orientation === 'auto' || r.orientation === 'portrait' || r.orientation === 'landscape') s.orientation = r.orientation;
   if (r.previewKind === 'phone' || r.previewKind === 'tablet') s.previewKind = r.previewKind;
-  if (isUiScale(r.uiScale)) s.uiScale = r.uiScale;
   if (typeof r.maximizeOnDevice === 'boolean') s.maximizeOnDevice = r.maximizeOnDevice;
   s.perDevice = {};
   const per = r.perDevice && typeof r.perDevice === 'object' ? Object.entries(r.perDevice as Record<string, unknown>) : [];
   for (const [k, v] of per.slice(0, MAX_DEVICES)) {
     const key = deviceKey(k);
     if (!key || !v || typeof v !== 'object') continue;
-    const one = sanitizeSettings({ placement: (v as Record<string, unknown>).placement, uiScale: (v as Record<string, unknown>).uiScale });
-    s.perDevice[key] = { placement: one.placement, uiScale: one.uiScale };
+    s.perDevice[key] = { placement: sanitizeSettings({ placement: (v as Record<string, unknown>).placement }).placement };
   }
   return s;
 }

@@ -33,8 +33,6 @@ interface State {
   orientation: Orientation;
   /** Tipo usado na prévia enquanto nenhum aparelho está conectado. */
   previewKind: Kind;
-  /** tamanho da interface no aparelho, em % */
-  uiScale: number;
   maximizeOnDevice?: boolean;
   device: Device | null;
   paired: PairedDevice[];
@@ -230,7 +228,6 @@ function mockApi(): OpenAltApi & { demo(patch: DemoPatch): void } {
     rememberLayout: false,
     orientation: 'auto',
     previewKind: 'phone',
-    uiScale: 125,
     device: null,
     paired: [
       { id: 'a1', name: 'Moto g84', kind: 'phone', width: 1080, height: 2400, network: 'local', lastSeen: '17:57', live: false },
@@ -671,15 +668,29 @@ async function refreshRemote() {
   remote = r;
   if (view === 'pc') render();
 }
+/**
+ * Consulta o Tailscale só com a tela "Este PC" à vista (não na bandeja nem minimizado): a cada 4 s,
+ * ou a cada 30 s se ele nem está instalado.
+ */
+let remoteRound = 0;
 function watchRemote() {
-  if (view === 'pc' && remoteTimer === undefined) {
-    void refreshRemote();
-    remoteTimer = window.setInterval(() => void refreshRemote(), 4000);
-  } else if (view !== 'pc' && remoteTimer !== undefined) {
-    window.clearInterval(remoteTimer);
+  const want = view === 'pc' && !document.hidden;
+  if (want && remoteTimer === undefined) {
+    const round = ++remoteRound;
+    remoteTimer = 0;
+    const tick = async () => {
+      await refreshRemote();
+      if (round !== remoteRound) return; // parou (ou recomeçou) enquanto consultava
+      remoteTimer = window.setTimeout(() => void tick(), remote?.state === 'missing' ? 30_000 : 4000);
+    };
+    void tick();
+  } else if (!want && remoteTimer !== undefined) {
+    remoteRound++;
+    window.clearTimeout(remoteTimer);
     remoteTimer = undefined;
   }
 }
+document.addEventListener('visibilitychange', watchRemote);
 
 function renderAbout(): string {
   const link = (name: string, label: string, who: string, icon = 'open_in_new') =>

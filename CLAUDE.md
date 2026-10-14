@@ -35,7 +35,7 @@ genéricos, não só o do PC de testes.
 - `core/`: `@openalt/core`, TypeScript rodando direto no Node ≥ 24 (sem build). Só sintaxe apagável (`erasableSyntaxOnly`), imports com `.ts`. Código por plataforma em `core/src/<plataforma>/`; `core/src/layout.ts` é independente de plataforma. CLI: `core/src/cli.ts` (`display extend|layout|mirror|down|status|up`, saída JSON; `--help`).
 - "Nova tela" no GNOME exige o ajudante root `core/helper/openalt-helper` (ADR-0009). Nunca rodar `extend` sem avisar: as telas do usuário podem piscar e se mover.
 - O celular pode ficar à direita, à esquerda, acima ou abaixo de qualquer monitor (`--anchor --side --align`); "Espelhar" pode espelhar qualquer monitor (`--of`).
-- Áudio: "Onde sai o som" = aparelho / PC (padrão) / os dois (`core/src/audio.ts`). No "PC" o Sunshine liga com `stream_audio = disabled`; o `AudioRouter` confere a saída padrão a cada segundo (o Sunshine a troca ~0,5 s depois de conectar).
+- Áudio: o Sunshine sempre transmite o som; onde ele toca é a opção "Tocar áudio no PC" do app do aparelho (ADR-0013).
 - Reinício do GNOME (X11) depois que a Nova tela entra/sai: pela extensão do OpenAlt (`core/gnome-shell/openalt@cattastudios.dev`, D-Bus `dev.cattastudios.OpenAlt.Shell.Restart`); reserva: Alt+F2 → r. O app instala a extensão ao Ligar. **Nunca** testar GNOME aninhado com `dbus-run-session`: o dconf ativado grava no dconf real.
 - Nunca capturar a tela inteira do usuário (pode haver reunião/dados); no máximo a área do monitor virtual.
 - Testes: `npm test` (unidade, executor falso, não mexe na tela) · `npm run typecheck`.

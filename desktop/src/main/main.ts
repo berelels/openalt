@@ -2,7 +2,7 @@
 // com este processo só por IPC, e só por canais conhecidos vindos da nossa própria página.
 import { app, BrowserWindow, ipcMain, Menu, nativeImage, screen, shell, Tray, type IpcMainInvokeEvent } from 'electron';
 import { Controller } from './controller.js';
-import { authUrlFrom, restartShellViaHelper, run } from '@openalt/core';
+import { authUrlFrom, realSleep as sleep, restartShellViaHelper, run, waitFor } from '@openalt/core';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -121,19 +121,15 @@ function createWindow(): void {
  */
 let keyGuardUntil = 0;
 let restarting = false;
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function shellOwner(): Promise<string> {
   // o GNOME Shell ganha um nome novo no D-Bus quando reinicia: é assim que sabemos que deu certo
   const r = await run('busctl', ['--user', 'call', 'org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'GetNameOwner', 's', 'org.gnome.Shell']).catch(() => ({ stdout: '' }));
   return r.stdout.trim();
 }
-async function ownerChanged(before: string, ms: number): Promise<boolean> {
-  for (let t = 0; t < ms; t += 300) {
-    await sleep(300);
-    const now = await shellOwner();
-    if (now && now !== before) return true;
-  }
-  return false;
+/** O GNOME reiniciou (dono novo no D-Bus) dentro de `ms`? */
+function ownerChanged(before: string, ms: number): Promise<boolean> {
+  return waitFor(async () => { const now = await shellOwner(); return now && now !== before ? true : undefined; }, 'o GNOME reiniciar', ms, sleep)
+    .catch(() => false);
 }
 async function restartShell(win: BrowserWindow): Promise<boolean> {
   if (process.env.XDG_SESSION_TYPE !== 'x11' || win.isDestroyed() || restarting) return false;

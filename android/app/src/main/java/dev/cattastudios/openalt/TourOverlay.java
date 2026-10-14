@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,7 +87,7 @@ final class TourOverlay extends FrameLayout {
         setClickable(true); // os toques fora do cartão não chegam na tela de trás
         shade.setColor(0x9E14110D);
         outline.setStyle(Paint.Style.STROKE);
-        outline.setStrokeWidth(dp(2.5f));
+        outline.setStrokeWidth(Ui.dp(getContext(), 2.5f));
         outline.setColor(a.getResources().getColor(R.color.oa_accent));
 
         card = LayoutInflater.from(a).inflate(R.layout.oa_tour_card, this, false);
@@ -186,8 +185,8 @@ final class TourOverlay extends FrameLayout {
         }
         int w = getWidth();
         int h = getHeight();
-        int m = dp(16);
-        int cw = Math.min(dp(400), w - 2 * m);
+        int m = Ui.dp(getContext(), 16);
+        int cw = Math.min(Ui.dp(getContext(), 400), w - 2 * m);
         if (card.getLayoutParams().width != cw) {
             card.getLayoutParams().width = cw;
             card.requestLayout();
@@ -208,10 +207,10 @@ final class TourOverlay extends FrameLayout {
             int[] me = new int[2];
             target.getLocationInWindow(at);
             getLocationInWindow(me);
-            int pad = dp(8);
-            hole.set(Math.max(dp(4), at[0] - me[0] - pad), Math.max(dp(4), at[1] - me[1] - pad),
-                    Math.min(w - dp(4), at[0] - me[0] + target.getWidth() + pad), Math.min(h - dp(4), at[1] - me[1] + target.getHeight() + pad));
-            int gap = dp(16);
+            int pad = Ui.dp(getContext(), 8);
+            hole.set(Math.max(Ui.dp(getContext(), 4), at[0] - me[0] - pad), Math.max(Ui.dp(getContext(), 4), at[1] - me[1] - pad),
+                    Math.min(w - Ui.dp(getContext(), 4), at[0] - me[0] + target.getWidth() + pad), Math.min(h - Ui.dp(getContext(), 4), at[1] - me[1] + target.getHeight() + pad));
+            int gap = Ui.dp(getContext(), 16);
             if (h - hole.bottom - gap >= ch + m) {
                 x = clamp(hole.left, m, w - cw - m);
                 y = hole.bottom + gap;
@@ -256,7 +255,4 @@ final class TourOverlay extends FrameLayout {
         return Math.max(min, Math.min(v, max));
     }
 
-    private int dp(float v) {
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, getResources().getDisplayMetrics()));
-    }
 }

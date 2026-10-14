@@ -64,7 +64,7 @@ const PT: Dict = {
 
   // preferências
   'prefs.title': 'Como {dev} fica', 'prefs.hint': 'A orientação vale a partir da próxima conexão.',
-  'prefs.orientation': 'Orientação', 'prefs.uiScale': 'Tamanho das coisas na Nova tela',
+  'prefs.orientation': 'Orientação',
   'prefs.maximize': 'Maximizar janelas em {dev}', 'prefs.maximize.hint': 'Ao levar uma janela para a Nova tela',
   'prefs.remember': 'Lembrar o arranjo', 'prefs.remember.hint': 'Menos piscadas; grava no GNOME',
 
@@ -219,7 +219,7 @@ const ES: Dict = {
   'show.none': 'Ningún dispositivo', 'show.estimated': '(estimado)', 'show.kindAria': 'Tipo de dispositivo en la vista previa',
 
   'prefs.title': 'Cómo queda {dev}', 'prefs.hint': 'La orientación se aplica desde la próxima conexión.',
-  'prefs.orientation': 'Orientación', 'prefs.uiScale': 'Tamaño de las cosas en la Nueva pantalla',
+  'prefs.orientation': 'Orientación',
   'prefs.maximize': 'Maximizar ventanas en {dev}', 'prefs.maximize.hint': 'Al llevar una ventana a la Nueva pantalla',
   'prefs.remember': 'Recordar la disposición', 'prefs.remember.hint': 'Menos parpadeos; se guarda en GNOME',
 
@@ -367,7 +367,7 @@ const EN: Dict = {
   'show.none': 'No device', 'show.estimated': '(estimated)', 'show.kindAria': 'Device type in the preview',
 
   'prefs.title': 'How {dev} looks', 'prefs.hint': 'Orientation applies from the next connection.',
-  'prefs.orientation': 'Orientation', 'prefs.uiScale': 'Size of things on the New screen',
+  'prefs.orientation': 'Orientation',
   'prefs.maximize': 'Maximize windows on {dev}', 'prefs.maximize.hint': 'When you move a window to the New screen',
   'prefs.remember': 'Remember the arrangement', 'prefs.remember.hint': 'Less flicker; saved in GNOME',
 

@@ -1,34 +1,16 @@
 <!doctype html>
 <!-- OpenAlt: a abertura do app do PC dentro do app Android (StartActivity). intro.js é cópia de
-     desktop/dist/renderer/intro.js (scripts/sync-android-intro.mjs); o CSS abaixo é o da abertura
-     em desktop/src/renderer/styles/app.css. Sem rede: só esta página e o intro.js. -->
+     desktop/dist/renderer/intro.js (scripts/sync-android-intro.mjs); intro.css é cópia de
+     desktop/src/renderer/styles/intro.css. Sem rede: só esta página e o intro.js. -->
 <html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
 <style>
-  :root { --ease: cubic-bezier(0.22, 1, 0.36, 1); }
   html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
-  .intro { position: fixed; inset: 0; z-index: 1000; }
-  .intro.boot { background: #ff746c; }
-  .intro-curtain { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .intro-curtain path { fill: #ff746c; }
-  .intro-mark {
-    position: absolute; left: 50%; top: 50%; width: min(44vmin, 360px); height: min(44vmin, 360px);
-    margin: calc(min(44vmin, 360px) / -2) 0 0 calc(min(44vmin, 360px) / -2);
-    fill: none; stroke: #fff0e6; stroke-width: 30; stroke-linecap: round; stroke-linejoin: round;
-    overflow: visible; will-change: transform, opacity;
-  }
-  .intro-credit {
-    position: absolute; left: 0; right: 0; bottom: 36px; text-align: center;
-    font-family: monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; color: rgba(38, 33, 27, 0.82);
-    opacity: 0; animation: introHint 0.6s var(--ease) 1.4s forwards; transition: opacity 0.2s;
-  }
-  @keyframes introHint { to { opacity: 1; } }
-  .intro.fade-out { animation: introFade 0.9s var(--ease) forwards; }
-  @keyframes introFade { 0%, 45% { opacity: 1; } 100% { opacity: 0; } }
 </style>
+<link rel="stylesheet" href="intro.css">
 </head>
 <body>
 <div class="intro boot" id="intro"></div>

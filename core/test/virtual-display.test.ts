@@ -120,13 +120,6 @@ test('sem nada do OpenAlt, a remoção não executa nada', async () => {
   assert.deepEqual(calls, ['xrandr --query']);
 });
 
-test('tamanho da interface: 125% num tablet 2000×1200 vira monitor de 1600×960', async () => {
-  const { scaleRequest } = await import('../src/linux-x11/virtual-display.ts');
-  assert.deepEqual(scaleRequest({ width: 2000, height: 1200, fps: 60 }, 125), { width: 1600, height: 960, fps: 60 });
-  assert.deepEqual(scaleRequest({ width: 2400, height: 1080, fps: 60 }, 150), { width: 1600, height: 720, fps: 60 });
-  assert.deepEqual(scaleRequest({ width: 2000, height: 1200, fps: 60 }, 100), { width: 2000, height: 1200, fps: 60 });
-  assert.throws(() => scaleRequest({ width: 2000, height: 1200, fps: 60 }, 50), RangeError);
-});
 
 test('evita a saída que a dock usa como monitor preferido (senão a dock e o Super pulam para o aparelho)', async () => {
   const { pickOutput, dockPreferredConnectors } = await import('../src/linux-x11/virtual-display.ts');

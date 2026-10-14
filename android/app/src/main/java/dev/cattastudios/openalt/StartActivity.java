@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.hardware.input.InputManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -331,13 +330,7 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
         }
     }
 
-    private boolean portrait() {
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-    }
 
-    private int dp(float v) {
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, getResources().getDisplayMetrics()));
-    }
 
     private void renderCards() {
         View focused = getCurrentFocus();
@@ -389,19 +382,19 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
 
     private void addCard(View card, Size size) {
         LinearLayout.LayoutParams lp;
-        if (portrait()) {
+        if (Ui.portrait(StartActivity.this)) {
             lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            card.setMinimumHeight(dp(size == Size.BIG ? 280 : 132));
-            lp.bottomMargin = dp(8);
+            card.setMinimumHeight(Ui.dp(StartActivity.this, size == Size.BIG ? 280 : 132));
+            lp.bottomMargin = Ui.dp(StartActivity.this, 8);
         }
         else {
             int width = size == Size.BIG ? 440 : size == Size.MEDIUM ? 330 : 280;
-            lp = new LinearLayout.LayoutParams(dp(width), ViewGroup.LayoutParams.MATCH_PARENT);
-            lp.rightMargin = dp(16);
+            lp = new LinearLayout.LayoutParams(Ui.dp(StartActivity.this, width), ViewGroup.LayoutParams.MATCH_PARENT);
+            lp.rightMargin = Ui.dp(StartActivity.this, 16);
         }
         if (size != Size.BIG) {
             // cartões menores: o nome logo abaixo do ícone, sem empurrar para o fim
-            card.findViewById(R.id.oaCardSpacer).setVisibility(portrait() ? View.GONE : View.VISIBLE);
+            card.findViewById(R.id.oaCardSpacer).setVisibility(Ui.portrait(StartActivity.this) ? View.GONE : View.VISIBLE);
             ((TextView) card.findViewById(R.id.oaCardTitle)).setTextSize(TypedValue.COMPLEX_UNIT_SP, 26);
         }
         cards.addView(card, lp);
@@ -623,15 +616,15 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
         g.setTypeface(g.getTypeface(), android.graphics.Typeface.BOLD);
         g.setGravity(android.view.Gravity.CENTER);
         g.setBackgroundResource(R.drawable.oa_pad_glyph_bg);
-        g.setMinWidth(dp(28));
-        g.setMinHeight(dp(28));
-        g.setPadding(dp(8), 0, dp(8), 0);
+        g.setMinWidth(Ui.dp(StartActivity.this, 28));
+        g.setMinHeight(Ui.dp(StartActivity.this, 28));
+        g.setPadding(Ui.dp(StartActivity.this, 8), 0, Ui.dp(StartActivity.this, 8), 0);
         TextView l = new TextView(this);
         l.setText(label);
         l.setTextColor(getResources().getColor(R.color.oa_text));
         l.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         l.setTypeface(l.getTypeface(), android.graphics.Typeface.BOLD);
-        l.setPadding(dp(8), 0, dp(20), 0);
+        l.setPadding(Ui.dp(StartActivity.this, 8), 0, Ui.dp(StartActivity.this, 20), 0);
         item.addView(g);
         item.addView(l);
         padHints.addView(item);

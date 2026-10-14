@@ -58,7 +58,13 @@
     });
   }
   alignWalls();
-  window.addEventListener('resize', alignWalls);
+  // no máximo uma vez por quadro (cada chamada lê e escreve o layout)
+  let wallsQueued = false;
+  window.addEventListener('resize', () => {
+    if (wallsQueued) return;
+    wallsQueued = true;
+    requestAnimationFrame(() => { wallsQueued = false; alignWalls(); });
+  });
 
   // ── topo ganha linha ao rolar ──
   const nav = document.getElementById('nav');

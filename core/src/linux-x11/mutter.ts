@@ -166,7 +166,8 @@ export function buildApplyArgs(
   now: MutterState,
   before: MutterState,
   layout: Layout,
-  added: NewMonitor,
+  /** o monitor do aparelho; sem ele, só os monitores da pessoa (desfazer) */
+  added: NewMonitor | null,
   method: keyof typeof APPLY_METHOD,
 ): string[] {
   const groups: { rect: Layout[string]; scale: number; transform: number; primary: boolean; monitors: [string, string][] }[] = [];
@@ -184,9 +185,11 @@ export function buildApplyArgs(
     });
   }
 
-  const rect = layout[added.connector];
-  if (!rect) throw new Error(`O layout não inclui o monitor novo ${added.connector}`);
-  groups.push({ rect, scale: primaryScale(before), transform: 0, primary: false, monitors: [[added.connector, added.modeId]] });
+  if (added) {
+    const rect = layout[added.connector];
+    if (!rect) throw new Error(`O layout não inclui o monitor novo ${added.connector}`);
+    groups.push({ rect, scale: primaryScale(before), transform: 0, primary: false, monitors: [[added.connector, added.modeId]] });
+  }
 
   const args = [
     '--user', 'call', ...DEST, 'ApplyMonitorsConfig', 'uua(iiduba(ssa{sv}))a{sv}',
@@ -205,19 +208,7 @@ export function buildApplyArgs(
  * da pessoa, nas posições, modos e escalas de antes. O monitor do aparelho fica de fora (desligado).
  */
 export function buildRestoreArgs(now: MutterState, before: MutterState): string[] {
-  const layout = layoutFromMutter(before);
-  const args = [
-    '--user', 'call', ...DEST, 'ApplyMonitorsConfig', 'uua(iiduba(ssa{sv}))a{sv}',
-    String(now.serial), String(APPLY_METHOD.temporary), String(before.logical.length),
-  ];
-  for (const lm of before.logical) {
-    const rect = layout[lm.connectors[0]];
-    if (!rect) throw new Error(`O layout não inclui o monitor ${lm.connectors[0]}`);
-    args.push(String(rect.x), String(rect.y), String(lm.scale), String(lm.transform), String(lm.primary), String(lm.connectors.length));
-    for (const c of lm.connectors) args.push(c, currentMode(before, c).id, '0');
-  }
-  args.push('0');
-  return args;
+  return buildApplyArgs(now, before, layoutFromMutter(before), null, 'temporary');
 }
 
 export async function applyMonitorsConfig(run: Runner, args: string[]): Promise<void> {

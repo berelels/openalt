@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -86,8 +85,8 @@ public class SettingsActivity extends Activity {
             }
         });
 
-        current = savedInstanceState != null ? savedInstanceState.getInt(STATE_CATEGORY, 0) : (portrait() ? -1 : 0);
-        if (!portrait() && current < 0) {
+        current = savedInstanceState != null ? savedInstanceState.getInt(STATE_CATEGORY, 0) : (Ui.portrait(SettingsActivity.this) ? -1 : 0);
+        if (!Ui.portrait(SettingsActivity.this) && current < 0) {
             current = 0;
         }
         buildRail();
@@ -117,13 +116,7 @@ public class SettingsActivity extends Activity {
         out.putInt(STATE_CATEGORY, current);
     }
 
-    private boolean portrait() {
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-    }
 
-    private int dp(float v) {
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, getResources().getDisplayMetrics()));
-    }
 
     private int color(int id) {
         return getResources().getColor(id);
@@ -138,17 +131,17 @@ public class SettingsActivity extends Activity {
             LinearLayout b = new LinearLayout(this);
             b.setFocusable(true);
             b.setClickable(true);
-            b.setBackgroundResource(portrait() ? R.drawable.oa_row_bg : R.drawable.oa_rail_item_bg);
-            b.setGravity(portrait() ? Gravity.START : Gravity.CENTER_VERTICAL);
-            b.setOrientation(portrait() ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
-            b.setPadding(dp(16), dp(portrait() ? 18 : 0), dp(16), dp(portrait() ? 18 : 0));
-            b.setMinimumHeight(dp(portrait() ? 132 : 56));
+            b.setBackgroundResource(Ui.portrait(SettingsActivity.this) ? R.drawable.oa_row_bg : R.drawable.oa_rail_item_bg);
+            b.setGravity(Ui.portrait(SettingsActivity.this) ? Gravity.START : Gravity.CENTER_VERTICAL);
+            b.setOrientation(Ui.portrait(SettingsActivity.this) ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
+            b.setPadding(Ui.dp(SettingsActivity.this, 16), Ui.dp(SettingsActivity.this, Ui.portrait(SettingsActivity.this) ? 18 : 0), Ui.dp(SettingsActivity.this, 16), Ui.dp(SettingsActivity.this, Ui.portrait(SettingsActivity.this) ? 18 : 0));
+            b.setMinimumHeight(Ui.dp(SettingsActivity.this, Ui.portrait(SettingsActivity.this) ? 132 : 56));
             b.setContentDescription(getString(TITLES[i]));
 
             ImageView icon = new ImageView(this);
             icon.setImageResource(ICONS[i]);
             icon.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-            int size = dp(portrait() ? 30 : 24);
+            int size = Ui.dp(SettingsActivity.this, Ui.portrait(SettingsActivity.this) ? 30 : 24);
             b.addView(icon, new LinearLayout.LayoutParams(size, size));
 
             TextView label = new TextView(this);
@@ -157,14 +150,14 @@ public class SettingsActivity extends Activity {
             label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
             label.setTypeface(label.getTypeface(), android.graphics.Typeface.BOLD);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            if (portrait()) {
-                lp.topMargin = dp(18);
+            if (Ui.portrait(SettingsActivity.this)) {
+                lp.topMargin = Ui.dp(SettingsActivity.this, 18);
             }
             else {
-                lp.leftMargin = dp(14);
+                lp.leftMargin = Ui.dp(SettingsActivity.this, 14);
             }
             b.addView(label, lp);
-            if (portrait()) {
+            if (Ui.portrait(SettingsActivity.this)) {
                 TextView sub = new TextView(this);
                 sub.setText(SUBS[i]);
                 sub.setTextColor(color(R.color.oa_text));
@@ -181,7 +174,7 @@ public class SettingsActivity extends Activity {
                 }
             });
             // deitado, o foco no trilho já mostra a categoria (como nos consoles)
-            if (!portrait()) {
+            if (!Ui.portrait(SettingsActivity.this)) {
                 b.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                     @Override
                     public void onFocusChange(View v, boolean hasFocus) {
@@ -192,15 +185,15 @@ public class SettingsActivity extends Activity {
                 });
             }
 
-            if (portrait()) {
+            if (Ui.portrait(SettingsActivity.this)) {
                 GridLayout.LayoutParams g = new GridLayout.LayoutParams(GridLayout.spec(i / 2, 1f), GridLayout.spec(i % 2, 1f));
                 g.width = 0;
-                g.setMargins(dp(6), dp(6), dp(6), dp(6));
+                g.setMargins(Ui.dp(SettingsActivity.this, 6), Ui.dp(SettingsActivity.this, 6), Ui.dp(SettingsActivity.this, 6), Ui.dp(SettingsActivity.this, 6));
                 rail.addView(b, g);
             }
             else {
                 LinearLayout.LayoutParams r = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                r.bottomMargin = dp(6);
+                r.bottomMargin = Ui.dp(SettingsActivity.this, 6);
                 rail.addView(b, r);
             }
         }
@@ -208,7 +201,7 @@ public class SettingsActivity extends Activity {
 
     private void showCategory(int index, boolean focusContent) {
         current = index;
-        boolean grid = portrait() && index < 0;
+        boolean grid = Ui.portrait(SettingsActivity.this) && index < 0;
         if (railScroll != null) {
             railScroll.setVisibility(grid ? View.VISIBLE : View.GONE);
         }
@@ -229,7 +222,7 @@ public class SettingsActivity extends Activity {
     @Override
     public void onBackPressed() {
         UiSounds.play(this, UiSoundSynth.Sound.BACK);
-        if (portrait() && current >= 0) {
+        if (Ui.portrait(SettingsActivity.this) && current >= 0) {
             showCategory(-1, false);
             if (rail.getChildCount() > 0) {
                 rail.getChildAt(0).requestFocus();
@@ -289,42 +282,30 @@ public class SettingsActivity extends Activity {
         addLinkRow(inflater, R.drawable.oa_ic_gamepad, getString(R.string.openalt_map_title),
                 getString(R.string.openalt_map_summary), new Intent(this, ButtonMapActivity.class));
         if (key != null && ButtonMap.has(this, key)) {
-            View row = inflater.inflate(R.layout.oa_setting_row, rows, false);
-            stackValueBelow(row);
-            ((ImageView) row.findViewById(R.id.oaRowIcon)).setImageResource(R.drawable.oa_ic_gamepad);
-            ((TextView) row.findViewById(R.id.oaRowTitle)).setText(R.string.openalt_map_reset);
-            ((TextView) row.findViewById(R.id.oaRowHint)).setText(R.string.openalt_map_reset_summary);
-            ((TextView) row.findViewById(R.id.oaRowValue)).setText(R.string.openalt_map_custom);
-            row.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ButtonMap.clear(SettingsActivity.this, key);
-                    UiSounds.play(SettingsActivity.this, UiSoundSynth.Sound.TOGGLE_OFF);
-                    android.widget.Toast.makeText(SettingsActivity.this, R.string.openalt_map_reset_done, android.widget.Toast.LENGTH_SHORT).show();
-                    showCategory(current, false);
-                }
-            });
-            rows.addView(row);
+            addActionRow(inflater, R.drawable.oa_ic_gamepad, getString(R.string.openalt_map_reset),
+                    getString(R.string.openalt_map_reset_summary), getString(R.string.openalt_map_custom), new Runnable() {
+                        @Override
+                        public void run() {
+                            ButtonMap.clear(SettingsActivity.this, key);
+                            UiSounds.play(SettingsActivity.this, UiSoundSynth.Sound.TOGGLE_OFF);
+                            android.widget.Toast.makeText(SettingsActivity.this, R.string.openalt_map_reset_done, android.widget.Toast.LENGTH_SHORT).show();
+                            showCategory(current, false);
+                        }
+                    });
         }
     }
 
     /** "Fazer o tour de novo": volta para a tela de entrada, que mostra o tour. */
     private void addTourRow(LayoutInflater inflater) {
-        View row = inflater.inflate(R.layout.oa_setting_row, rows, false);
-        stackValueBelow(row);
-        ((ImageView) row.findViewById(R.id.oaRowIcon)).setImageResource(R.drawable.oa_ic_info);
-        ((TextView) row.findViewById(R.id.oaRowTitle)).setText(R.string.openalt_tour_again);
-        ((TextView) row.findViewById(R.id.oaRowHint)).setText(R.string.openalt_tour_again_summary);
-        ((TextView) row.findViewById(R.id.oaRowValue)).setText(R.string.openalt_settings_open);
-        row.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                UiSounds.play(SettingsActivity.this, UiSoundSynth.Sound.SELECT);
-                prefs.edit().putBoolean(StartActivity.TOUR_DONE, false).apply();
-                finish();
-            }
-        });
-        rows.addView(row);
+        addActionRow(inflater, R.drawable.oa_ic_info, getString(R.string.openalt_tour_again),
+                getString(R.string.openalt_tour_again_summary), getString(R.string.openalt_settings_open), new Runnable() {
+                    @Override
+                    public void run() {
+                        UiSounds.play(SettingsActivity.this, UiSoundSynth.Sound.SELECT);
+                        prefs.edit().putBoolean(StartActivity.TOUR_DONE, false).apply();
+                        finish();
+                    }
+                });
     }
 
     private String versionName() {
@@ -335,25 +316,41 @@ public class SettingsActivity extends Activity {
         }
     }
 
+    /** Linha que abre outra tela; sem `intent`, só texto (ex.: a versão em Sobre). */
     private void addLinkRow(LayoutInflater inflater, int icon, String title, String hint, final Intent intent) {
+        addActionRow(inflater, icon, title, hint, intent == null ? null : getString(R.string.openalt_settings_open),
+                intent == null ? null : new Runnable() {
+                    @Override
+                    public void run() {
+                        UiSounds.play(SettingsActivity.this, UiSoundSynth.Sound.SELECT);
+                        startActivity(intent);
+                    }
+                });
+    }
+
+    /** Uma linha com ícone, nome, explicação e o valor à direita; `action` null = só texto. */
+    private void addActionRow(LayoutInflater inflater, int icon, String title, String hint, String value, final Runnable action) {
         View row = inflater.inflate(R.layout.oa_setting_row, rows, false);
         stackValueBelow(row);
         ((ImageView) row.findViewById(R.id.oaRowIcon)).setImageResource(icon);
         ((TextView) row.findViewById(R.id.oaRowTitle)).setText(title);
         ((TextView) row.findViewById(R.id.oaRowHint)).setText(hint);
-        TextView value = row.findViewById(R.id.oaRowValue);
-        if (intent == null) {
-            value.setVisibility(View.GONE);
+        TextView v = row.findViewById(R.id.oaRowValue);
+        if (value == null) {
+            v.setVisibility(View.GONE);
+        }
+        else {
+            v.setText(value);
+        }
+        if (action == null) {
             row.setFocusable(false);
             row.setClickable(false);
         }
         else {
-            value.setText(R.string.openalt_settings_open);
             row.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
-                    UiSounds.play(SettingsActivity.this, UiSoundSynth.Sound.SELECT);
-                    startActivity(intent);
+                public void onClick(View view) {
+                    action.run();
                 }
             });
         }
@@ -362,7 +359,7 @@ public class SettingsActivity extends Activity {
 
     /** Em pé não cabe tudo numa linha: o valor (e o - e +) desce para baixo do nome. */
     private void stackValueBelow(View row) {
-        if (!portrait()) {
+        if (!Ui.portrait(SettingsActivity.this)) {
             return;
         }
         LinearLayout root = (LinearLayout) row;
@@ -376,7 +373,7 @@ public class SettingsActivity extends Activity {
             line.addView(v);
         }
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.topMargin = dp(10);
+        lp.topMargin = Ui.dp(SettingsActivity.this, 10);
         texts.addView(line, lp);
         // no começo da linha, sem a margem da esquerda
         ((LinearLayout.LayoutParams) row.findViewById(R.id.oaRowValue).getLayoutParams()).leftMargin = 0;

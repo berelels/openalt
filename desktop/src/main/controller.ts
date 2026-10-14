@@ -52,7 +52,7 @@ import {
   readSettings,
   resolvePlacement,
   retractDesktop,
-  fileForcedStore,
+  hasPendingRelease,
   refreshBackgroundsViaHelper,
   run,
   startSunshine,
@@ -83,7 +83,6 @@ export interface UiState {
   phase: Phase;
   pcName: string;
   monitors: (Rect & { id: string; name: string; primary: boolean })[];
-  uiScale: number;
   maximizeOnDevice: boolean;
   sunshineKind: SunshineKind | null;
   placement: { anchor: string; side: Settings['placement']['side']; align: Settings['placement']['align']; offset: number };
@@ -198,7 +197,6 @@ export class Controller extends EventEmitter {
       rememberLayout: s.rememberLayout,
       orientation: s.orientation,
       previewKind: s.previewKind,
-      uiScale: s.uiScale,
       maximizeOnDevice: s.maximizeOnDevice,
       sunshineKind: this.sunshineKind,
       device: c ? { name: c.name, kind: kindOf(c.width, c.height), width: c.width, height: c.height, fps: c.fps, network: 'local' } : null,
@@ -312,7 +310,7 @@ export class Controller extends EventEmitter {
       });
       // a extensão do OpenAlt reinicia o GNOME sem a caixa do Alt+F2 (GNOME no X11; carrega no 1º reinício)
       if (process.env.XDG_SESSION_TYPE === 'x11' && /gnome/i.test(process.env.XDG_CURRENT_DESKTOP ?? '')) {
-        await installShellHelper({ run }).catch(() => 'unavailable');
+        void installShellHelper({ run }).catch(() => 'unavailable'); // não segura o Ligar
       }
       this.sunshine = await startSunshine(setup.confPath, { kind: this.sunshineKind ?? 'flatpak' });
       const mine = this.sunshine;
@@ -362,7 +360,7 @@ export class Controller extends EventEmitter {
     this.watcher?.close();
     this.watcher = null;
     // também devolve uma saída que ficou forçada num desconectar sem senha (a pessoa está no PC agora)
-    const pending = (await fileForcedStore(this.paths.runtime).read().catch(() => [] as string[])).length > 0;
+    const pending = await hasPendingRelease(this.paths.runtime);
     if (this.connection || pending) {
       const wasExtend = this.connection?.mode === 'extend' || pending;
       await retractDesktop().catch(() => {});
@@ -454,7 +452,7 @@ export class Controller extends EventEmitter {
       // recarregar as extensões resolvia o Super, mas não o papel de parede, que só volta reiniciando.
       // Desconectou sem a permissão do sistema: a saída do aparelho ficou forçada (só fora da área de
       // trabalho). Reiniciar o GNOME agora poderia religá-la; o "Desligar" a devolve e aí reinicia.
-      const pending = !c && wasExtend && (await fileForcedStore(this.paths.runtime).read().catch(() => [] as string[])).length > 0;
+      const pending = !c && wasExtend && await hasPendingRelease(this.paths.runtime);
       if ((c && c.mode !== 'mirror') || (!c && wasExtend && !pending)) this.emit('monitors-changed');
       // sem reiniciar, o papel de parede não volta sozinho: a extensão do OpenAlt só refaz os fundos
       if (pending) void refreshBackgroundsViaHelper(run);
@@ -498,7 +496,7 @@ export class Controller extends EventEmitter {
     if (!name) return {};
     const key = deviceKey(name);
     const cur = settingsFor(this.settings, name);
-    return { perDevice: { ...this.settings.perDevice, [key]: { placement: cur.placement, uiScale: cur.uiScale, ...patch } } };
+    return { perDevice: { ...this.settings.perDevice, [key]: { placement: cur.placement, ...patch } } };
   }
   async setOrientation(o: unknown) { if (o === 'portrait' || o === 'landscape') await this.save({ orientation: o }); }
   async setPreviewKind(k: unknown) { if (k === 'phone' || k === 'tablet') await this.save({ previewKind: k }); }

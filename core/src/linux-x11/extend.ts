@@ -10,7 +10,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { buildEdid, serialForDevice, timingFromModeline } from '../edid.ts';
 import { placeBeside, type Layout, type Placement } from '../layout.ts';
-import { CommandError, run as defaultRun, type Runner } from '../proc.ts';
+import { CommandError, realSleep, run as defaultRun, type Runner } from '../proc.ts';
 import { drmConnectorFor, isValidConnectorName, listDrmConnectors, parseConnectorIds, type DrmConnector } from './drm.ts';
 import {
   applyMonitorsConfig,
@@ -77,6 +77,14 @@ export async function helperAuthorized(
 export interface ForcedStore {
   read(): Promise<string[]>;
   write(connectors: string[]): Promise<void>;
+}
+
+/**
+ * Ficou uma saída forçada para devolver? (um desconectar sem a permissão do sistema a deixa ligada,
+ * fora da área de trabalho; o próximo conectar ou o "Desligar" a devolve)
+ */
+export async function hasPendingRelease(dir: string = defaultRuntimeDir()): Promise<boolean> {
+  return (await fileForcedStore(dir).read()).length > 0;
 }
 
 export function fileForcedStore(dir: string = defaultRuntimeDir()): ForcedStore {
@@ -170,9 +178,8 @@ export interface ExtendResult extends DisplayRequest {
   applied: boolean;
 }
 
-const realSleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
-
-async function waitFor<T>(
+/** Repete `check` (a cada 200 ms) até ele devolver algo; erro se passar de `timeoutMs`. */
+export async function waitFor<T>(
   check: () => Promise<T | undefined>,
   what: string,
   timeoutMs: number,
@@ -372,8 +379,8 @@ export async function retractOnDisconnect(
 ): Promise<{ released: string[]; removed: string[]; pending: boolean }> {
   const { run = defaultRun, store = fileForcedStore() } = opts;
   const forced = await store.read();
-  const authorized = opts.authorized ?? await helperAuthorized(run);
-  if (!forced.length || authorized) return { ...(await retractDesktop(opts)), pending: false };
+  // nada forçado (ex.: Espelhar): nem precisa conferir a permissão
+  if (!forced.length || (opts.authorized ?? await helperAuthorized(run))) return { ...(await retractDesktop(opts)), pending: false };
   await releaseWithoutPassword(opts);
   return { released: [], removed: [], pending: true };
 }

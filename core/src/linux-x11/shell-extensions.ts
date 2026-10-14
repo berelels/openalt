@@ -6,9 +6,10 @@
 // para as extensões de cada pessoa (não dá para saber de antemão quais se perdem).
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { run as defaultRun, type Runner } from '../proc.ts';
+import { realSleep, run as defaultRun, type Runner } from '../proc.ts';
 
-const VALID_UUID = /^[\w.@\-]{1,128}$/;
+/** nome de extensão do GNOME que dá para regravar no gsettings sem escapar nada */
+export const VALID_UUID = /^[\w.@\-]{1,128}$/;
 const MARKER = 'extensions-reloading.json';
 
 export interface ReloadOptions {
@@ -17,7 +18,6 @@ export interface ReloadOptions {
   sleep?: (ms: number) => Promise<void>;
 }
 
-const realSleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 /** Recarrega (desliga e liga, na mesma ordem) as extensões ligadas. Devolve as recarregadas. */
 export async function reloadMonitorSensitiveExtensions({ run = defaultRun, runtimeDir, sleep = realSleep }: ReloadOptions): Promise<string[]> {

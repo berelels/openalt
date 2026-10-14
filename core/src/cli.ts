@@ -4,7 +4,7 @@
 import { parseArgs } from 'node:util';
 import { isAlign, isSide, type Placement } from './layout.ts';
 import { assessEnvironment, gatherFacts } from './linux-x11/environment.ts';
-import { extendDesktop, moveDesktop, planExtend, retractDesktop, retractOnDisconnect } from './linux-x11/extend.ts';
+import { extendDesktop, hasPendingRelease, moveDesktop, planExtend, retractDesktop, retractOnDisconnect } from './linux-x11/extend.ts';
 import {
   createMirrorDisplay,
   createVirtualDisplay,
@@ -67,9 +67,11 @@ async function main(argv: string[]): Promise<unknown> {
   const [group, asked] = positionals;
   // "auto" (chamado pela ponte do Sunshine): o modo escolhido no app do PC; pelo Tailscale
   // (fora de casa) sempre "Espelhar", a "Nova tela" é só na mesma rede
-  const action = asked === 'auto'
-    ? (await sunshineClientViaTailscale(run) ? 'mirror' : (await readSettings(openaltPaths().config)).mode)
-    : asked;
+  let action = asked;
+  if (asked === 'auto') {
+    action = (await readSettings(openaltPaths().config)).mode;
+    if (action === 'extend' && await sunshineClientViaTailscale(run)) action = 'mirror';
+  }
   if (values.help || group !== 'display') throw new UsageError();
 
   const env = { ...process.env };
@@ -113,7 +115,7 @@ async function main(argv: string[]): Promise<unknown> {
   }
   // Uma saída que ficou forçada num desconectar sem senha ainda parece "conectada": devolvê-la ANTES de
   // escolher, senão a escolha pula para outra saída, que o Sunshine (configurado no Ligar) não captura.
-  if (fromSunshine && (action === 'extend' || action === 'mirror')) await retractDesktop();
+  if (fromSunshine && (action === 'extend' || action === 'mirror') && await hasPendingRelease()) await retractDesktop();
   // a mesma saída que o app escolheu ao ligar (evita a do monitor preferido da dock)
   const output = values.output ?? (fromSunshine ? await chooseOutput() : undefined);
   const connected = async (mode: 'extend' | 'mirror') => {

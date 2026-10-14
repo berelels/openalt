@@ -3,21 +3,18 @@ import { test } from 'node:test';
 import { buildEdid, isValidEdid, serialForDevice } from '../src/edid.ts';
 import { DEFAULT_SETTINGS, sanitizeSettings, settingsFor } from '../src/settings.ts';
 
-test('cada aparelho tem o seu lugar e tamanho; aparelho novo usa o padrão', () => {
+test('cada aparelho tem o seu lugar; aparelho novo usa o padrão', () => {
   const s = sanitizeSettings({
     ...DEFAULT_SETTINGS,
     perDevice: {
-      'Celular do Gabriel': { placement: { anchor: 'HDMI-A-0', side: 'left', align: 'center', offset: 0 }, uiScale: 150 },
-      'bad\n<x>': { placement: { anchor: '../x', side: 'nowhere' }, uiScale: 7 },
+      'Celular do Gabriel': { placement: { anchor: 'HDMI-A-0', side: 'left', align: 'center', offset: 0 } },
+      'bad\n<x>': { placement: { anchor: '../x', side: 'nowhere' } },
     },
   });
   assert.equal(settingsFor(s, 'Celular do Gabriel').placement.side, 'left');
-  assert.equal(settingsFor(s, 'Celular do Gabriel').uiScale, 150);
   assert.equal(settingsFor(s, 'Tablet novo').placement.side, DEFAULT_SETTINGS.placement.side);
-  assert.equal(settingsFor(s, undefined).uiScale, DEFAULT_SETTINGS.uiScale);
   // entrada estranha vira o padrão, com a chave limpa
   assert.deepEqual(s.perDevice['badx'].placement.anchor, 'primary');
-  assert.equal(s.perDevice['badx'].uiScale, DEFAULT_SETTINGS.uiScale);
 });
 
 test('EDID: série estável e diferente por aparelho, e continua válido', () => {

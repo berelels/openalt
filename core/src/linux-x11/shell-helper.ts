@@ -7,11 +7,11 @@ import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { run as defaultRun, type Runner } from '../proc.ts';
+import { VALID_UUID } from './shell-extensions.ts';
 
 export const SHELL_HELPER_UUID = 'openalt@cattastudios.dev';
 const OBJECT_PATH = '/dev/cattastudios/OpenAlt';
 const IFACE = 'dev.cattastudios.OpenAlt.Shell';
-const VALID_UUID = /^[\w.@\-]{1,128}$/;
 
 /** A pasta da extensão no projeto/pacote (a mesma de src/ e de dist/: as duas ficam em core/). */
 export function shellHelperSource(): string {
@@ -53,11 +53,11 @@ export interface InstallOptions {
 export async function installShellHelper({ run = defaultRun, source = shellHelperSource(), extensionsDir = shellExtensionsDir() }: InstallOptions = {}): Promise<HelperInstall> {
   if (await shellHelperVersion(run)) return 'active';
   const get = async (key: string) => (await run('gsettings', ['get', 'org.gnome.shell', key]).catch(() => ({ stdout: '' }))).stdout.trim();
-  const enabledRaw = await get('enabled-extensions');
+  const [enabledRaw, userOff, disabledRaw] = await Promise.all([get('enabled-extensions'), get('disable-user-extensions'), get('disabled-extensions')]);
   const enabled = parseStringList(enabledRaw);
   if (!enabled) return 'unavailable'; // sem GNOME, ou uma lista que não sabemos regravar sem estragar
-  if ((await get('disable-user-extensions')) === 'true') return 'disabled-by-user';
-  if ((parseStringList(await get('disabled-extensions')) ?? []).includes(SHELL_HELPER_UUID)) return 'disabled-by-user';
+  if (userOff === 'true') return 'disabled-by-user';
+  if ((parseStringList(disabledRaw) ?? []).includes(SHELL_HELPER_UUID)) return 'disabled-by-user';
 
   const dest = join(extensionsDir, SHELL_HELPER_UUID);
   await mkdir(dest, { recursive: true, mode: 0o755 });
@@ -74,19 +74,23 @@ export async function installShellHelper({ run = defaultRun, source = shellHelpe
   return 'pending-restart';
 }
 
+/** Chama um método no objeto da extensão; null se o GNOME (ou a extensão) não respondeu. */
+async function callShell(run: Runner, method: string, ...args: string[]): Promise<string | null> {
+  const r = await run('gdbus', ['call', '--session', '--dest', 'org.gnome.Shell', '--object-path', OBJECT_PATH,
+    '--method', method, ...args], { timeoutMs: 3000 }).catch(() => null);
+  return r ? r.stdout : null;
+}
+
 /** A versão da extensão rodando no GNOME, ou 0 se ela não está carregada. */
 export async function shellHelperVersion(run: Runner = defaultRun): Promise<number> {
-  const r = await run('gdbus', ['call', '--session', '--dest', 'org.gnome.Shell', '--object-path', OBJECT_PATH,
-    '--method', 'org.freedesktop.DBus.Properties.Get', IFACE, 'Version'], { timeoutMs: 3000 }).catch(() => ({ stdout: '' }));
-  const m = /uint32 (\d+)/.exec(r.stdout);
+  const out = await callShell(run, 'org.freedesktop.DBus.Properties.Get', IFACE, 'Version');
+  const m = /uint32 (\d+)/.exec(out ?? '');
   return m ? Number(m[1]) : 0;
 }
 
 /** Pede à extensão para reiniciar o GNOME. true = aceito (o GNOME reinicia em seguida). */
 export async function restartShellViaHelper(run: Runner = defaultRun): Promise<boolean> {
-  const r = await run('gdbus', ['call', '--session', '--dest', 'org.gnome.Shell', '--object-path', OBJECT_PATH,
-    '--method', `${IFACE}.Restart`], { timeoutMs: 3000 }).catch(() => ({ stdout: '' }));
-  return r.stdout.trim() === '(true,)';
+  return (await callShell(run, `${IFACE}.Restart`))?.trim() === '(true,)';
 }
 
 /**
@@ -94,7 +98,5 @@ export async function restartShellViaHelper(run: Runner = defaultRun): Promise<b
  * reiniciar o GNOME. true = a extensão respondeu. Usado ao desconectar sem a permissão do sistema.
  */
 export async function refreshBackgroundsViaHelper(run: Runner = defaultRun): Promise<boolean> {
-  const r = await run('gdbus', ['call', '--session', '--dest', 'org.gnome.Shell', '--object-path', OBJECT_PATH,
-    '--method', `${IFACE}.RefreshBackgrounds`], { timeoutMs: 3000 }).catch(() => null);
-  return r !== null;
+  return (await callShell(run, `${IFACE}.RefreshBackgrounds`)) !== null;
 }
