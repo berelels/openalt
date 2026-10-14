@@ -269,6 +269,7 @@ public class SettingsActivity extends Activity {
         if (category == SettingsModel.Category.ABOUT) {
             addLinkRow(inflater, R.drawable.oa_ic_info, getString(R.string.openalt_app_name) + " " + versionName(),
                     getString(R.string.openalt_about_text), null);
+            addTourRow(inflater);
         }
         for (SettingsModel.Item it : items) {
             if (it.category == category) {
@@ -305,6 +306,25 @@ public class SettingsActivity extends Activity {
             });
             rows.addView(row);
         }
+    }
+
+    /** "Fazer o tour de novo": volta para a tela de entrada, que mostra o tour. */
+    private void addTourRow(LayoutInflater inflater) {
+        View row = inflater.inflate(R.layout.oa_setting_row, rows, false);
+        stackValueBelow(row);
+        ((ImageView) row.findViewById(R.id.oaRowIcon)).setImageResource(R.drawable.oa_ic_info);
+        ((TextView) row.findViewById(R.id.oaRowTitle)).setText(R.string.openalt_tour_again);
+        ((TextView) row.findViewById(R.id.oaRowHint)).setText(R.string.openalt_tour_again_summary);
+        ((TextView) row.findViewById(R.id.oaRowValue)).setText(R.string.openalt_settings_open);
+        row.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UiSounds.play(SettingsActivity.this, UiSoundSynth.Sound.SELECT);
+                prefs.edit().putBoolean(StartActivity.TOUR_DONE, false).apply();
+                finish();
+            }
+        });
+        rows.addView(row);
     }
 
     private String versionName() {

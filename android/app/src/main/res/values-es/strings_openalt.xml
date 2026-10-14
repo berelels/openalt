@@ -137,4 +137,23 @@
     <string name="openalt_map_custom">Mapeado</string>
     <string name="openalt_pref_ui_sounds_title">Sonidos de la interfaz</string>
     <string name="openalt_pref_ui_sounds_summary">Sonidos cortos al moverte, elegir y volver, como en una consola. Siguen el volumen multimedia.</string>
+    <string name="openalt_tour_count">Paso %1$d de %2$d</string>
+    <string name="openalt_tour_next">Siguiente</string>
+    <string name="openalt_tour_back">Volver</string>
+    <string name="openalt_tour_done">Listo</string>
+    <string name="openalt_tour_skip">Saltar el tour</string>
+    <string name="openalt_tour_pc_title">Tu PC</string>
+    <string name="openalt_tour_pc_text">Toca la tarjeta (o pulsa A) para conectar. Se pone roja cuando el PC está listo.</string>
+    <string name="openalt_tour_options_title">Opciones del PC</string>
+    <string name="openalt_tour_options_text">Mantén pulsada la tarjeta (o pulsa X) para despertar el PC, ver sus apps, probar la red o quitarlo.</string>
+    <string name="openalt_tour_pair_title">Emparejar un PC</string>
+    <string name="openalt_tour_pair_text">Abre OpenAlt en el PC, pulsa Encender y apunta la cámara al QR que aparece.</string>
+    <string name="openalt_tour_network_title">En casa o fuera</string>
+    <string name="openalt_tour_network_text">Muestra cómo estás conectado: Wi-Fi en casa, o Tailscale fuera de casa (solo duplicar).</string>
+    <string name="openalt_tour_settings_title">Ajustes</string>
+    <string name="openalt_tour_settings_text">Video, sonido, control y asignación de botones. Puedes repetir este tour desde ahí, en Acerca de.</string>
+    <string name="openalt_tour_pad_title">Con control</string>
+    <string name="openalt_tour_pad_text">Los atajos de tu control aparecen aquí abajo, con los nombres de sus botones.</string>
+    <string name="openalt_tour_again">Hacer el tour otra vez</string>
+    <string name="openalt_tour_again_summary">Muestra qué hace cada parte de la pantalla de inicio, en pocos pasos.</string>
 </resources>

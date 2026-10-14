@@ -137,4 +137,23 @@
     <string name="openalt_map_custom">Mapeado</string>
     <string name="openalt_pref_ui_sounds_title">Sons da interface</string>
     <string name="openalt_pref_ui_sounds_summary">Sons curtos ao mover, escolher e voltar, como num console. Seguem o volume de mídia.</string>
+    <string name="openalt_tour_count">Passo %1$d de %2$d</string>
+    <string name="openalt_tour_next">Próximo</string>
+    <string name="openalt_tour_back">Voltar</string>
+    <string name="openalt_tour_done">Pronto</string>
+    <string name="openalt_tour_skip">Pular o tour</string>
+    <string name="openalt_tour_pc_title">Seu PC</string>
+    <string name="openalt_tour_pc_text">Toque no cartão (ou aperte A) para conectar. Ele fica vermelho quando o PC está pronto.</string>
+    <string name="openalt_tour_options_title">Opções do PC</string>
+    <string name="openalt_tour_options_text">Toque e segure no cartão (ou aperte X) para acordar o PC, ver os apps dele, testar a rede ou excluir.</string>
+    <string name="openalt_tour_pair_title">Parear um PC</string>
+    <string name="openalt_tour_pair_text">Abra o OpenAlt no PC, clique em Ligar e aponte a câmera para o QR que aparece.</string>
+    <string name="openalt_tour_network_title">Em casa ou fora</string>
+    <string name="openalt_tour_network_text">Mostra por onde você está conectado: Wi-Fi em casa, ou Tailscale fora de casa (só espelhar).</string>
+    <string name="openalt_tour_settings_title">Configurações</string>
+    <string name="openalt_tour_settings_text">Vídeo, som, controle e mapeamento de botões. Dá para refazer este tour por lá, em Sobre.</string>
+    <string name="openalt_tour_pad_title">Com controle</string>
+    <string name="openalt_tour_pad_text">Os atalhos do seu controle aparecem aqui embaixo, com os nomes dos botões dele.</string>
+    <string name="openalt_tour_again">Fazer o tour de novo</string>
+    <string name="openalt_tour_again_summary">Mostra o que cada parte da tela de entrada faz, em poucos passos.</string>
 </resources>

@@ -146,4 +146,23 @@
     <string name="openalt_map_custom">Mapped</string>
     <string name="openalt_pref_ui_sounds_title">Interface sounds</string>
     <string name="openalt_pref_ui_sounds_summary">Short sounds when you move, choose and go back, like on a console. They follow the media volume.</string>
+    <string name="openalt_tour_count">Step %1$d of %2$d</string>
+    <string name="openalt_tour_next">Next</string>
+    <string name="openalt_tour_back">Back</string>
+    <string name="openalt_tour_done">Done</string>
+    <string name="openalt_tour_skip">Skip tour</string>
+    <string name="openalt_tour_pc_title">Your PC</string>
+    <string name="openalt_tour_pc_text">Tap the card (or press A) to connect. It turns red when the PC is ready.</string>
+    <string name="openalt_tour_options_title">PC options</string>
+    <string name="openalt_tour_options_text">Touch and hold the card (or press X) to wake the PC, see its apps, test the network or remove it.</string>
+    <string name="openalt_tour_pair_title">Pair a PC</string>
+    <string name="openalt_tour_pair_text">Open OpenAlt on the PC, press Turn on and point the camera at the QR code that shows up.</string>
+    <string name="openalt_tour_network_title">Home or away</string>
+    <string name="openalt_tour_network_text">Shows how you are connected: Wi-Fi at home, or Tailscale away from home (mirror only).</string>
+    <string name="openalt_tour_settings_title">Settings</string>
+    <string name="openalt_tour_settings_text">Video, sound, controller and button mapping. You can take this tour again from there, under About.</string>
+    <string name="openalt_tour_pad_title">With a controller</string>
+    <string name="openalt_tour_pad_text">Your controller shortcuts show up down here, with its own button names.</string>
+    <string name="openalt_tour_again">Take the tour again</string>
+    <string name="openalt_tour_again_summary">Shows what each part of the start screen does, in a few steps.</string>
 </resources>

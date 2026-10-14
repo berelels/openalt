@@ -81,6 +81,7 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
     private TextView touchHint;
     private TextView network;
     private WebView intro;
+    private TourOverlay tour;
     private InputManager inputManager;
     private String focusedKey;
 
@@ -152,6 +153,7 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
         updatePadHints();
         updateNetwork();
         startPolling();
+        maybeStartTour();
     }
 
     @Override
@@ -232,6 +234,7 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
         if (INTRO_DONE.equals(url) && intro.getVisibility() == View.VISIBLE) {
             intro.setVisibility(View.GONE);
             focusFirstCard();
+            maybeStartTour();
             // escondida, a página ainda toca: o acorde final soa até o fim (~1 s depois da cortina)
             intro.postDelayed(new Runnable() {
                 @Override
@@ -635,8 +638,88 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
         updatePadHints();
     }
 
+    // ── tour guiado ────────────────────────────────────────────────────────
+
+    static final String TOUR_DONE = "openalt_tour_done";
+
+    /** Na primeira vez (ou depois de "Fazer o tour de novo" em Configurações → Sobre), sem a abertura na frente. */
+    private void maybeStartTour() {
+        intro.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (tour != null || isFinishing() || intro.getVisibility() == View.VISIBLE || !inForeground
+                        || PreferenceManager.getDefaultSharedPreferences(StartActivity.this).getBoolean(TOUR_DONE, false)) {
+                    return;
+                }
+                startTour();
+            }
+        }, 400); // os cartões já desenhados
+    }
+
+    private void startTour() {
+        List<TourOverlay.Step> steps = new ArrayList<>();
+        View pc = null;
+        for (int i = 0; i < cards.getChildCount(); i++) {
+            Object tag = cards.getChildAt(i).getTag();
+            if (tag instanceof String && ((String) tag).startsWith("pc:")) {
+                pc = cards.getChildAt(i);
+                break;
+            }
+        }
+        if (pc != null) {
+            steps.add(new TourOverlay.Step(pc, getString(R.string.openalt_tour_pc_title), getString(R.string.openalt_tour_pc_text)));
+            steps.add(new TourOverlay.Step(pc, getString(R.string.openalt_tour_options_title), getString(R.string.openalt_tour_options_text)));
+        }
+        View pair = cards.findViewWithTag("pair");
+        if (pair != null) {
+            steps.add(new TourOverlay.Step(pair, getString(R.string.openalt_tour_pair_title), getString(R.string.openalt_tour_pair_text)));
+        }
+        if (network != null && network.getVisibility() == View.VISIBLE) {
+            steps.add(new TourOverlay.Step(network, getString(R.string.openalt_tour_network_title), getString(R.string.openalt_tour_network_text)));
+        }
+        steps.add(new TourOverlay.Step(findViewById(R.id.oaSettings), getString(R.string.openalt_tour_settings_title), getString(R.string.openalt_tour_settings_text)));
+        if (padHints.getVisibility() == View.VISIBLE) {
+            steps.add(new TourOverlay.Step(padHints, getString(R.string.openalt_tour_pad_title), getString(R.string.openalt_tour_pad_text)));
+        }
+        tour = TourOverlay.start(this, (android.view.ViewGroup) findViewById(R.id.oaHomeContent), steps, new Runnable() {
+            @Override
+            public void run() {
+                tour = null;
+                PreferenceManager.getDefaultSharedPreferences(StartActivity.this).edit().putBoolean(TOUR_DONE, true).apply();
+                restoreFocus();
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (tour != null) {
+            tour.end();
+            return;
+        }
+        super.onBackPressed();
+    }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (tour != null) {
+            // no tour: A aperta o botão com foco, B sai; os atalhos da tela (X, Menu) esperam
+            if (keyCode == KeyEvent.KEYCODE_BUTTON_B || keyCode == KeyEvent.KEYCODE_BACK) {
+                tour.end();
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_BUTTON_A) {
+                View f = getCurrentFocus();
+                if (f != null) {
+                    f.performClick();
+                }
+                return true;
+            }
+            if (keyCode == KeyEvent.KEYCODE_BUTTON_X || keyCode == KeyEvent.KEYCODE_BUTTON_START || keyCode == KeyEvent.KEYCODE_MENU) {
+                return true;
+            }
+            return super.onKeyDown(keyCode, event);
+        }
         // qualquer botão pula a abertura (o toque é tratado pela própria página)
         if (intro.getVisibility() == View.VISIBLE && keyCode != KeyEvent.KEYCODE_BACK) {
             // pula pela própria página, como no PC: a cortina sobe e a música toca só o final
