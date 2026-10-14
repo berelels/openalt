@@ -53,6 +53,7 @@ import {
   resolvePlacement,
   retractDesktop,
   hasPendingRelease,
+  realSleep,
   refreshBackgroundsViaHelper,
   run,
   startSunshine,
@@ -488,6 +489,26 @@ export class Controller extends EventEmitter {
       this.mutter = await getMutterState(run).catch(() => this.mutter);
       this.emitState();
     }
+  }
+
+  /**
+   * Depois que o GNOME reinicia com a "Nova tela", ele arruma os monitores do jeito dele: para um
+   * aparelho que nunca viu, todos em fila da esquerda para a direita (e as janelas mudam de tela).
+   * Reaplica o lugar escolhido; tenta de novo se o GNOME ainda estiver arrumando.
+   */
+  async reapplyPlacement(): Promise<void> {
+    if (this.connection?.mode !== 'extend') return;
+    const p = settingsFor(this.settings, this.connection.name).placement;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        await moveDesktop({ anchor: p.anchor, anchorName: p.anchorName, side: p.side, align: p.align, offset: p.offset ?? 0 }, { remember: this.settings.rememberLayout });
+        break;
+      } catch {
+        await realSleep(1000);
+      }
+    }
+    this.mutter = await getMutterState(run).catch(() => this.mutter);
+    this.emitState();
   }
 
   async setMode(m: unknown) { if (m === 'extend' || m === 'mirror') await this.save({ mode: m }); }
