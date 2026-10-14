@@ -1,6 +1,6 @@
 // Processo principal do OpenAlt (Electron). ADR-0011: nenhuma porta aberta; a interface fala
 // com este processo só por IPC, e só por canais conhecidos vindos da nossa própria página.
-import { app, BrowserWindow, ipcMain, screen, shell, type IpcMainInvokeEvent } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, nativeImage, screen, shell, Tray, type IpcMainInvokeEvent } from 'electron';
 import { Controller } from './controller.js';
 import { authUrlFrom, restartShellViaHelper, run } from '@openalt/core';
 import { dirname, join } from 'node:path';
@@ -243,6 +243,45 @@ ipcMain.handle('window:toggle-fullscreen', (e) => {
   return win.isFullScreen();
 });
 ipcMain.handle('window:is-fullscreen', (e) => fromOurPage(e).isFullScreen());
+
+// ── bandeja do sistema: continuar em segundo plano ─────────────────────────
+// O GNOME só mostra ícones de bandeja com a extensão AppIndicator (o Zorin já vem com ela). Sem a
+// bandeja, só minimiza: esconder a janela sem ícone deixaria o OpenAlt sem jeito de voltar.
+let tray: Tray | null = null;
+async function hasTray(): Promise<boolean> {
+  if (process.platform !== 'linux') return true;
+  const r = await run('gdbus', ['call', '--session', '--dest', 'org.freedesktop.DBus', '--object-path', '/org/freedesktop/DBus',
+    '--method', 'org.freedesktop.DBus.NameHasOwner', 'org.kde.StatusNotifierWatcher'], { timeoutMs: 2000 }).catch(() => ({ stdout: '' }));
+  return r.stdout.includes('true');
+}
+const label = (v: unknown, fallback: string) => (typeof v === 'string' && v.length > 0 && v.length <= 80 ? v : fallback);
+ipcMain.handle('window:to-tray', async (e, labels: unknown) => {
+  const win = fromOurPage(e);
+  if (!(await hasTray())) { win.minimize(); return 'minimized'; }
+  const l = (labels && typeof labels === 'object' ? labels : {}) as Record<string, unknown>;
+  const show = () => {
+    tray?.destroy();
+    tray = null;
+    win.show();
+    win.setFullScreen(true); // volta como estava: em tela cheia
+    win.focus();
+  };
+  tray?.destroy();
+  tray = new Tray(nativeImage.createFromPath(join(here, '..', '..', 'build', 'icon.png')).resize({ width: 22, height: 22 }));
+  tray.setToolTip('OpenAlt');
+  tray.setContextMenu(Menu.buildFromTemplate([
+    { label: label(l.show, 'OpenAlt'), click: show },
+    { type: 'separator' },
+    { label: label(l.quit, 'Quit'), click: () => app.quit() },
+  ]));
+  tray.on('click', show);
+  if (win.isFullScreen()) {
+    // sair da tela cheia antes de esconder (no X11, esconder em tela cheia deixa a tela preta)
+    await new Promise<void>((resolve) => { win.once('leave-full-screen', () => resolve()); win.setFullScreen(false); setTimeout(resolve, 800); });
+  }
+  win.hide();
+  return 'tray';
+});
 
 app.whenReady().then(async () => {
   await controller.init();

@@ -310,6 +310,7 @@ interface WindowApi {
   toggleFullscreen(): Promise<boolean>;
   isFullscreen(): Promise<boolean>;
   onFullscreen(cb: (on: boolean) => void): void;
+  toTray(labels: { show: string; quit: string }): Promise<'tray' | 'minimized'>;
 }
 const winApi = (window as unknown as { openaltWindow?: WindowApi }).openaltWindow;
 let fullscreen = false;
@@ -371,6 +372,7 @@ function topbar(title: string, sub: string, live = false): string {
         <span class="pill-btn"><span class="ms" aria-hidden="true">computer</span><strong>${esc(s.pcName)}</strong></span>
         <span class="pill-btn"><span class="ms" aria-hidden="true">${s.device?.network === 'tailscale' ? 'public' : 'wifi'}</span>${net}</span>
         <button class="icon-btn" data-goto="pc" aria-label="${t('top.pcChecks')}"><span class="ms" aria-hidden="true">tune</span></button>
+        <button class="icon-btn" id="btnTray" aria-label="${t('top.toTray')}" title="${t('top.toTray')}"><span class="ms" aria-hidden="true">minimize</span></button>
         <button class="icon-btn" id="btnFullscreen" aria-label="${fsLabel}" title="${fsLabel}"><span class="ms" aria-hidden="true">${fullscreen ? 'fullscreen_exit' : 'fullscreen'}</span></button>
       </div>
     </header>
@@ -842,6 +844,7 @@ function bindView() {
     void navigator.clipboard.writeText(b.dataset.cmd ?? '').then(() => { b.lastChild!.textContent = t('remote.copied'); });
   });
   $('#btnFullscreen')?.addEventListener('click', () => void toggleFullscreen());
+  $('#btnTray')?.addEventListener('click', () => void winApi?.toTray({ show: t('tray.show'), quit: t('tray.quit') }));
   $('#btnSunshine')?.addEventListener('click', () => void api.instalarSunshine());
   $('#btnHelper')?.addEventListener('click', () => void api.instalarPermissao());
   $('#btnSetupDone')?.addEventListener('click', () => { if (isDemo) (api as ReturnType<typeof mockApi>).demo({ phase: 'off' }); });

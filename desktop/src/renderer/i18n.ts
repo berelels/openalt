@@ -28,7 +28,7 @@ const PT: Dict = {
 
   // topo
   'net.local': 'Rede local', 'net.away': 'Fora de casa',
-  'top.pcChecks': 'O que funciona neste PC', 'top.fullscreen': 'Tela cheia (F11)', 'top.exitFullscreen': 'Sair da tela cheia (Esc)',
+  'top.pcChecks': 'O que funciona neste PC', 'top.fullscreen': 'Tela cheia (F11)', 'top.toTray': 'Continuar em segundo plano (bandeja do sistema)', 'tray.show': 'Mostrar o OpenAlt', 'tray.quit': 'Sair do OpenAlt', 'top.exitFullscreen': 'Sair da tela cheia (Esc)',
 
   // conexão
   'conn.title': 'Conexão',
@@ -179,7 +179,7 @@ const ES: Dict = {
   'align.top': 'Arriba', 'align.middle': 'Centro', 'align.bottom': 'Abajo', 'align.left': 'Izquierda', 'align.right': 'Derecha',
 
   'net.local': 'Red local', 'net.away': 'Fuera de casa',
-  'top.pcChecks': 'Qué funciona en este PC', 'top.fullscreen': 'Pantalla completa (F11)', 'top.exitFullscreen': 'Salir de pantalla completa (Esc)',
+  'top.pcChecks': 'Qué funciona en este PC', 'top.fullscreen': 'Pantalla completa (F11)', 'top.toTray': 'Seguir en segundo plano (bandeja del sistema)', 'tray.show': 'Mostrar OpenAlt', 'tray.quit': 'Salir de OpenAlt', 'top.exitFullscreen': 'Salir de pantalla completa (Esc)',
 
   'conn.title': 'Conexión',
   'conn.setup': 'Preparar', 'conn.setup.sub': 'Primera vez en este PC',
@@ -318,7 +318,7 @@ const EN: Dict = {
   'align.top': 'Top', 'align.middle': 'Center', 'align.bottom': 'Bottom', 'align.left': 'Left', 'align.right': 'Right',
 
   'net.local': 'Local network', 'net.away': 'Away from home',
-  'top.pcChecks': 'What works on this PC', 'top.fullscreen': 'Full screen (F11)', 'top.exitFullscreen': 'Exit full screen (Esc)',
+  'top.pcChecks': 'What works on this PC', 'top.fullscreen': 'Full screen (F11)', 'top.toTray': 'Keep running in the background (system tray)', 'tray.show': 'Show OpenAlt', 'tray.quit': 'Quit OpenAlt', 'top.exitFullscreen': 'Exit full screen (Esc)',
 
   'conn.title': 'Connection',
   'conn.setup': 'Set up', 'conn.setup.sub': 'First time on this PC',
