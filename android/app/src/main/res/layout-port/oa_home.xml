@@ -68,8 +68,10 @@
             android:textSize="13sp"
             android:textStyle="bold" />
 
+        <!-- id diferente do HorizontalScrollView deitado: com o mesmo id, girar o aparelho
+             tentava restaurar o estado de um no outro e o app fechava -->
         <ScrollView
-            android:id="@+id/oaCardsScroll"
+            android:id="@+id/oaCardsScrollPort"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
