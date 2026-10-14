@@ -149,9 +149,13 @@ async function main(argv: string[]): Promise<unknown> {
     }
     case 'down': {
       // Pela ponte do Sunshine o aparelho desconectou: nunca pedir senha (a pessoa pode estar longe)
-      const r = fromSunshine ? await retractOnDisconnect() : await retractDesktop();
-      if (fromSunshine) await clearConnection(paths.runtime);
-      return r;
+      // o aparelho saiu mesmo que desfazer a tela falhe (ex.: um monitor foi tirado no meio): o app não
+      // pode continuar mostrando "conectado"
+      try {
+        return fromSunshine ? await retractOnDisconnect() : await retractDesktop();
+      } finally {
+        if (fromSunshine) await clearConnection(paths.runtime);
+      }
     }
     case 'check':
       return assessEnvironment(await gatherFacts(run));

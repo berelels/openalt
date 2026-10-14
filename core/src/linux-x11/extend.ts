@@ -323,13 +323,14 @@ export async function retractDesktop(
   await session.write(null);
 
   if (forced.length) {
-    // espera o GNOME largar o monitor do OpenAlt (com EDID não há modo OA_ para esperar)
+    // espera o GNOME largar o monitor do OpenAlt (com EDID não há modo OA_ para esperar). Só uma
+    // espera: se o GNOME demorar, a limpeza continua (a saída já voltou ao automático acima)
     await waitFor(
       async () => ((await getMutterState(run)).monitors.some((m) => isOpenAltMonitor(m)) ? undefined : true),
       'o GNOME largar o monitor do aparelho',
       timeoutMs,
       sleep,
-    );
+    ).catch(() => {});
     // espera a saída voltar a "disconnected" antes de apagar o modo que ela usava
     await waitFor(
       async () => {
