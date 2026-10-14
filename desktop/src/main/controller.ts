@@ -2,8 +2,8 @@
 // A interface só pede ações de alto nível; tudo aqui é validado (não confiamos no renderer).
 import { EventEmitter } from 'node:events';
 import { watch, type FSWatcher } from 'node:fs';
-import { mkdir, readFile } from 'node:fs/promises';
-import { hostname, userInfo } from 'node:os';
+import { copyFile, mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
+import { hostname, tmpdir, userInfo } from 'node:os';
 import { join } from 'node:path';
 import {
   assessEnvironment,
@@ -60,6 +60,7 @@ import {
   sunshineApi,
   sunshineDir,
   LayoutError,
+  CommandError,
   writeSettings,
   writeSunshineSetup,
   type Assessment,
@@ -118,6 +119,8 @@ export interface ControllerOptions {
   cli: { runner: string; args: string[] };
   /** Variáveis extras repassadas à CLI (ex.: OPENALT_HELPER no desenvolvimento). */
   cliEnv?: Record<string, string>;
+  /** Pasta com openalt-helper, a regra do polkit e install-helper.sh. */
+  helperDir: string;
 }
 
 export class Controller extends EventEmitter {
@@ -533,8 +536,28 @@ export class Controller extends EventEmitter {
     }
   }
 
+  /**
+   * Instala o ajudante e a regra do polkit (pacote AppImage; o .deb já faz isso). Uma senha, só com o
+   * clique da pessoa. Os arquivos vão antes para uma pasta temporária: dentro do AppImage, montado só
+   * para o usuário, o root não consegue lê-los.
+   */
   async instalarPermissao(): Promise<void> {
-    this.fail({ key: 'err.helperLater' });
+    this.error = null;
+    const dir = await mkdtemp(join(tmpdir(), 'openalt-helper-'));
+    try {
+      for (const f of ['openalt-helper', 'dev.cattastudios.openalt.policy', 'install-helper.sh']) {
+        await copyFile(join(this.opts.helperDir, f), join(dir, f));
+      }
+      await run('pkexec', ['/bin/sh', join(dir, 'install-helper.sh'), dir], { timeoutMs: 300_000 });
+      await this.refreshSystem();
+      this.emitState();
+    } catch (e) {
+      // 126/127 do pkexec = a pessoa fechou a caixa de senha
+      const code = e instanceof CommandError ? e.exitCode : undefined;
+      this.fail(code === 126 || code === 127 ? { key: 'err.helperCancelled' } : e);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   }
 
   /** Prévia de posição: mesma conta do núcleo (layout.ts), com o arranjo atual do GNOME. */

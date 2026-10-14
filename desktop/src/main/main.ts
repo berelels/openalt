@@ -37,8 +37,11 @@ function targetBounds() {
 
 const controller = new Controller({
   // a ponte do Sunshine roda a CLI do núcleo com o próprio Electron (sem precisar de Node instalado)
-  cli: { runner: process.execPath, args: [process.env.OPENALT_CORE_CLI ?? join(here, '..', '..', '..', 'core', 'dist', 'cli.js')] },
+  // o núcleo compilado: no projeto, core/dist; no pacote, node_modules/@openalt/core/dist
+  cli: { runner: process.execPath, args: [process.env.OPENALT_CORE_CLI ?? fileURLToPath(new URL('cli.js', import.meta.resolve('@openalt/core')))] },
   cliEnv: process.env.OPENALT_HELPER ? { OPENALT_HELPER: process.env.OPENALT_HELPER } : {},
+  // o ajudante e a regra do polkit, para o botão "Instalar" (o .deb já os instala sozinho)
+  helperDir: app.isPackaged ? join(process.resourcesPath, 'helper') : join(here, '..', '..', '..', 'core', 'helper'),
 });
 
 function createWindow(): void {

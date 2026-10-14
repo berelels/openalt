@@ -1,0 +1,36 @@
+# Pacotes do app do PC (Linux): AppImage e .deb. Gerar: npm run dist -w @openalt/desktop
+appId: dev.cattastudios.openalt
+productName: OpenAlt
+electronVersion: 44.5.1
+executableName: openalt
+copyright: Copyright © Catta Studios
+artifactName: openalt-${version}-${arch}.${ext}
+directories:
+  output: release
+  buildResources: build
+# sem asar: a ponte do Sunshine roda o núcleo (node_modules/@openalt/core/dist/cli.js) como Node
+# comum, e a extensão do GNOME é copiada de dentro do pacote
+asar: false
+files:
+  - dist/**
+  - package.json
+  - "!**/*.map"
+extraResources:
+  # o ajudante root, a regra do polkit e o instalador deles (botão "Instalar" e o .deb)
+  - from: ../core/helper
+    to: helper
+linux:
+  target: [AppImage, deb]
+  category: Utility
+  icon: build/icon.png
+  synopsis: Your Android phone or tablet as a second monitor, a mirror or a game screen
+  description: >-
+    OpenAlt turns an Android phone or tablet into a second monitor, a mirror of your PC or a game
+    screen, at home or away (with Tailscale). It sets up Sunshine for you; pair by scanning a QR code.
+  maintainer: Catta Studios <gabrieldiasnevess@outlook.com>
+deb:
+  packageName: openalt
+  # o ajudante e a regra do polkit vão junto (a senha é a da instalação do pacote)
+  afterInstall: build/deb-after-install.sh
+  afterRemove: build/deb-after-remove.sh
+  recommends: [pkexec]

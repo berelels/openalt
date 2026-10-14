@@ -588,7 +588,13 @@ function renderPc(): string {
   };
   return topbar(t('pc.title'), t('pc.sub'))
     + `<div class="bento"><section class="card c8 fade-up d2"><ul class="checks">
-        ${state.checks.map((c) => { const [cls, icon] = map[c.status]; return checkRow(cls, icon, t(`check.${c.id}`), c.key ? uiText({ key: c.key, vars: c.vars }) : esc(c.message)); }).join('')}
+        ${state.checks.map((c) => {
+          const [cls, icon] = map[c.status];
+          // a permissão do sistema que falta se instala daqui mesmo (uma senha)
+          const action = c.id === 'helper' && c.status === 'needs-setup'
+            ? `<button class="btn outline small" id="btnHelper"><span class="ms" aria-hidden="true">shield</span>${t('setup.install')}</button>` : undefined;
+          return checkRow(cls, icon, t(`check.${c.id}`), c.key ? uiText({ key: c.key, vars: c.vars }) : esc(c.message), action);
+        }).join('')}
       </ul></section>
       <section class="card sage c4 fade-up d3"><div class="card-top"><h2 class="card-name">${t('pc.summary')}</h2></div>
         <p class="big">2/2</p><p class="big-sub">${t('pc.summary.text')}</p></section>
