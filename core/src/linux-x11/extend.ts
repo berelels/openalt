@@ -18,6 +18,7 @@ import {
   buildRestoreArgs,
   findMode,
   getMutterState,
+  isOpenAltMonitor,
   layoutFromMutter,
   layoutSize,
   matchesLayout,
@@ -322,6 +323,13 @@ export async function retractDesktop(
   await session.write(null);
 
   if (forced.length) {
+    // espera o GNOME largar o monitor do OpenAlt (com EDID não há modo OA_ para esperar)
+    await waitFor(
+      async () => ((await getMutterState(run)).monitors.some((m) => isOpenAltMonitor(m)) ? undefined : true),
+      'o GNOME largar o monitor do aparelho',
+      timeoutMs,
+      sleep,
+    );
     // espera a saída voltar a "disconnected" antes de apagar o modo que ela usava
     await waitFor(
       async () => {

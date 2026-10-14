@@ -114,6 +114,9 @@ async function main(argv: string[]): Promise<unknown> {
     remember ??= s.rememberLayout;
     if (mirrorOf === undefined && s.mirrorOf !== 'primary') mirrorOf = s.mirrorOf;
   }
+  // Uma saída que ficou forçada num desconectar sem senha ainda parece "conectada": devolvê-la ANTES de
+  // escolher, senão a escolha pula para outra saída, que o Sunshine (configurado no Ligar) não captura.
+  if (fromSunshine && (action === 'extend' || action === 'mirror')) await retractDesktop();
   // a mesma saída que o app escolheu ao ligar (evita a do monitor preferido da dock)
   const output = values.output ?? (fromSunshine ? await chooseOutput() : undefined);
   const connected = async (mode: 'extend' | 'mirror') => {

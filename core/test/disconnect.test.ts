@@ -56,7 +56,9 @@ test('retractOnDisconnect com permissão: desfaz tudo pelo ajudante', async () =
   const store: ForcedStore = { read: async () => forced, write: async (v) => { forced = v; } };
   const session = { read: async () => null, write: async () => {} } as unknown as SessionStore;
   const helperCalls: string[] = [];
-  const run: Runner = async () => ({ stdout: '', stderr: '' });
+  // o GNOME sem o monitor do OpenAlt (o mesmo arranjo de 2 monitores dos outros testes)
+  const json = readFileSync(new URL('fixtures/mutter-2monitores.json', import.meta.url), 'utf8');
+  const run: Runner = async (_cmd, args) => ({ stdout: args.some((a) => /GetCurrentState/.test(a)) ? json : '', stderr: '' });
   const r = await retractOnDisconnect({ run, store, session, helper: async (c, a) => { helperCalls.push(`${c} ${a}`); }, authorized: true, timeoutMs: 10, sleep: async () => {} });
   assert.deepEqual(helperCalls, ['card1-DP-2 detect']);
   assert.deepEqual(forced, []);
