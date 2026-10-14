@@ -53,6 +53,7 @@ public class ButtonMapActivity extends Activity {
         hint = findViewById(R.id.oaMapHint);
         stepLabel = findViewById(R.id.oaMapStep);
         progress = findViewById(R.id.oaMapProgress);
+        UiSounds.attach(this);
         progress.setMax(TARGETS.length);
         ((Button) findViewById(R.id.oaMapSkip)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +64,7 @@ public class ButtonMapActivity extends Activity {
         ((Button) findViewById(R.id.oaMapCancel)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                UiSounds.play(ButtonMapActivity.this, UiSoundSynth.Sound.BACK);
                 finish();
             }
         });
@@ -138,11 +140,13 @@ public class ButtonMapActivity extends Activity {
             String key = ButtonMap.deviceKey(device);
             if (key != null) {
                 ButtonMap.save(this, key, map);
+                UiSounds.play(this, UiSoundSynth.Sound.LAUNCH);
                 Toast.makeText(this, R.string.openalt_map_saved, Toast.LENGTH_LONG).show();
             }
             finish();
             return;
         }
+        UiSounds.play(this, UiSoundSynth.Sound.SELECT);
         showStep();
     }
 

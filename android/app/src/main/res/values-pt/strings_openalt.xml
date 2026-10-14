@@ -136,4 +136,6 @@
     <string name="openalt_map_no_controller_hint">Conecte um controle (USB ou Bluetooth) e abra de novo.</string>
     <string name="openalt_map_none">Sem mapeamento</string>
     <string name="openalt_map_custom">Mapeado</string>
+    <string name="openalt_pref_ui_sounds_title">Sons da interface</string>
+    <string name="openalt_pref_ui_sounds_summary">Sons curtos ao mover, escolher e voltar, como num console. Ficam mudos com o aparelho no silencioso ou no vibrar.</string>
 </resources>

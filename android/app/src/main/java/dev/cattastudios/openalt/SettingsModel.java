@@ -55,7 +55,7 @@ final class SettingsModel {
                 "checkbox_stretch_video", "video_format", "checkbox_enable_hdr", "checkbox_full_range"}) {
             CATEGORY.put(k, Category.VIDEO);
         }
-        for (String k : new String[]{"checkbox_host_audio", "list_audio_config", "checkbox_enable_audiofx"}) {
+        for (String k : new String[]{"checkbox_host_audio", "openalt_ui_sounds", "list_audio_config", "checkbox_enable_audiofx"}) {
             CATEGORY.put(k, Category.AUDIO);
         }
         for (String k : new String[]{"openalt_controller_style", "seekbar_deadzone", "checkbox_flip_face_buttons",

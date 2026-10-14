@@ -145,4 +145,6 @@
     <string name="openalt_map_no_controller_hint">Connect a controller (USB or Bluetooth) and open this again.</string>
     <string name="openalt_map_none">No mapping</string>
     <string name="openalt_map_custom">Mapped</string>
+    <string name="openalt_pref_ui_sounds_title">Interface sounds</string>
+    <string name="openalt_pref_ui_sounds_summary">Short sounds when you move, choose and go back, like on a console. Silent when the device is on silent or vibrate.</string>
 </resources>

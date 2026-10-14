@@ -101,6 +101,7 @@ public class PairQrActivity extends Activity {
         progress = findViewById(R.id.pairProgress);
         primaryButton = findViewById(R.id.pairPrimaryButton);
         cancelButton = findViewById(R.id.pairCancelButton);
+        UiSounds.warmUp(this);
 
         primaryButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -373,6 +374,7 @@ public class PairQrActivity extends Activity {
 
     private void showFailure(String text) {
         screen = Screen.FAILED;
+        UiSounds.play(this, UiSoundSynth.Sound.ERROR);
         progress.setVisibility(View.GONE);
         status.setText(text);
         primaryButton.setText(hasCamera() ? R.string.openalt_pair_scan_again : R.string.openalt_pair_done);
@@ -383,6 +385,7 @@ public class PairQrActivity extends Activity {
 
     private void showDone(String text) {
         screen = Screen.DONE;
+        UiSounds.play(this, UiSoundSynth.Sound.LAUNCH);
         progress.setVisibility(View.GONE);
         status.setText(text);
         primaryButton.setText(R.string.openalt_pair_done);

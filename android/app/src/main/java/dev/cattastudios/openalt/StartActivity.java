@@ -118,6 +118,7 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
         Immersive.prepare(this);
         setContentView(R.layout.oa_home);
         GridPaperDrawable.apply(findViewById(R.id.oaHomeContent));
+        UiSounds.attach(this);
 
         cards = findViewById(R.id.oaCards);
         padHints = findViewById(R.id.oaPadHints);
@@ -430,6 +431,7 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
         card.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                UiSounds.play(StartActivity.this, UiSoundSynth.Sound.SELECT);
                 PcOptions.show(StartActivity.this, d, StartActivity.this);
                 return true;
             }
@@ -449,6 +451,7 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
         card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                UiSounds.play(StartActivity.this, UiSoundSynth.Sound.SELECT);
                 startActivity(new Intent(StartActivity.this, PairQrActivity.class));
             }
         });
@@ -478,12 +481,15 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
 
     private void openComputer(ComputerDetails d) {
         if (d.state == ComputerDetails.State.ONLINE && d.pairState != PairState.PAIRED) {
+            UiSounds.play(this, UiSoundSynth.Sound.SELECT);
             startActivity(new Intent(this, PairQrActivity.class));
         }
         else if (!ready(d) || managerBinder == null) {
+            UiSounds.play(this, UiSoundSynth.Sound.ERROR);
             Toast.makeText(this, getString(R.string.openalt_home_offline_toast, d.name), Toast.LENGTH_LONG).show();
         }
         else {
+            UiSounds.play(this, UiSoundSynth.Sound.LAUNCH);
             OpenAltLauncher.connect(this, d, managerBinder, new Runnable() {
                 @Override
                 public void run() {
@@ -509,6 +515,7 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
     }
 
     private void openSettings() {
+        UiSounds.play(this, UiSoundSynth.Sound.SELECT);
         startActivity(new Intent(this, SettingsActivity.class));
     }
 
@@ -641,6 +648,7 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
                 if (f != null && f.getTag() instanceof String && ((String) f.getTag()).startsWith("pc:")) {
                     ComputerDetails d = computers.get(((String) f.getTag()).substring(3));
                     if (d != null) {
+                        UiSounds.play(this, UiSoundSynth.Sound.SELECT);
                         PcOptions.show(this, d, this);
                         return true;
                     }

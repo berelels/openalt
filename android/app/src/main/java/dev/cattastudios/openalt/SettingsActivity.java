@@ -71,6 +71,7 @@ public class SettingsActivity extends Activity {
         GridPaperDrawable.apply(((android.view.ViewGroup) findViewById(android.R.id.content)).getChildAt(0));
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        UiSounds.attach(this);
         items = SettingsModel.load(this);
         rail = findViewById(R.id.oaRail);
         rows = findViewById(R.id.oaRows);
@@ -175,6 +176,7 @@ public class SettingsActivity extends Activity {
             b.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    UiSounds.play(SettingsActivity.this, UiSoundSynth.Sound.SELECT);
                     showCategory(index, true);
                 }
             });
@@ -226,6 +228,7 @@ public class SettingsActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        UiSounds.play(this, UiSoundSynth.Sound.BACK);
         if (portrait() && current >= 0) {
             showCategory(-1, false);
             if (rail.getChildCount() > 0) {
@@ -241,6 +244,7 @@ public class SettingsActivity extends Activity {
         // LB / RB trocam de categoria
         if ((keyCode == KeyEvent.KEYCODE_BUTTON_L1 || keyCode == KeyEvent.KEYCODE_BUTTON_R1) && current >= 0) {
             int next = (current + (keyCode == KeyEvent.KEYCODE_BUTTON_R1 ? 1 : ORDER.length - 1)) % ORDER.length;
+            UiSounds.play(this, UiSoundSynth.Sound.SELECT);
             showCategory(next, true);
             return true;
         }
@@ -294,6 +298,7 @@ public class SettingsActivity extends Activity {
                 @Override
                 public void onClick(View v) {
                     ButtonMap.clear(SettingsActivity.this, key);
+                    UiSounds.play(SettingsActivity.this, UiSoundSynth.Sound.TOGGLE_OFF);
                     android.widget.Toast.makeText(SettingsActivity.this, R.string.openalt_map_reset_done, android.widget.Toast.LENGTH_SHORT).show();
                     showCategory(current, false);
                 }
@@ -327,6 +332,7 @@ public class SettingsActivity extends Activity {
             row.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    UiSounds.play(SettingsActivity.this, UiSoundSynth.Sound.SELECT);
                     startActivity(intent);
                 }
             });
@@ -375,8 +381,11 @@ public class SettingsActivity extends Activity {
             row.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    prefs.edit().putBoolean(it.key, !prefs.getBoolean(it.key, it.defaultBool)).apply();
+                    boolean on = !prefs.getBoolean(it.key, it.defaultBool);
+                    prefs.edit().putBoolean(it.key, on).apply();
                     bindValue(row, it);
+                    // depois de gravar: ao ligar os sons da interface, o próprio clique já toca
+                    UiSounds.play(SettingsActivity.this, on ? UiSoundSynth.Sound.TOGGLE_ON : UiSoundSynth.Sound.TOGGLE_OFF);
                 }
             });
         }
@@ -384,6 +393,7 @@ public class SettingsActivity extends Activity {
             row.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    UiSounds.play(SettingsActivity.this, UiSoundSynth.Sound.SELECT);
                     chooseFromList(row, it);
                 }
             });
@@ -443,7 +453,10 @@ public class SettingsActivity extends Activity {
     }
 
     private void stepNumber(View row, SettingsModel.Item it, int direction) {
-        prefs.edit().putInt(it.key, SettingsModel.stepValue(it, intValue(it), direction)).apply();
+        int before = intValue(it);
+        int after = SettingsModel.stepValue(it, before, direction);
+        UiSounds.play(this, after == before ? UiSoundSynth.Sound.MOVE : direction > 0 ? UiSoundSynth.Sound.TOGGLE_ON : UiSoundSynth.Sound.TOGGLE_OFF);
+        prefs.edit().putInt(it.key, after).apply();
         bindValue(row, it);
     }
 
@@ -531,6 +544,7 @@ public class SettingsActivity extends Activity {
                             e.putInt("seekbar_bitrate_kbps", PreferenceConfiguration.getDefaultBitrate(res, fps));
                         }
                         e.apply();
+                        UiSounds.play(SettingsActivity.this, UiSoundSynth.Sound.TOGGLE_ON);
                         dialog.dismiss();
                         // a qualidade mudou junto: redesenha a categoria inteira e devolve o foco à mesma opção
                         int index = rows.indexOfChild(row);

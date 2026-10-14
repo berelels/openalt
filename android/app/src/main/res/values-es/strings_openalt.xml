@@ -136,4 +136,6 @@
     <string name="openalt_map_no_controller_hint">Conecta un mando (USB o Bluetooth) y vuelve a abrir esto.</string>
     <string name="openalt_map_none">Sin mapeo</string>
     <string name="openalt_map_custom">Mapeado</string>
+    <string name="openalt_pref_ui_sounds_title">Sonidos de la interfaz</string>
+    <string name="openalt_pref_ui_sounds_summary">Sonidos cortos al moverte, elegir y volver, como en una consola. Se silencian con el dispositivo en silencio o vibración.</string>
 </resources>
