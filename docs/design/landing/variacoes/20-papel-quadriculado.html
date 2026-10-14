@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>20 Papel quadriculado</title>
+<link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="../devices.css">
+<style>
+body { background: #EFE6D6; }
+.grid { position: absolute; inset: 0; background-image:
+  linear-gradient(rgba(38,33,27,.12) 1px, transparent 1px), linear-gradient(90deg, rgba(38,33,27,.12) 1px, transparent 1px),
+  linear-gradient(rgba(38,33,27,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(38,33,27,.05) 1px, transparent 1px);
+  background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px; }
+nav { position: absolute; top: 28px; left: 48px; right: 48px; display: flex; align-items: center; justify-content: space-between; z-index: 5; }
+nav .mono { font-family: 'JetBrains Mono'; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; display: flex; gap: 30px; }
+nav .dl { font-family: 'JetBrains Mono'; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; background: var(--ink); color: #EFE6D6; padding: 12px 18px; }
+h1 { position: absolute; left: 48px; top: 130px; font-family: 'Newsreader'; font-weight: 400; font-size: 100px; line-height: .92; letter-spacing: -0.04em; z-index: 3; width: 700px; }
+h1 em { font-style: italic; color: var(--red-ink); }
+.lede { position: absolute; left: 52px; top: 470px; width: 470px; font-size: 18px; line-height: 1.55; color: var(--muted); z-index: 3; }
+.ctas { position: absolute; left: 48px; top: 580px; display: flex; gap: 12px; z-index: 3; }
+.ctas > span { display: inline-flex; gap: 8px; align-items: center; padding: 16px 24px; font-weight: 600; font-size: 15px; }
+.ctas .red { background: var(--red); } .ctas .out { border: 1.5px solid var(--ink); }
+.dim { position: absolute; font-family: 'JetBrains Mono'; font-size: 11px; color: var(--ink); z-index: 4; display: flex; align-items: center; gap: 8px; }
+.dim i { display: block; height: 1px; background: var(--ink); position: relative; }
+.dim i::before, .dim i::after { content: ''; position: absolute; top: -4px; width: 1px; height: 9px; background: var(--ink); } .dim i::before { left: 0; } .dim i::after { right: 0; }
+.mosaic { position: absolute; left: 840px; top: 120px; display: grid; grid-template-columns: repeat(4, 120px); grid-template-rows: repeat(5, 120px); z-index: 2; }
+.t { position: relative; overflow: hidden; }
+.t svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.dev { position: absolute; z-index: 4; }
+.meta { position: absolute; left: 52px; bottom: 50px; display: flex; gap: 48px; z-index: 3; }
+.meta b { display: block; font-family: 'Newsreader'; font-size: 36px; font-weight: 400; letter-spacing: -0.02em; }
+.meta small { font-family: 'JetBrains Mono'; font-size: 11px; color: var(--muted); }
+.stamp { position: absolute; left: 600px; top: 640px; width: 130px; height: 130px; border-radius: 50%; border: 1.5px solid var(--ink); display: grid; place-items: center; text-align: center; font-family: 'JetBrains Mono'; font-size: 10px; line-height: 1.6; transform: rotate(-12deg); z-index: 3; }
+</style></head><body>
+<div class="grid"></div>
+<nav><span class="logo"><svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg><span>Open<em>Alt</em></span></span><div class="mono"><span>01 How it works</span><span>02 Modes</span><span>03 Away</span><span>04 Source</span></div><span class="dl">Download ↓</span></nav>
+<h1>Freedom to stream <em>anywhere,</em> for anyone.</h1>
+<p class="lede">Your phone or tablet becomes a second monitor, a mirror of your PC or a game screen. One QR code. That’s the setup.</p>
+<div class="ctas"><span class="red"><span class="ms">download</span>Get it for Linux</span><span class="out">See the plan</span></div>
+<div class="mosaic">
+  <div class="t" style="background:#FF746C"><svg viewBox="0 0 120 120"><path d="M0 120A120 120 0 0 1 120 0V120Z" fill="#26211B"/></svg></div>
+  <div class="t" style="background:#EFE6D6"></div>
+  <div class="t" style="background:#4A7350"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="34" fill="#EFE6D6"/><circle cx="60" cy="60" r="14" fill="#4A7350"/></svg></div>
+  <div class="t" style="background:#F2B33D"><svg viewBox="0 0 120 120"><path d="M30 90l30-60 30 60z" fill="#26211B"/></svg></div>
+  <div class="t" style="background:#26211B"><svg viewBox="0 0 120 120" fill="none" stroke="#EFE6D6" stroke-width="8"><path d="M30 70a42 42 0 0 1 60 0M42 82a24 24 0 0 1 36 0"/><circle cx="60" cy="94" r="5" fill="#EFE6D6"/></svg></div>
+  <div class="t" style="background:#F2B9B4"></div><div class="t" style="background:#F2B9B4"></div>
+  <div class="t" style="background:#EFE6D6"><svg viewBox="0 0 120 120"><path d="M0 0H120A120 120 0 0 1 0 120Z" fill="#FF746C"/></svg></div>
+  <div class="t" style="background:#8FBF92"></div><div class="t" style="background:#F2B9B4"></div><div class="t" style="background:#F2B9B4"></div>
+  <div class="t" style="background:#26211B"><svg viewBox="0 0 120 120"><rect x="34" y="34" width="22" height="22" fill="#EFE6D6"/><rect x="64" y="34" width="22" height="22" fill="#EFE6D6"/><rect x="34" y="64" width="22" height="22" fill="#EFE6D6"/><rect x="70" y="70" width="10" height="10" fill="#FF746C"/></svg></div>
+  <div class="t" style="background:#F2B33D"><svg viewBox="0 0 120 120"><path d="M20 80h80M30 80V56l30-22 30 22v24" fill="none" stroke="#26211B" stroke-width="8" stroke-linejoin="round"/></svg></div>
+  <div class="t" style="background:#EFE6D6"></div>
+  <div class="t" style="background:#4A7350"><svg viewBox="0 0 120 120"><path d="M120 120A120 120 0 0 1 0 0V120Z" fill="#8FBF92"/></svg></div>
+  <div class="t" style="background:#FF746C"></div>
+  <div class="t" style="background:#EFE6D6"><svg viewBox="0 0 120 120" fill="none" stroke="#26211B" stroke-width="7" stroke-linecap="round"><path d="M34 52h52c10 0 16 8 16 18s-6 18-16 18c-8 0-12-6-16-10H50c-4 4-8 10-16 10-10 0-16-8-16-18s6-18 16-18z"/></svg></div>
+  <div class="t" style="background:#26211B"></div><div class="t" style="background:#F2B9B4"></div><div class="t" style="background:#EFE6D6"></div>
+</div>
+<div class="dev" style="left:900px;top:360px"><div class="lap" style="--w:330px"><div class="lid"><div class="scr"><img src="../img/app-claro.png" alt=""></div></div><div class="deck"></div></div></div>
+<div class="dev" style="left:1250px;top:300px;transform:rotate(4deg)"><div class="phn" style="--w:118px"><i class="btn-l1"></i><i class="btn-l2"></i><i class="btn-r"></i><div class="bz"><div class="scr"><div class="island"></div><div class="status"><span>9:41</span><span><span class="ms">wifi</span> <span class="ms">battery_full</span></span></div><div class="app-oa"><div class="wm">Open<em>Alt</em></div><p class="sb">Your phone or tablet as a PC screen</p><div class="pc"><span class="ms">computer</span><div><b>my-pc</b><small>● Paired · tap to connect</small></div></div><div class="qr"><b>Pair a new PC</b><span><span class="ms">qr_code_scanner</span>Scan QR</span></div></div><div class="home"></div></div></div></div></div>
+<span class="dim" style="left:900px;top:560px"><i style="width:330px"></i></span><span class="dim" style="left:1010px;top:572px">+ 1 screen · 1080×2400</span>
+<span class="dim" style="left:1190px;top:270px">← side: right · align: top</span>
+<div class="stamp">ONE QR<br>NO PIN<br>NO ACCOUNT<br>GPL-3.0</div>
+<div class="meta"><span><b>3</b><small>modes</small></span><span><b>1</b><small>QR to pair</small></span><span><b>∞</b><small>places to stream</small></span></div>
+</body></html>

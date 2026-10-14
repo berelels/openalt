@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>22 Colagem</title>
+<link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="../devices.css">
+<style>
+body { background: var(--paper); }
+body::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(38,33,27,.07) 1px, transparent 1px); background-size: 22px 22px; }
+nav { position: absolute; top: 30px; left: 60px; right: 60px; display: flex; align-items: center; justify-content: space-between; z-index: 6; }
+nav .pills { display: flex; gap: 8px; } nav .pills span { padding: 10px 18px; border-radius: 999px; background: var(--card); border: 1.5px solid var(--ink); font-size: 14px; font-weight: 600; }
+nav .dl { padding: 12px 22px; border-radius: 999px; background: var(--red); border: 1.5px solid var(--ink); font-weight: 700; font-size: 14px; box-shadow: 3px 3px 0 var(--ink); }
+h1 { position: absolute; left: 0; right: 0; top: 118px; text-align: center; font-family: 'Newsreader'; font-weight: 400; font-size: 118px; line-height: .92; letter-spacing: -0.04em; z-index: 2; }
+h1 em { font-style: italic; color: var(--red-ink); }
+.stk { position: absolute; z-index: 4; filter: drop-shadow(0 0 0 #fff) drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(0 14px 18px rgba(38,33,27,.22)); }
+.badge { position: absolute; z-index: 5; width: 128px; height: 128px; border-radius: 50%; display: grid; place-items: center; text-align: center; border: 2px solid var(--ink); font-weight: 700; font-size: 14px; line-height: 1.15; box-shadow: 4px 4px 0 var(--ink); }
+.badge b { display: block; font-family: 'Newsreader'; font-weight: 400; font-size: 34px; }
+.card { position: absolute; z-index: 5; width: 250px; background: #F2B9B4; border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+.card div { padding: 16px 18px; } .card div:first-child { font-family: 'Newsreader'; font-size: 24px; line-height: 1.05; border-bottom: 2px dashed rgba(38,33,27,.3); }
+.card div:last-child { font-size: 13px; line-height: 1.45; }
+.diamond { position: absolute; z-index: 5; width: 50px; height: 50px; background: var(--ink); transform: rotate(45deg); border-radius: 6px; display: grid; place-items: center; }
+.diamond span { transform: rotate(-45deg); color: #fff; font-family: 'Newsreader'; font-size: 24px; }
+.ctas { position: absolute; left: 0; right: 0; top: 345px; display: flex; justify-content: center; gap: 12px; z-index: 5; }
+.ctas > span { display: inline-flex; gap: 8px; align-items: center; padding: 15px 26px; border-radius: 999px; font-weight: 700; font-size: 15px; border: 1.5px solid var(--ink); }
+.ctas .red { background: var(--red); box-shadow: 3px 3px 0 var(--ink); } .ctas .out { background: var(--card); }
+.marquee { position: absolute; left: -20px; right: -20px; bottom: 18px; height: 64px; background: var(--ink); color: var(--paper); transform: rotate(-2deg); display: flex; align-items: center; gap: 34px; white-space: nowrap; font-family: 'Newsreader'; font-size: 32px; z-index: 6; overflow: hidden; }
+.marquee em { color: var(--red); }
+</style></head><body>
+<nav>{{LOGO}}<div class="pills"><span>New screen</span><span>Mirror</span><span>Games</span><span>Away</span></div><span class="dl">Download ↓</span></nav>
+<h1>Freedom to stream<br><em>anywhere,</em> for anyone.</h1>
+<div class="ctas"><span class="red"><span class="ms">download</span>Get it for Linux</span><span class="out">See how it works ↗</span></div>
+<div class="stk" style="left:470px;top:440px;transform:rotate(-3deg)"><div class="lap" style="--w:500px"><div class="lid"><div class="scr"><img src="../img/app-claro.png" alt=""></div></div><div class="deck"></div></div></div>
+<div class="stk" style="left:960px;top:420px;transform:rotate(8deg)">{{PHONE:130}}</div>
+<div class="stk" style="left:150px;top:470px;transform:rotate(-8deg)"><div class="tab dark" style="--w:280px"><div class="bz"><div class="scr"><img src="../img/app-escuro.png" alt=""></div></div></div></div>
+<div class="stk" style="left:360px;top:400px;transform:rotate(-10deg)">{{BUBBLE:monitor:110}}</div>
+<div class="stk" style="left:1110px;top:400px;transform:rotate(10deg)">{{BUBBLE:pad:120:flip}}</div>
+<div class="stk" style="left:1200px;top:600px;transform:rotate(-6deg)">{{BUBBLE:qr:100}}</div>
+<div class="badge" style="left:1262px;top:250px;background:#8FBF92;transform:rotate(10deg)"><span><b>Free</b>open source</span></div>
+<div class="badge" style="left:56px;top:270px;background:#F2B33D;transform:rotate(-10deg)"><span><b>1 QR</b>no PIN</span></div>
+<div class="card" style="left:120px;top:690px;transform:rotate(3deg)"><div>Streaming made simple.</div><div>No PIN, no settings, no account.</div></div>
+<div class="diamond" style="left:1080px;top:690px"><span>&amp;</span></div>
+<div class="marquee"><span>Freedom to stream <em>anywhere</em> ✦</span><span>for anyone ✦</span><span>new screen ✦</span><span>mirror ✦</span><span>game screen ✦</span><span>Freedom to stream <em>anywhere</em> ✦</span><span>for anyone ✦</span></div>
+</body></html>

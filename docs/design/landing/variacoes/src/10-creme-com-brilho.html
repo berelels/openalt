@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>10 Creme com brilho</title>
+<link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="../devices.css">
+<style>
+body { background: #FBF6EE; font-family: 'Inter', sans-serif; }
+.glow { position: absolute; border-radius: 50%; filter: blur(90px); }
+.g1 { width: 700px; height: 520px; right: -160px; top: -120px; background: radial-gradient(circle, rgba(255,116,108,.45), transparent 70%); }
+.g2 { width: 600px; height: 480px; left: 200px; bottom: -220px; background: radial-gradient(circle, rgba(143,191,146,.5), transparent 70%); }
+nav { position: absolute; top: 36px; left: 100px; right: 100px; display: flex; align-items: center; justify-content: space-between; z-index: 3; }
+.pillnav { display: flex; gap: 4px; padding: 6px; border-radius: 999px; background: rgba(255,255,255,.7); border: 1px solid var(--line); font-size: 14px; font-weight: 500; }
+.pillnav span { padding: 8px 14px; border-radius: 999px; } .pillnav span.on { background: var(--ink); color: #fff; }
+.dl { background: var(--ink); color: #fff; padding: 13px 24px; font-weight: 600; font-size: 14px; }
+h1 { position: absolute; left: 100px; top: 140px; font-size: 98px; font-weight: 700; letter-spacing: -0.05em; line-height: .98; z-index: 2; }
+h1 span { font-family: 'Newsreader'; font-weight: 400; font-style: italic; color: var(--red-ink); letter-spacing: -0.03em; }
+.panels { position: absolute; left: 400px; top: 280px; width: 400px; height: 500px; }
+.panels i { position: absolute; top: 0; width: 182px; height: 100%; } .panels i:first-child { left: 0; background: #F3E2DE; } .panels i:last-child { right: 0; background: #E3EDE0; }
+.char { left: 330px; top: 270px; z-index: 2; transform: scale(.9); transform-origin: top center; }
+.lede { position: absolute; left: 100px; top: 470px; width: 205px; font-size: 15px; font-weight: 600; line-height: 1.5; z-index: 2; }
+.lede::after { content: ''; display: block; width: 46px; height: 3px; background: var(--red); margin-top: 14px; }
+.ctas { position: absolute; left: 100px; top: 600px; display: flex; flex-direction: column; gap: 10px; z-index: 2; }
+.b { display: inline-flex; gap: 8px; align-items: center; padding: 14px 22px; border-radius: 999px; font-weight: 600; font-size: 15px; width: max-content; }
+.b.red { background: var(--red); } .b.out { border: 1.5px solid var(--ink); }
+.right { position: absolute; right: 100px; top: 160px; width: 360px; z-index: 2; }
+.chip { display: inline-flex; gap: 8px; align-items: center; padding: 8px 14px; border-radius: 999px; background: #fff; border: 1px solid var(--line); font-size: 13px; font-weight: 600; }
+.chip .ms { font-size: 16px; color: var(--red-ink); }
+.right p.q { margin-top: 22px; font-size: 19px; font-weight: 600; line-height: 1.5; }
+.right p.q u { text-decoration-color: var(--red); text-decoration-thickness: 3px; text-underline-offset: 4px; }
+.nodes { position: absolute; right: 100px; top: 400px; width: 360px; z-index: 2; }
+.nodes svg { position: absolute; left: 0; top: 0; }
+.node { position: relative; display: flex; gap: 14px; align-items: center; height: 74px; }
+.node .ic { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: #fff; border: 1px solid var(--line); box-shadow: 0 6px 14px -8px rgba(38,33,27,.3); }
+.node b { font-size: 15px; } .node b::before { content: '•'; color: var(--red); margin-right: 8px; }
+.node small { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.node .val { margin-left: auto; font-family: 'JetBrains Mono'; font-size: 12px; color: var(--muted); }
+.strip { position: absolute; left: 0; right: 0; bottom: 34px; display: flex; justify-content: center; gap: 64px; font-size: 17px; font-weight: 600; color: rgba(38,33,27,.38); z-index: 2; }
+.strip span { display: inline-flex; gap: 8px; align-items: center; } .strip .ms { font-size: 20px; }
+</style></head><body>
+<div class="glow g1"></div><div class="glow g2"></div>
+<nav>{{LOGO}}<div class="pillnav"><span class="on">Home</span><span>New screen</span><span>Mirror</span><span>Games</span><span>Away</span></div><span class="dl">Download</span></nav>
+<h1>Any screen<br>is <span>your</span> screen</h1>
+<div class="panels"><i></i><i></i></div>
+{{CHAR:desk}}
+<p class="lede">Phone or tablet, standing or lying down — on any side of any monitor.</p>
+<div class="ctas"><span class="b red"><span class="ms">download</span>Download free</span><span class="b out">How it works ↗</span></div>
+<div class="right"><span class="chip"><span class="ms">qr_code_2</span>Pair with one QR code →</span>
+  <p class="q">Freedom to stream <u>anywhere</u>, for <u>anyone</u>: your PC follows you to the sofa, the café or the train.</p></div>
+<div class="nodes">
+  <svg width="40" height="296" fill="none" stroke="#D9CFBE" stroke-width="1.5"><path d="M22 30V270"/></svg>
+  <div class="node"><span class="ic"><span class="ms">tablet</span></span><div><b>Tablet</b><small>Mirror any monitor</small></div><span class="val">2560×1600</span></div>
+  <div class="node"><span class="ic"><span class="ms">smartphone</span></span><div><b>Phone</b><small>One more screen</small></div><span class="val">1080×2400</span></div>
+  <div class="node"><span class="ic"><span class="ms">sports_esports</span></span><div><b>Game screen</b><small>Steam Big Picture</small></div><span class="val">120 Hz</span></div>
+  <div class="node"><span class="ic"><span class="ms">public</span></span><div><b>Away from home</b><small>Tailscale, your account</small></div><span class="val">4G · 5G</span></div>
+</div>
+<div class="strip"><span><span class="ms">wb_sunny</span>Sunshine</span><span><span class="ms">dark_mode</span>Moonlight</span><span><span class="ms">hub</span>Tailscale</span><span><span class="ms">desktop_windows</span>GNOME</span><span><span class="ms">android</span>Android</span><span><span class="ms">gavel</span>GPL-3.0</span></div>
+</body></html>

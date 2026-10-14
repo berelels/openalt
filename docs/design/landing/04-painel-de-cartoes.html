@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>04 Painel de cartões</title>
+<link rel="stylesheet" href="base.css"><link rel="stylesheet" href="devices.css">
+<style>
+body { background: var(--paper); }
+nav { position: absolute; top: 30px; left: 56px; right: 56px; display: flex; justify-content: space-between; align-items: center; }
+nav .pills { display: flex; gap: 8px; }
+nav .pills span { padding: 10px 18px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: 14px; font-weight: 500; }
+nav .pills span.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+h1 { position: absolute; left: 56px; top: 104px; font-family: 'Newsreader'; font-weight: 400; font-size: 70px; letter-spacing: -0.035em; line-height: 1; width: 900px; }
+h1 em { font-style: italic; color: var(--red-ink); }
+.side { position: absolute; right: 56px; top: 118px; width: 380px; font-size: 17px; line-height: 1.55; color: var(--muted); }
+.side .cta { margin-top: 18px; display: flex; gap: 10px; }
+.b { display: inline-flex; align-items: center; gap: 8px; padding: 13px 22px; border-radius: 999px; font-weight: 600; font-size: 15px; color: var(--ink); }
+.b.red { background: var(--red); } .b.out { border: 1.5px solid var(--ink); }
+.grid { position: absolute; left: 56px; right: 56px; top: 300px; bottom: 40px; display: grid; grid-template-columns: 1.5fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 18px; }
+.c { position: relative; border-radius: 28px; overflow: hidden; padding: 26px 28px; background: var(--card); border: 1px solid var(--line); }
+.c h3 { font-family: 'Newsreader'; font-weight: 400; font-size: 30px; letter-spacing: -0.02em; }
+.c p { margin-top: 6px; font-size: 14px; color: var(--muted); max-width: 260px; line-height: 1.45; }
+.c .tag { position: absolute; top: 24px; right: 24px; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; background: rgba(38,33,27,.08); }
+.c.red { background: var(--red); border: 0; grid-row: span 2; } .c.red p { color: #5a1d18; }
+.c.sage { background: var(--sage); border: 0; color: #F6F1E7; } .c.sage p { color: rgba(246,241,231,.75); } .c.sage .tag { background: rgba(255,255,255,.15); }
+.c.dark { background: var(--ink); color: #F6F1E7; border: 0; } .c.dark p { color: rgba(246,241,231,.65); } .c.dark .tag { background: rgba(255,255,255,.12); }
+.c .dev { position: absolute; }
+.big { font-family: 'Newsreader'; font-size: 64px; line-height: 1; margin-top: 18px; letter-spacing: -0.03em; }
+.qrart { position: absolute; right: 24px; bottom: 22px; width: 92px; height: 92px; border-radius: 14px; background: #fff; padding: 8px; box-shadow: 0 8px 20px -10px rgba(0,0,0,.3); }
+.qrart div { width: 100%; height: 100%; background: conic-gradient(from 90deg, #26211B 25%, transparent 0 50%, #26211B 0 75%, transparent 0) 0 0 / 14px 14px; }
+</style></head><body>
+<nav>
+  <span class="logo"><svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg><span>Open<em>Alt</em></span></span>
+  <div class="pills"><span class="on">Overview</span><span>Modes</span><span>Away</span><span>Docs</span><span>GitHub</span></div>
+</nav>
+<h1>Freedom to stream <em>anywhere,</em> for anyone.</h1>
+<div class="side">The phone or tablet in your pocket becomes another screen for your PC. Free and open source.
+  <div class="cta"><span class="b red"><span class="ms">download</span>Download</span><span class="b out">Watch the demo</span></div></div>
+
+<div class="grid">
+  <div class="c red">
+    <span class="tag"><span class="ms">add_to_queue</span></span>
+    <h3>New screen</h3><p>One more monitor, on any side of any monitor. Windows open maximized on it.</p>
+    <div class="dev" style="left:28px;bottom:26px"><div class="lap" style="--w:470px"><div class="lid"><div class="scr"><img src="img/app-claro.png" alt=""></div></div><div class="deck"></div></div></div>
+    <div class="dev" style="right:26px;bottom:20px;transform:rotate(5deg)"><div class="phn" style="--w:128px"><i class="btn-l1"></i><i class="btn-l2"></i><i class="btn-r"></i><div class="bz"><div class="scr"><div class="island"></div><div class="status"><span>9:41</span><span><span class="ms">wifi</span> <span class="ms">battery_full</span></span></div><div class="app-oa"><div class="wm">Open<em>Alt</em></div><p class="sb">Your phone or tablet as a PC screen</p><div class="pc"><span class="ms">computer</span><div><b>my-pc</b><small>● Paired · tap to connect</small></div></div><div class="qr"><b>Pair a new PC</b><span><span class="ms">qr_code_scanner</span>Scan QR</span></div></div><div class="home"></div></div></div></div></div>
+  </div>
+  <div class="c sage">
+    <span class="tag"><span class="ms">screen_share</span></span>
+    <h3>Mirror</h3><p>Show any monitor on the tablet.</p>
+    <div class="dev" style="left:40px;bottom:-60px;transform:rotate(-6deg)"><div class="tab dark" style="--w:300px"><div class="bz"><div class="scr"><img src="img/app-escuro.png" alt=""></div></div></div></div>
+  </div>
+  <div class="c dark">
+    <span class="tag"><span class="ms">sports_esports</span></span>
+    <h3>Game screen</h3><p>Your PC games on the sofa, through Sunshine.</p>
+    <div class="dev" style="left:120px;top:96px"><div class="phn land dark" style="--w:126px"><i class="btn-l1"></i><i class="btn-l2"></i><i class="btn-r"></i><div class="bz"><div class="scr"><div class="island"></div><div class="desk" style="background:radial-gradient(circle at 50% 62%,#ffd27a 0 9%,transparent 10%),linear-gradient(90deg,#2b1f45,#ff746c 60%,#f2b33d)"></div></div></div></div></div>
+  </div>
+  <div class="c">
+    <span class="tag"><span class="ms">public</span></span>
+    <h3>Away from home</h3><p>Tailscale with your own account. No port to open.</p>
+    <p class="big">4G · 5G</p>
+  </div>
+  <div class="c">
+    <span class="tag"><span class="ms">qr_code_2</span></span>
+    <h3>One QR, done</h3><p>Single-use code that expires in 2 minutes. No PIN to type.</p>
+    <div class="qrart"><div></div></div>
+  </div>
+</div>
+</body></html>

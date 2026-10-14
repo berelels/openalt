@@ -2333,6 +2333,9 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
             return (keyCode == REMAP_CONSUME);
         }
 
+        // OpenAlt: botões remapeados para este controle (Configurações › Controle › Mapear botões)
+        keyCode = dev.cattastudios.openalt.ButtonMap.translate(activityContext, event.getDevice(), keyCode);
+
         if (prefConfig.flipFaceButtons) {
             keyCode = handleFlipFaceButtons(keyCode);
         }
@@ -2569,6 +2572,9 @@ public class ControllerHandler implements InputManager.InputDeviceListener, UsbD
         if (keyCode < 0) {
             return (keyCode == REMAP_CONSUME);
         }
+
+        // OpenAlt: botões remapeados para este controle (Configurações › Controle › Mapear botões)
+        keyCode = dev.cattastudios.openalt.ButtonMap.translate(activityContext, event.getDevice(), keyCode);
 
         if (prefConfig.flipFaceButtons) {
             keyCode = handleFlipFaceButtons(keyCode);

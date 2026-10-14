@@ -1,8 +1,8 @@
 // Processo principal do OpenAlt (Electron). ADR-0011: nenhuma porta aberta; a interface fala
 // com este processo só por IPC, e só por canais conhecidos vindos da nossa própria página.
-import { app, BrowserWindow, ipcMain, screen, type IpcMainInvokeEvent } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, nativeImage, screen, shell, Tray, type IpcMainInvokeEvent } from 'electron';
 import { Controller } from './controller.js';
-import { run } from '@openalt/core';
+import { authUrlFrom, realSleep as sleep, restartShellViaHelper, run, waitFor } from '@openalt/core';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -100,6 +100,11 @@ function createWindow(): void {
   controller.on('monitors-changed', onMonitors);
   win.on('closed', () => controller.off('monitors-changed', onMonitors));
 
+  // login do Tailscale: abre no navegador da pessoa, e só se o endereço for do próprio Tailscale
+  const openLogin = (url: string) => { const ok = authUrlFrom(`${url}\n`); if (ok) void shell.openExternal(ok); };
+  controller.on('open-url', openLogin);
+  win.on('closed', () => controller.off('open-url', openLogin));
+
   const push = (s: unknown) => { if (!win.isDestroyed()) win.webContents.send('openalt:state', s); };
   controller.on('state', push);
   win.on('closed', () => controller.off('state', push));
@@ -108,11 +113,11 @@ function createWindow(): void {
 }
 
 /**
- * Reinicia o GNOME Shell como a pessoa faz à mão: Alt+F2 → r → Enter (X11). Depois que o monitor do
- * aparelho entra ou sai, é o único jeito de o papel de parede voltar (o serviço do Shell recusa
- * reiniciar por comando). Segurança: antes, a janela do OpenAlt recebe o foco (sem vir para a frente) e ignora
- * teclas por alguns segundos — se a caixa do Alt+F2 não abrir, o "r" e o Enter caem no próprio
- * OpenAlt e não fazem nada, em vez de irem para outro app da pessoa.
+ * Reinicia o GNOME Shell (X11). Depois que o monitor do aparelho entra ou sai, é o único jeito de o
+ * papel de parede voltar; o serviço do Shell recusa reiniciar por comando.
+ * 1º: pela extensão do OpenAlt (core/gnome-shell), sem caixa nenhuma e sem simular teclado.
+ * Reserva (a extensão ainda não carregou, ex.: 1ª vez, logo depois de instalada): como a pessoa faz
+ * à mão, Alt+F2 → r → Enter. Esse reinício já carrega a extensão para as próximas vezes.
  */
 let keyGuardUntil = 0;
 let restarting = false;
@@ -121,16 +126,41 @@ async function shellOwner(): Promise<string> {
   const r = await run('busctl', ['--user', 'call', 'org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'GetNameOwner', 's', 'org.gnome.Shell']).catch(() => ({ stdout: '' }));
   return r.stdout.trim();
 }
+/** O GNOME reiniciou (dono novo no D-Bus) dentro de `ms`? */
+function ownerChanged(before: string, ms: number): Promise<boolean> {
+  return waitFor(async () => { const now = await shellOwner(); return now && now !== before ? true : undefined; }, 'o GNOME reiniciar', ms, sleep)
+    .catch(() => false);
+}
 async function restartShell(win: BrowserWindow): Promise<boolean> {
   if (process.env.XDG_SESSION_TYPE !== 'x11' || win.isDestroyed() || restarting) return false;
   restarting = true;
-  const id = String(win.getNativeWindowHandle().readUInt32LE(0));
-  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
   try {
-    await run('xdotool', ['version']);
     const before = await shellOwner();
     if (!before) return false;
     await sleep(1500); // o GNOME ainda está arrumando os monitores logo depois da troca
+    if (await restartShellViaHelper(run)) {
+      if (await ownerChanged(before, 10_000)) return true;
+      // aceitou e não reiniciou em 10 s: o Shell travou? A caixa do Alt+F2 também não ajudaria.
+      return false;
+    }
+    return await restartWithAltF2(win, before);
+  } catch {
+    return false;
+  } finally {
+    restarting = false;
+  }
+}
+
+/**
+ * Alt+F2 → r → Enter. Segurança: antes, a janela do OpenAlt recebe o foco (sem vir para a frente) e
+ * ignora teclas por alguns segundos — se a caixa do Alt+F2 não abrir, o "r" e o Enter caem no
+ * próprio OpenAlt e não fazem nada, em vez de irem para outro app da pessoa.
+ */
+async function restartWithAltF2(win: BrowserWindow, before: string): Promise<boolean> {
+  if (win.isDestroyed()) return false;
+  const id = String(win.getNativeWindowHandle().readUInt32LE(0));
+  try {
+    await run('xdotool', ['version']);
     // Até 3 tentativas, cada uma esperando mais pela caixa do Alt+F2 (ao conectar ela demora).
     for (let attempt = 1; attempt <= 3; attempt++) {
       keyGuardUntil = Date.now() + 8000;
@@ -144,11 +174,7 @@ async function restartShell(win: BrowserWindow): Promise<boolean> {
       // com menos de ~0,4 s a caixa ainda não processou o "r" e o Enter não reinicia (teste ao vivo)
       await sleep(450);
       await run('xdotool', ['key', '--clearmodifiers', 'Return']);
-      for (let i = 0; i < 20; i++) {
-        await sleep(300);
-        const now = await shellOwner();
-        if (now && now !== before) return true;
-      }
+      if (await ownerChanged(before, 6000)) return true;
       // não reiniciou: fecha a caixa, se ficou aberta, e tenta de novo
       await run('xdotool', ['key', '--clearmodifiers', 'Escape']).catch(() => {});
       await sleep(400);
@@ -157,10 +183,24 @@ async function restartShell(win: BrowserWindow): Promise<boolean> {
   } catch {
     return false;
   } finally {
-    restarting = false;
     setTimeout(() => { keyGuardUntil = 0; }, 1500);
   }
 }
+
+/**
+ * Links da aba Sobre. A página pede pelo NOME; só estes endereços abrem (no navegador da pessoa,
+ * fora do app). Assim uma página comprometida não consegue abrir um endereço qualquer.
+ */
+export const LINKS: Record<string, string> = {
+  openalt: 'https://github.com/berelels/openalt',
+  catta: 'https://berelels.github.io',
+  'moonlight-android': 'https://github.com/moonlight-stream/moonlight-android',
+  'moonlight-common-c': 'https://github.com/moonlight-stream/moonlight-common-c',
+  sunshine: 'https://github.com/LizardByte/Sunshine',
+  tailscale: 'https://github.com/tailscale/tailscale',
+  'tailscale-pc': 'https://tailscale.com/download/linux',
+  'tailscale-device': 'https://tailscale.com/download',
+};
 
 // ── canais da interface → controlador (todos conferem a origem; argumentos validados lá) ──
 const actions: Record<string, (...args: unknown[]) => Promise<unknown>> = {
@@ -173,14 +213,18 @@ const actions: Record<string, (...args: unknown[]) => Promise<unknown>> = {
   setMode: (m) => controller.setMode(m),
   setMirrorOf: (id) => controller.setMirrorOf(id),
   setOrientation: (o) => controller.setOrientation(o),
-  setAudio: (v) => controller.setAudio(v),
-  setUiScale: (v) => controller.setUiScale(v),
   setPreviewKind: (k) => controller.setPreviewKind(k),
   setPref: (k, v) => controller.setPref(k, v),
   esquecer: (id) => controller.esquecer(id),
   instalarSunshine: () => controller.instalarSunshine(),
   instalarPermissao: () => controller.instalarPermissao(),
   plan: (p, size) => controller.plan(p, size),
+  remote: () => controller.remote(),
+  tailscaleSignIn: () => controller.tailscaleSignIn(),
+  openLink: async (name) => {
+    const url = typeof name === 'string' && Object.hasOwn(LINKS, name) ? LINKS[name] : null;
+    if (url) await shell.openExternal(url);
+  },
 };
 for (const [name, fn] of Object.entries(actions)) {
   ipcMain.handle(`openalt:${name}`, (e, ...args) => {
@@ -195,6 +239,51 @@ ipcMain.handle('window:toggle-fullscreen', (e) => {
   return win.isFullScreen();
 });
 ipcMain.handle('window:is-fullscreen', (e) => fromOurPage(e).isFullScreen());
+
+// ── bandeja do sistema: continuar em segundo plano ─────────────────────────
+// O GNOME só mostra ícones de bandeja com a extensão AppIndicator (o Zorin já vem com ela). Sem a
+// bandeja, só minimiza: esconder a janela sem ícone deixaria o OpenAlt sem jeito de voltar.
+let tray: Tray | null = null;
+async function hasTray(): Promise<boolean> {
+  if (process.platform !== 'linux') return true;
+  const r = await run('gdbus', ['call', '--session', '--dest', 'org.freedesktop.DBus', '--object-path', '/org/freedesktop/DBus',
+    '--method', 'org.freedesktop.DBus.NameHasOwner', 'org.kde.StatusNotifierWatcher'], { timeoutMs: 2000 }).catch(() => ({ stdout: '' }));
+  return r.stdout.includes('true');
+}
+const label = (v: unknown, fallback: string) => (typeof v === 'string' && v.length > 0 && v.length <= 80 ? v : fallback);
+ipcMain.handle('window:to-tray', async (e, labels: unknown) => {
+  const win = fromOurPage(e);
+  if (!(await hasTray())) { win.minimize(); return 'minimized'; }
+  const l = (labels && typeof labels === 'object' ? labels : {}) as Record<string, unknown>;
+  const show = () => {
+    tray?.destroy();
+    tray = null;
+    win.show();
+    win.setFullScreen(true); // volta como estava: em tela cheia
+    win.focus();
+  };
+  // sem o ícone (ex.: faltou no pacote), um item invisível na bandeja deixaria a janela sem volta
+  const icon = nativeImage.createFromPath(join(here, '..', '..', 'build', 'icon.png'));
+  if (icon.isEmpty()) { win.minimize(); return 'minimized'; }
+  tray?.destroy();
+  tray = new Tray(icon.resize({ width: 22, height: 22 }));
+  tray.setToolTip('OpenAlt');
+  tray.setContextMenu(Menu.buildFromTemplate([
+    { label: label(l.show, 'OpenAlt'), click: show },
+    { type: 'separator' },
+    { label: label(l.quit, 'Quit'), click: () => app.quit() },
+  ]));
+  tray.on('click', show);
+  if (win.isFullScreen()) {
+    // sair da tela cheia antes de esconder (no X11, esconder em tela cheia deixa a tela preta)
+    await new Promise<void>((resolve) => { win.once('leave-full-screen', () => resolve()); win.setFullScreen(false); setTimeout(resolve, 800); });
+  }
+  win.hide();
+  return 'tray';
+});
+
+// a música da abertura toca ao abrir, sem esperar um clique (é o próprio app, não uma página da web)
+app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 
 app.whenReady().then(async () => {
   await controller.init();

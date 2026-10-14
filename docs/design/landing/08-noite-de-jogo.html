@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>08 Noite de jogo</title>
+<link rel="stylesheet" href="base.css"><link rel="stylesheet" href="devices.css">
+<style>
+body { background: #0D0B10; color: #F4EFE8; }
+.bg { position: absolute; inset: 0; background: radial-gradient(50% 60% at 72% 48%, rgba(255,116,108,.32), transparent 70%), radial-gradient(40% 50% at 95% 95%, rgba(143,191,146,.22), transparent 70%); }
+.scan { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 4px); }
+nav { position: absolute; top: 34px; left: 64px; right: 64px; display: flex; justify-content: space-between; align-items: center; z-index: 3; }
+.logo { color: #F4EFE8; } .logo em { color: var(--red); }
+nav ul { display: flex; gap: 32px; list-style: none; font-size: 15px; color: rgba(244,239,232,.65); }
+nav .b { padding: 11px 20px; border-radius: 12px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); font-size: 14px; }
+.copy { position: absolute; left: 64px; top: 190px; width: 560px; z-index: 3; }
+.tag { display: inline-flex; gap: 8px; align-items: center; font-family: 'JetBrains Mono'; font-size: 12px; letter-spacing: .1em; color: var(--red); padding: 7px 12px; border: 1px solid rgba(255,116,108,.4); border-radius: 8px; }
+h1 { margin-top: 22px; font-size: 92px; font-weight: 800; letter-spacing: -0.055em; line-height: .92; }
+h1 span { color: var(--red); text-shadow: 0 0 40px rgba(255,116,108,.55); }
+.copy p { margin-top: 22px; font-size: 18px; line-height: 1.55; color: rgba(244,239,232,.7); }
+.copy p em { font-family: 'Newsreader'; font-size: 21px; color: #F4EFE8; }
+.ctas { margin-top: 32px; display: flex; gap: 12px; }
+.ctas > span { display: inline-flex; gap: 10px; align-items: center; padding: 16px 24px; border-radius: 14px; font-weight: 700; font-size: 15px; }
+.ctas .red { background: var(--red); color: #1a1210; box-shadow: 0 10px 40px -10px rgba(255,116,108,.7); }
+.ctas .out { border: 1px solid rgba(255,255,255,.2); }
+.stats { position: absolute; left: 64px; bottom: 54px; display: flex; gap: 46px; z-index: 3; }
+.stats b { display: block; font-size: 30px; font-weight: 700; letter-spacing: -0.03em; }
+.stats small { font-size: 13px; color: rgba(244,239,232,.55); }
+.T { position: absolute; left: 680px; top: 200px; transform: rotate(-4deg); z-index: 2; }
+/* uma cena de jogo desenhada (sem marca de jogo nenhum) */
+.game { position: absolute; inset: 0; background: linear-gradient(180deg, #2a1d4a 0%, #8b3a62 45%, #ff746c 62%, #f2b33d 75%); }
+.game .sun { position: absolute; left: 50%; top: 40%; width: 26%; aspect-ratio: 1; border-radius: 50%; transform: translateX(-50%); background: repeating-linear-gradient(180deg, #ffd27a 0 10px, transparent 10px 14px); }
+.game .mt { position: absolute; left: 0; right: 0; bottom: 0; height: 46%; background: linear-gradient(transparent 0, #1a1030 60%), repeating-linear-gradient(90deg, rgba(255,116,108,.5) 0 1px, transparent 1px 40px); clip-path: polygon(0 40%, 18% 10%, 34% 38%, 52% 0, 70% 32%, 86% 8%, 100% 30%, 100% 100%, 0 100%); background-color: #1a1030; }
+.game .car { position: absolute; left: 44%; bottom: 10%; width: 12%; height: 9%; border-radius: 6px 6px 3px 3px; background: #F4EFE8; box-shadow: 0 0 20px rgba(255,255,255,.6); }
+.hud { position: absolute; left: 4%; top: 6%; font-family: 'JetBrains Mono'; font-size: 11px; color: #fff; opacity: .85; }
+.pad { position: absolute; left: 1010px; top: 600px; z-index: 3; width: 300px; transform: rotate(8deg); filter: drop-shadow(0 30px 30px rgba(0,0,0,.5)); }
+.P { position: absolute; left: 1210px; top: 120px; z-index: 3; transform: rotate(12deg); }
+</style></head><body>
+<div class="bg"></div><div class="scan"></div>
+<nav>
+  <span class="logo"><svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg><span>Open<em>Alt</em></span></span>
+  <ul><li>Games</li><li>Second screen</li><li>Away from home</li><li>FAQ</li></ul>
+  <span class="b">GitHub ↗</span>
+</nav>
+<div class="copy">
+  <span class="tag"><span class="ms" style="font-size:16px">sports_esports</span>GAME SCREEN · NEW SCREEN · MIRROR</span>
+  <h1>Your PC.<br>Your games.<br><span>Any screen.</span></h1>
+  <p><em>Freedom to stream anywhere, for anyone.</em> Play from the sofa, the bed or a friend’s place — on the phone or tablet you already have, with a controller if you like.</p>
+  <div class="ctas"><span class="red"><span class="ms">download</span>Download free</span><span class="out"><span class="ms">play_arrow</span>Watch it run</span></div>
+</div>
+<div class="stats"><span><b>Sunshine</b><small>streaming on the PC</small></span><span><b>Moonlight</b><small>protocol on the device</small></span><span><b>GPL-3.0</b><small>free, forever</small></span></div>
+<div class="T"><div class="tab dark" style="--w:560px"><div class="bz"><div class="scr"><div class="game"><div class="sun"></div><div class="mt"></div><div class="car"></div><div class="hud">LAP 2/3 · 1:12.408<br>60 FPS · 6 ms</div></div></div></div></div></div>
+<svg class="pad" viewBox="0 0 300 190"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3540"/><stop offset="1" stop-color="#16131a"/></linearGradient></defs>
+  <path d="M70 20h160c40 0 60 30 66 70l4 46c3 30-20 50-44 40-16-6-28-26-42-38H86c-14 12-26 32-42 38-24 10-47-10-44-40l4-46C10 50 30 20 70 20z" fill="url(#g)" stroke="#4a4450" stroke-width="2"/>
+  <circle cx="92" cy="80" r="26" fill="#0d0b10"/><path d="M92 62v36M74 80h36" stroke="#F4EFE8" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="212" cy="64" r="10" fill="#FF746C"/><circle cx="236" cy="86" r="10" fill="#8FBF92"/><circle cx="188" cy="86" r="10" fill="#F2B33D"/><circle cx="212" cy="108" r="10" fill="#9fb6ff"/>
+  <circle cx="122" cy="122" r="18" fill="#0d0b10" stroke="#4a4450"/><circle cx="178" cy="122" r="18" fill="#0d0b10" stroke="#4a4450"/></svg>
+<div class="P"><div class="phn dark" style="--w:120px"><i class="btn-l1"></i><i class="btn-l2"></i><i class="btn-r"></i><div class="bz"><div class="scr"><div class="island"></div><div class="status"><span>9:41</span><span><span class="ms">wifi</span> <span class="ms">battery_full</span></span></div><div class="app-oa"><div class="wm">Open<em>Alt</em></div><p class="sb">Your phone or tablet as a PC screen</p><div class="pc"><span class="ms">computer</span><div><b>my-pc</b><small>● Paired · tap to connect</small></div></div><div class="qr"><b>Pair a new PC</b><span><span class="ms">qr_code_scanner</span>Scan QR</span></div></div><div class="home"></div></div></div></div></div>
+</body></html>

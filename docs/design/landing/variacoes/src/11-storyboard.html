@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>11 Storyboard</title>
+<link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="../devices.css">
+<style>
+body { background: #0B0A09; color: #F3EEE6; }
+.glow { position: absolute; border-radius: 50%; filter: blur(90px); }
+.g1 { width: 800px; height: 500px; left: 320px; top: -260px; background: radial-gradient(circle, rgba(255,116,108,.55), transparent 70%); }
+.g2 { width: 600px; height: 400px; right: -200px; top: 60px; background: radial-gradient(circle, rgba(143,191,146,.35), transparent 70%); }
+nav { position: absolute; top: 34px; left: 56px; right: 56px; display: flex; align-items: center; justify-content: space-between; z-index: 3; }
+.logo { color: #F3EEE6; } .logo em { color: var(--red); }
+.pillnav { display: flex; gap: 4px; padding: 6px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); font-size: 14px; }
+.pillnav span { padding: 8px 14px; border-radius: 999px; color: rgba(243,238,230,.75); } .pillnav span.on { background: rgba(255,255,255,.1); color: #fff; }
+.dl { padding: 11px 20px; border-radius: 999px; background: var(--red); color: #14110E; font-weight: 600; font-size: 14px; }
+.top { position: absolute; top: 118px; left: 0; right: 0; text-align: center; z-index: 2; }
+.chip { display: inline-flex; gap: 8px; align-items: center; padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1); font-size: 13px; }
+h1 { margin-top: 16px; font-size: 60px; font-weight: 500; letter-spacing: -0.045em; line-height: 1.03; }
+h1 .fade { background: linear-gradient(90deg, #fff 30%, rgba(255,255,255,.4)); -webkit-background-clip: text; color: transparent; }
+.panels { position: absolute; left: 56px; right: 56px; top: 360px; bottom: 50px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.p { position: relative; border-radius: 24px; overflow: hidden; }
+.p .cap { position: absolute; left: 18px; top: 16px; z-index: 4; display: inline-flex; gap: 8px; align-items: center; padding: 7px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; background: rgba(15,13,11,.75); color: #F3EEE6; }
+.p .cap b { color: var(--red); font-family: 'JetBrains Mono'; font-weight: 500; }
+.p .time { position: absolute; right: 18px; top: 20px; z-index: 4; font-family: 'JetBrains Mono'; font-size: 12px; opacity: .7; }
+.p .char .bubbles { display: none; }
+.p .char { left: 50%; margin-left: -300px; top: 110px; transform: scale(.62); transform-origin: top center; }
+/* 1: saindo de casa */
+.s1 { background: #FBF6EE; color: #26211B; } .s1 .time { color: #26211B; }
+.s1 .door { position: absolute; left: 34px; bottom: 0; width: 120px; height: 300px; border-radius: 60px 60px 0 0; background: #F2B9B4; border: 3px solid #26211B; border-bottom: 0; }
+.s1 .door::after { content: ''; position: absolute; right: 16px; top: 150px; width: 10px; height: 10px; border-radius: 50%; background: #26211B; }
+.s1 .plant { position: absolute; right: 30px; bottom: 0; width: 70px; height: 120px; border-radius: 40px 40px 6px 6px; background: #8FBF92; border: 3px solid #26211B; border-bottom: 0; }
+/* 2: no ônibus */
+.s2 { background: #1B2233; }
+.s2 .win { position: absolute; left: 22px; right: 22px; top: 58px; height: 190px; border-radius: 18px; background: linear-gradient(180deg, #2b3a5c, #6b4a6a); overflow: hidden; border: 3px solid #0f1420; }
+.s2 .win i { position: absolute; bottom: 0; width: 46px; background: #141a28; }
+.s2 .win em { position: absolute; width: 6px; height: 6px; border-radius: 2px; background: #ffd27a; opacity: .8; }
+.s2 .seat { position: absolute; left: 0; right: 0; bottom: 0; height: 90px; background: #0f1420; }
+.s2 .char { --ln: #F3EEE6; --ft: #26211B; --face: #F3EEE6; --hair: #3A322B; }
+.s2 .sig { position: absolute; right: 18px; bottom: 18px; z-index: 4; font-family: 'JetBrains Mono'; font-size: 12px; color: var(--sage-l); }
+/* 3: no café, com o tablet de monitor extra */
+.s3 { background: radial-gradient(90% 70% at 70% 10%, rgba(255,116,108,.35), transparent 70%), #2A211B; }
+.s3 .char { top: 70px; --ln: #F3EEE6; --ft: #26211B; --face: #F3EEE6; --hair: #3A322B; }
+.s3 .table { position: absolute; left: 0; right: 0; bottom: 0; height: 120px; background: #C98D5E; border-top: 4px solid #8c5c3a; z-index: 3; }
+.s3 .on { position: absolute; bottom: 104px; z-index: 4; }
+</style></head><body>
+<div class="glow g1"></div><div class="glow g2"></div>
+<nav>{{LOGO}}<div class="pillnav"><span class="on">The story</span><span>New screen</span><span>Games</span><span>Away</span><span>FAQ</span></div><span class="dl">Download</span></nav>
+<div class="top"><span class="chip">● Scroll to follow the day</span>
+  <h1>Freedom to stream<br><span class="fade">anywhere, for anyone.</span></h1></div>
+<div class="panels">
+  <div class="p s1"><span class="cap"><b>01</b>Leave home playing</span><span class="time">08:00</span>
+    <div class="door"></div><div class="plant"></div>{{CHAR:phone-game}}</div>
+  <div class="p s2"><span class="cap"><b>02</b>Keep playing on 4G</span><span class="time">08:30</span>
+    <div class="win"><i style="left:20px;height:90px"></i><i style="left:80px;height:130px"></i><i style="left:150px;height:70px"></i><i style="left:230px;height:110px"></i><i style="left:300px;height:150px"></i><em style="left:94px;bottom:80px"></em><em style="left:310px;bottom:100px"></em><em style="left:240px;bottom:60px"></em></div>
+    <div class="seat"></div>{{CHAR:phone-game}}<span class="sig">Tailscale · 4G ▂▄▆</span></div>
+  <div class="p s3"><span class="cap"><b>03</b>Arrive, add a screen</span><span class="time">09:10</span>
+    {{CHAR:none}}<div class="table"></div>
+    <div class="on" style="left:40px"><div class="lap" style="--w:220px"><div class="lid"><div class="scr"><img src="../img/app-claro.png" alt=""></div></div><div class="deck"></div></div></div>
+    <div class="on" style="left:262px;bottom:110px"><div class="tab dark" style="--w:150px"><div class="bz"><div class="scr"><div class="desk"><div class="win"><div class="tb"><i></i><i></i><i></i></div><div class="body"><div></div><div></div><div></div></div></div></div></div></div></div></div>
+  </div>
+</div>
+</body></html>

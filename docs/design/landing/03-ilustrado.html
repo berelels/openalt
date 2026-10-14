@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>03 Ilustrado</title>
+<link rel="stylesheet" href="base.css"><link rel="stylesheet" href="devices.css">
+<style>
+body { background: #FBF6EE; font-family: 'Inter', sans-serif; }
+nav { position: absolute; top: 40px; left: 100px; right: 100px; display: flex; align-items: center; justify-content: space-between; padding-bottom: 26px; border-bottom: 1px solid var(--line); }
+nav ul { display: flex; gap: 48px; list-style: none; font-size: 15px; font-weight: 500; }
+.right { display: flex; gap: 24px; align-items: center; font-size: 15px; font-weight: 500; }
+.right .dl { background: var(--ink); color: #fff; padding: 13px 24px; }
+h1 { position: absolute; left: 100px; top: 150px; font-size: 96px; font-weight: 700; letter-spacing: -0.05em; line-height: .98; z-index: 2; }
+.small { position: absolute; left: 100px; top: 470px; width: 220px; font-size: 15px; font-weight: 600; line-height: 1.5; }
+.small::after { content: ''; display: block; width: 46px; height: 3px; background: var(--red); margin-top: 14px; }
+.stat { position: absolute; left: 100px; bottom: 70px; width: 300px; }
+.stat b { font-size: 50px; font-weight: 600; letter-spacing: -0.03em; }
+.stat p { margin-top: 10px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.scroll { position: absolute; left: 860px; bottom: 76px; font-size: 13px; font-weight: 600; letter-spacing: .06em; display: flex; gap: 6px; align-items: center; }
+.ill { position: absolute; left: 320px; top: 250px; width: 600px; height: 560px; }
+.intab { position: absolute; left: 470px; top: 618px; transform: rotate(-8deg); z-index: 3; }
+.card { position: absolute; right: 100px; top: 180px; width: 260px; background: #F2B9B4; }
+.card div { padding: 22px; }
+.card div:first-child { font-size: 20px; font-weight: 600; color: #6B1F1A; border-bottom: 2px dashed rgba(107,31,26,.25); }
+.card div:last-child { font-size: 13px; line-height: 1.5; color: #6B1F1A; display: flex; justify-content: space-between; gap: 18px; align-items: end; }
+.diamond { position: absolute; right: 410px; top: 250px; width: 46px; height: 46px; background: var(--ink); transform: rotate(45deg); border-radius: 6px; display: grid; place-items: center; }
+.diamond span { transform: rotate(-45deg); color: #fff; font-weight: 700; }
+.quote { position: absolute; right: 100px; top: 410px; width: 300px; font-size: 18px; font-weight: 600; line-height: 1.5; }
+.quote u { text-decoration-color: var(--red); text-decoration-thickness: 3px; text-underline-offset: 4px; }
+.big { position: absolute; right: 100px; top: 540px; width: 300px; display: flex; align-items: center; gap: 16px; }
+.big b { font-size: 44px; font-weight: 600; letter-spacing: -0.03em; }
+.big i { flex: 1; height: 1px; background: var(--muted); }
+.big small { font-size: 13px; color: var(--muted); width: 70px; }
+.foot { position: absolute; right: 100px; bottom: 60px; width: 300px; border-top: 1px solid var(--line); padding-top: 22px; display: flex; gap: 16px; align-items: center; font-size: 14px; }
+.foot .dot { width: 46px; height: 46px; border-radius: 50%; background: var(--sage); display: grid; place-items: center; color: #fff; }
+</style></head><body>
+<nav>
+  <span class="logo"><svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg><span>Open<em>Alt</em></span></span>
+  <ul><li>Features</li><li>Devices</li><li>Games</li><li>Open source</li><li>Help</li></ul>
+  <div class="right"><span>GitHub</span><span class="dl">Download</span></div>
+</nav>
+<h1>Any screen<br>is your screen</h1>
+<p class="small">Phone, tablet, standing or lying down — on any side of any monitor.</p>
+<div class="stat"><b>3 modes</b><p>A new screen, a mirror of your PC, or a game screen. Pick one, scan, done.</p></div>
+<span class="scroll">SCROLL DOWN <span class="ms" style="font-size:16px">south</span></span>
+
+<svg class="ill" viewBox="0 0 600 560" fill="none" stroke="#26211B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="60" y="20" width="200" height="460" fill="#EFE3E0" stroke="none"/>
+  <rect x="300" y="20" width="200" height="460" fill="#E6EEE3" stroke="none"/>
+  <g transform="translate(-30 100)">
+  <!-- balão do tablet -->
+  <path d="M40 140c0-40 30-60 70-60s70 20 70 60-30 60-70 60c-12 0-22-2-30-6l-30 22 8-34c-12-12-18-26-18-42z" fill="#8FBF92"/>
+  <rect x="80" y="112" width="60" height="44" rx="6" fill="#FBF6EE"/><path d="M96 168h28"/>
+  <!-- balão do controle -->
+  <path d="M380 110c0-44 34-70 80-70s80 26 80 70-34 70-80 70c-14 0-26-3-36-8l-34 24 8-38c-12-14-18-30-18-48z" fill="#FF746C"/>
+  <path d="M418 98h84c14 0 22 12 22 26s-10 26-22 26c-10 0-16-8-22-14h-40c-6 6-12 14-22 14-12 0-22-12-22-26s8-26 22-26z" fill="#FBF6EE"/>
+  <path d="M432 116v14M425 123h14"/><circle cx="486" cy="118" r="3" fill="#26211B"/><circle cx="496" cy="128" r="3" fill="#26211B"/>
+  </g>
+  <!-- pessoa -->
+  <path d="M150 560c-10-120 40-220 150-220s170 100 160 220z" fill="#F2B33D"/>
+  <path d="M250 352c-10 60 0 120 40 200M340 350c10 60 0 120-30 200" />
+  <path d="M262 250c0-34 18-58 46-58s46 24 46 58-18 64-46 64-46-30-46-64z" fill="#FBF6EE"/>
+  <path d="M262 236c-6-40 20-66 50-62 30 4 48 30 40 58-14-16-34-22-56-18-14 2-26 10-34 22z" fill="#26211B"/>
+  <path d="M296 262c2 10 8 16 14 16M330 258h0M290 258h0" stroke-width="5"/>
+  <path d="M300 286c8 6 18 6 26 0"/>
+  <path d="M300 314v28M316 314v28"/>
+  <path d="M206 470c-20 10-30 30-20 46s40 12 50-6M424 430c20 6 30 26 22 44s-36 18-46 0" fill="#FBF6EE"/>
+</svg>
+<div class="intab"><div class="tab dark" style="--w:300px"><div class="bz"><div class="scr"><div class="desk"><div class="win"><div class="tb"><i></i><i></i><i></i></div><div class="body"><div></div><div></div><div></div></div></div></div></div></div></div></div>
+
+<div class="diamond"><span>&</span></div>
+<div class="card"><div>Streaming made simple.</div><div><span>Scan one QR code on your phone. No PIN, no settings, no account.</span><span class="ms">north_east</span></div></div>
+<p class="quote">Freedom to stream <u>anywhere</u>, for <u>anyone</u>: your PC follows you to the sofa, the café or the train.</p>
+<div class="big"><b>100%</b><i></i><small>open source GPL-3.0</small></div>
+<div class="foot"><span class="dot"><span class="ms">public</span></span>Away from home with Tailscale — your account, your network.</div>
+</body></html>

@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenAlt — Empowering anyone to stream anywhere</title>
+  <meta name="description" content="Free and open source: turn your phone or tablet into a second monitor, a mirror of your PC or a game screen. One QR code.">
+  <meta name="theme-color" content="#EFE6D6">
+  <meta property="og:title" content="OpenAlt — Empowering anyone to stream anywhere">
+  <meta property="og:description" content="Your phone or tablet as a second monitor, a mirror or a game screen. Free and open source.">
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/newsreader-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="stylesheet" href="css/intro.css">
+  <script src="vendor/gsap.min.js" defer></script>
+  <script src="vendor/ScrollTrigger.min.js" defer></script>
+  <script src="js/i18n.js" defer></script>
+  <script src="js/intro.js" defer></script>
+  <script src="js/main.js" defer></script>
+  <!-- sem JavaScript, sem abertura: a página aparece direto -->
+  <noscript><style>.intro { display: none; } body.intro-on { overflow: auto; }</style></noscript>
+</head>
+<body class="intro-on">
+<!-- a abertura dos apps (js/intro.js, cópia de desktop/src/renderer/intro.ts); aqui não dá para pular -->
+<div class="intro boot" id="intro" aria-hidden="true"></div>
+<a class="skip" href="#main" data-i18n="skip">Skip to content</a>
+
+<!-- ícones (usados com <use href="#i-…">) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 40 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h34M30 2l6 6-6 6"/></symbol>
+    <symbol id="i-ne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 11 12 4l8 7v9H4z"/></symbol>
+    <symbol id="i-bus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="5" y="3" width="14" height="15" rx="3"/><path d="M5 11h14M8 21v-3M16 21v-3"/></symbol>
+    <symbol id="i-cafe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 9h12v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM16 11h2a3 3 0 0 1 0 6h-2"/></symbol>
+    <symbol id="i-power" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 3v9M7 6a8 8 0 1 0 10 0"/></symbol>
+    <symbol id="i-gh" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.93.36.31.68.92.68 1.86v2.76c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></symbol>
+  </defs>
+</svg>
+
+<header class="nav" id="nav">
+  <a class="logo" href="#top" aria-label="OpenAlt">
+    <svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg>
+    <span>Open<em>Alt</em></span>
+  </a>
+  <ul class="nav-links mono">
+    <li><a href="#modes" data-i18n="nav.modes">01 Modes</a></li>
+    <li><a href="#how" data-i18n="nav.how">02 How it works</a></li>
+    <li><a href="#sides" data-i18n="nav.sides">03 Any side</a></li>
+    <li><a href="#open" data-i18n="nav.open">04 Open source</a></li>
+  </ul>
+  <div class="nav-end">
+    <div class="lang" role="group" aria-label="Language" data-i18n-aria="lang.label">
+      <button type="button" data-lang="pt" aria-pressed="false">PT</button><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="es" aria-pressed="false">ES</button>
+    </div>
+    <a class="btn ink" href="#download"><span data-i18n="nav.download">Download</span><svg aria-hidden="true"><use href="#i-down"/></svg></a>
+  </div>
+</header>
+
+<main id="main">
+<!-- ── herói ───────────────────────────────────────────── -->
+<section class="hero wrap" id="top">
+  <div>
+    <h1 class="h1" data-i18n="hero.title" data-split>Empowering anyone to stream <em>anywhere.</em></h1>
+    <p class="lede" data-i18n="hero.lede">Your phone or tablet becomes a second monitor, a mirror of your PC or a game screen. One QR code. That’s the setup.</p>
+    <div class="ctas">
+      <a class="btn red" href="#download"><svg aria-hidden="true"><use href="#i-down"/></svg><span data-i18n="hero.cta">Get it for Linux</span></a>
+      <a class="btn" href="#modes" data-i18n="hero.cta2">See the plan</a>
+    </div>
+    <div class="stats">
+      <div><b>3</b><span data-i18n="stat.modes">modes</span></div>
+      <div><b>1</b><span data-i18n="stat.qr">QR to pair</span></div>
+      <div><b>∞</b><span data-i18n="stat.places">places to stream</span></div>
+    </div>
+  </div>
+
+  <div class="mosaic-wrap" aria-hidden="true">
+    <div class="mosaic">
+      <div class="tile t-red"><svg viewBox="0 0 120 120"><path d="M0 120A120 120 0 0 1 120 0V120Z" fill="#26211B"/></svg></div>
+      <div class="tile t-paper"></div>
+      <div class="tile t-sage"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="34" fill="#EFE6D6"/><circle cx="60" cy="60" r="14" fill="#4A7350"/></svg></div>
+      <div class="tile t-sun"><svg viewBox="0 0 120 120"><path d="M30 90l30-60 30 60z" fill="#26211B"/></svg></div>
+      <div class="tile t-ink"><svg viewBox="0 0 120 120" fill="none" stroke="#EFE6D6" stroke-width="8" stroke-linecap="round"><path d="M30 70a42 42 0 0 1 60 0M42 82a24 24 0 0 1 36 0"/><circle cx="60" cy="94" r="5" fill="#EFE6D6"/></svg></div>
+      <div class="tile t-pink"></div><div class="tile t-pink"></div>
+      <div class="tile t-paper"><svg viewBox="0 0 120 120"><path d="M0 0H120A120 120 0 0 1 0 120Z" fill="#FF746C"/></svg></div>
+      <div class="tile t-sagel"></div><div class="tile t-pink"></div><div class="tile t-pink"></div>
+      <div class="tile t-ink"><svg viewBox="0 0 120 120"><rect x="34" y="34" width="22" height="22" fill="#EFE6D6"/><rect x="64" y="34" width="22" height="22" fill="#EFE6D6"/><rect x="34" y="64" width="22" height="22" fill="#EFE6D6"/><rect x="70" y="70" width="10" height="10" fill="#FF746C"/></svg></div>
+      <div class="tile t-sun"><svg viewBox="0 0 120 120" fill="none" stroke="#26211B" stroke-width="8" stroke-linejoin="round"><path d="M20 80h80M30 80V56l30-22 30 22v24"/></svg></div>
+      <div class="tile t-paper"></div>
+      <div class="tile t-sage"><svg viewBox="0 0 120 120"><path d="M120 120A120 120 0 0 1 0 0V120Z" fill="#8FBF92"/></svg></div>
+      <div class="tile t-red"></div>
+      <div class="tile t-paper"><svg viewBox="0 0 120 120" fill="none" stroke="#26211B" stroke-width="7" stroke-linecap="round"><path d="M34 52h52c10 0 16 8 16 18s-6 18-16 18c-8 0-12-6-16-10H50c-4 4-8 10-16 10-10 0-16-8-16-18s6-18 16-18z"/></svg></div>
+      <div class="tile t-ink"></div><div class="tile t-pink"></div><div class="tile t-paper"></div>
+    </div>
+    <div class="fd fd-lap hero-lap" style="--w:calc(var(--t) * 2.6); left:calc(var(--t) * .4); top:calc(var(--t) * 2.1)">
+      <div class="lid"><div class="scr"><div class="ui-app"><div class="bar"><i></i><b></b></div><div class="c1"></div><div class="c2"></div><div class="c3"></div><div class="c4"></div></div></div></div><div class="base"></div>
+    </div>
+    <div class="fd fd-phone hero-phone" style="--w:calc(var(--t) * 1); left:calc(var(--t) * 3.35); top:calc(var(--t) * 1.55)">
+      <div class="scr"><div class="ui-phone"><b></b><i></i><div class="pc"></div><div class="qr"></div></div></div>
+    </div>
+    <span class="dim hero-dim1" style="left:calc(var(--t) * .4); top:calc(var(--t) * 4.1)"><span class="rule" style="width:calc(var(--t) * 2.6)"></span></span>
+    <span class="dim" style="left:calc(var(--t) * .9); top:calc(var(--t) * 4.2)" data-i18n="hero.dim1">+ 1 screen · 1080×2400</span>
+    <span class="dim" style="right:0; top:calc(var(--t) * 1.2)" data-i18n="hero.dim2">← side: right · align: top</span>
+  </div>
+  <div class="stamp" aria-hidden="true" data-i18n="stamp">One QR<br>No PIN<br>No account<br>GPL-3.0</div>
+</section>
+
+<!-- ── modos: rolagem lateral ─────────────────────────── -->
+<section class="modes" id="modes" aria-labelledby="modesTitle">
+  <div class="modes-pin">
+    <div class="track" id="track">
+      <div class="panel intro">
+        <p class="eyebrow" data-i18n="modes.eyebrow">01 · Modes</p>
+        <h2 class="h2" id="modesTitle" data-i18n="modes.title">One phone. <em>Four</em> jobs.</h2>
+        <p class="lede" style="margin-top:18px" data-i18n="modes.lede">Keep scrolling: the page moves sideways, like dragging a window to a new screen.</p>
+        <p class="hint mono"><span data-i18n="modes.hint">Scroll</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></p>
+      </div>
+
+      <article class="panel" data-panel>
+        <div class="txt"><p class="num">01</p><h3 data-i18n="p1.title">A <em>new</em> screen</h3>
+          <p data-i18n="p1.text">One more monitor, on any side of any monitor. Drag a window over — it opens maximized on the tablet.</p>
+          <span class="tag" data-i18n="p1.tag">side: right · align: center</span></div>
+        <div class="stage" data-wall-root>
+          <div class="blk p-sage" style="right:0;top:0;width:34%;height:40%"></div>
+          <div class="blk p-red" style="right:34%;bottom:0;width:22%;height:22%"></div>
+          <div class="fd fd-lap" data-in style="--w:46%; left:6%; top:34%"><div class="lid"><div class="scr"><div class="ui-wall cont"></div><div class="ui-win" style="left:8%;top:12%;width:46%;height:58%"></div><div class="ui-win" style="left:62%;top:30%;width:50%;height:46%"></div></div></div><div class="base"></div></div>
+          <div class="fd fd-tab" data-in data-from="right" style="--w:34%; left:58%; top:40%"><div class="scr"><div class="ui-wall cont"></div><div class="ui-win" style="left:-12%;top:30%;width:62%;height:48%"></div></div></div>
+        </div>
+      </article>
+
+      <article class="panel" data-panel>
+        <div class="txt"><p class="num">02</p><h3 data-i18n="p2.title"><em>Mirror</em> any monitor</h3>
+          <p data-i18n="p2.text">Show your main screen — or any other — exactly as it is, on the phone or tablet in your hands.</p>
+          <span class="tag" data-i18n="p2.tag">mirror: LG 27″</span></div>
+        <div class="stage">
+          <div class="blk p-pink" style="right:0;top:0;width:44%;height:100%"></div>
+          <div class="blk p-ink" style="left:0;bottom:0;width:20%;height:20%"></div>
+          <svg class="blk" style="left:44%;top:30%;width:18%;height:20%" viewBox="0 0 100 60" fill="none" stroke="#26211B" stroke-width="2.5" stroke-dasharray="3 6" stroke-linecap="round"><path d="M4 30h86M80 20l10 10-10 10"/></svg>
+          <div class="fd fd-lap" data-in style="--w:42%; left:4%; top:26%"><div class="lid"><div class="scr"><div class="ui-app"><div class="bar"><i></i><b></b></div><div class="c1"></div><div class="c2"></div><div class="c3"></div><div class="c4"></div></div></div></div><div class="base"></div></div>
+          <div class="fd fd-tab" data-in data-from="right" style="--w:36%; left:58%; top:36%; rotate:4deg"><div class="scr"><div class="ui-app"><div class="bar"><i></i><b></b></div><div class="c1"></div><div class="c2"></div><div class="c3"></div><div class="c4"></div></div></div></div>
+        </div>
+      </article>
+
+      <article class="panel" data-panel>
+        <div class="txt"><p class="num">03</p><h3 data-i18n="p3.title">A <em>game</em> screen</h3>
+          <p data-i18n="p3.text">Your PC games on the sofa or in bed, streamed by Sunshine. Plug in a controller if you like.</p>
+          <span class="tag" data-i18n="p3.tag">up to your screen’s Hz</span></div>
+        <div class="stage">
+          <div class="blk p-sun" style="right:0;bottom:0;width:58%;height:46%"></div>
+          <div class="blk p-red" style="right:0;top:0;width:18%;height:22%"></div>
+          <div class="fd fd-phone land" data-in style="--w:58%; left:22%; top:22%"><div class="scr"><div class="ui-game"><span class="car"></span></div></div></div>
+          <svg class="pad" data-in data-from="bottom" style="left:46%;top:64%;width:34%" viewBox="0 0 300 190" aria-hidden="true">
+            <path d="M70 20h160c40 0 60 30 66 70l4 46c3 30-20 50-44 40-16-6-28-26-42-38H86c-14 12-26 32-42 38-24 10-47-10-44-40l4-46C10 50 30 20 70 20z" fill="#FBF6EE" stroke="#26211B" stroke-width="6"/>
+            <path d="M92 62v36M74 80h36" stroke="#26211B" stroke-width="10" stroke-linecap="round"/>
+            <circle cx="212" cy="62" r="11" fill="#FF746C" stroke="#26211B" stroke-width="4"/><circle cx="236" cy="86" r="11" fill="#8FBF92" stroke="#26211B" stroke-width="4"/><circle cx="188" cy="86" r="11" fill="#F2B33D" stroke="#26211B" stroke-width="4"/><circle cx="212" cy="110" r="11" fill="#26211B"/>
+          </svg>
+        </div>
+      </article>
+
+      <article class="panel" data-panel>
+        <div class="txt"><p class="num">04</p><h3 data-i18n="p4.title"><em>Away</em> from home</h3>
+          <p data-i18n="p4.text">Leave the PC at home and take its screen with you — over 4G, 5G or any Wi-Fi, with Tailscale and your own account. No port to open.</p>
+          <span class="tag" data-i18n="p4.tag">encrypted · your account</span></div>
+        <div class="stage">
+          <div class="blk p-ink" style="right:0;top:0;width:28%;height:28%"></div>
+          <div class="blk p-sage" style="left:10%;bottom:0;width:30%;height:16%"></div>
+          <svg class="blk" style="inset:0;width:100%;height:100%" viewBox="0 0 600 600" preserveAspectRatio="none" fill="none" aria-hidden="true">
+            <path class="route" d="M60 520C140 420 220 470 300 380S420 220 540 160" stroke="#26211B" stroke-width="3" stroke-dasharray="2 12" stroke-linecap="round"/>
+          </svg>
+          <span class="pin" style="left:4%;top:80%"><i><svg><use href="#i-home"/></svg></i><span data-i18n="p4.home">Home PC</span><small>Wi-Fi</small></span>
+          <span class="pin" style="left:42%;top:58%"><i><svg><use href="#i-bus"/></svg></i><span data-i18n="p4.bus">On the bus</span><small>4G</small></span>
+          <span class="pin" style="left:70%;top:18%"><i><svg><use href="#i-cafe"/></svg></i><span data-i18n="p4.cafe">Café</span><small>5G</small></span>
+          <div class="fd fd-phone" data-in data-from="bottom" style="--w:16%; left:62%; top:36%; rotate:8deg"><div class="scr"><div class="ui-game"><span class="car"></span></div></div></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ── como funciona ─────────────────────────────────── -->
+<section class="how wrap" id="how" aria-labelledby="howTitle">
+  <p class="eyebrow" data-i18n="how.eyebrow">02 · How it works</p>
+  <h2 class="h2" id="howTitle" data-i18n="how.title">Three steps. <em>Once.</em></h2>
+  <div class="steps">
+    <div class="step"><p class="n">1</p><h3 data-i18n="s1.title">Install on your PC</h3><p data-i18n="s1.text">OpenAlt sets up Sunshine with its own config — yours stays untouched. Linux today, Windows next.</p>
+      <div class="art"><div class="fd-lap" style="--w:150px;position:relative"><div class="lid"><div class="scr"><div class="ui-app"><div class="bar"><i></i><b></b></div><div class="c1"></div><div class="c2"></div><div class="c3"></div><div class="c4"></div></div></div></div><div class="base"></div></div></div></div>
+    <div class="step"><p class="n">2</p><h3 data-i18n="s2.title">Turn it on</h3><p data-i18n="s2.text">Nothing runs until you press the button. Press it again and everything goes back to how it was.</p>
+      <div class="art"><div class="power"><svg aria-hidden="true"><use href="#i-power"/></svg></div></div></div>
+    <div class="step"><p class="n">3</p><h3 data-i18n="s3.title">Scan the QR</h3><p data-i18n="s3.text">Open the OpenAlt app on the phone and point it at the code. It works once and expires in two minutes. No PIN.</p>
+      <div class="art"><div class="qrtile"><svg viewBox="0 0 29 29" shape-rendering="crispEdges" aria-hidden="true"><g fill="#26211B"><path d="M0 0h7v7H0zM22 0h7v7h-7zM0 22h7v7H0z"/><path fill="#FBF6EE" d="M1 1h5v5H1zM23 1h5v5h-5zM1 23h5v5H1z"/><path d="M2 2h3v3H2zM24 2h3v3h-3zM2 24h3v3H2zM9 1h2v2H9zM12 3h2v3h-2zM9 8h4v2H9zM15 9h3v2h-3zM20 9h2v4h-2zM9 12h2v5H9zM13 13h4v2h-4zM18 15h4v2h-4zM23 12h3v2h-3zM24 17h4v2h-4zM12 18h2v4h-2zM16 20h5v2h-5zM9 24h4v2H9zM15 24h2v4h-2zM19 23h2v2h-2zM22 26h5v2h-5zM25 21h3v3h-3z"/><path fill="#FF746C" d="M17 17h2v2h-2z"/></g></svg></div></div></div>
+  </div>
+</section>
+
+<!-- ── qualquer lado ─────────────────────────────────── -->
+<section class="sides wrap" id="sides" aria-labelledby="sidesTitle">
+  <div class="grid2">
+    <div>
+      <p class="eyebrow" data-i18n="sides.eyebrow">03 · Any side</p>
+      <h2 class="h2" id="sidesTitle" data-i18n="sides.title">Any phone. Any side. <em>Any</em> monitor.</h2>
+      <p class="lede" style="margin-top:18px" data-i18n="sides.lede">Right, left, above or below — of any monitor you have. Phone or tablet, standing or lying down. OpenAlt doesn’t assume your setup.</p>
+      <div class="chips"><span data-i18n="chip1">1 · 2 · 3 · 4+ monitors</span><span data-i18n="chip2">phone · tablet</span><span data-i18n="chip3">standing · lying down</span><span data-i18n="chip4">right · left · above · below</span></div>
+    </div>
+    <div class="plan" id="plan" aria-hidden="true">
+      <div class="mon" style="left:18%;top:30%;width:24%;height:30%">HDMI-1</div>
+      <div class="mon primary" style="left:42%;top:24%;width:36%;height:40%">DP-1 ★</div>
+      <div class="dev" id="planDev"></div>
+      <p class="readout"><span data-i18n="plan.side">side</span>: <b id="planSide">right</b> · <span data-i18n="plan.of">of</span>: <b id="planOf">DP-1</b></p>
+    </div>
+  </div>
+</section>
+
+<!-- ── aberto e privado ─────────────────────────────── -->
+<section class="open wrap" id="open" aria-labelledby="openTitle">
+  <p class="eyebrow" data-i18n="open.eyebrow">04 · Open source</p>
+  <h2 class="h2" id="openTitle" data-i18n="open.title">Yours. <em>Open.</em> Private.</h2>
+  <div class="cards">
+    <div class="cardx red wide"><b data-i18n="c1.b">Free, forever</b><p data-i18n="c1.p">GPL-3.0. No ads, no account, no tracking. Read every line of the code.</p><a href="https://github.com/berelels/openalt" data-i18n="c1.a">Source code ↗</a></div>
+    <div class="cardx paper"><b>1 QR</b><p data-i18n="c2.p">Single-use pairing code that expires in two minutes.</p></div>
+    <div class="cardx sage"><b>0</b><p data-i18n="c3.p">ports to open on your router. Away from home it goes through Tailscale, with your own account.</p></div>
+    <div class="cardx ink wide"><b data-i18n="c4.b">Built on giants</b><p data-i18n="c4.p">Streaming by Sunshine (LizardByte) and the Moonlight protocol. The Android app is a fork of Moonlight Android.</p>
+      <a href="https://github.com/moonlight-stream/moonlight-android">Moonlight Android ↗</a></div>
+    <div class="cardx sun"><b>Linux</b><p data-i18n="c5.p">Available now. Windows is next; Wayland after that.</p></div>
+    <div class="cardx pink"><b>Android</b><p data-i18n="c6.p">Any phone or tablet with Android. The app scans the QR and connects on its own.</p></div>
+  </div>
+</section>
+
+<!-- ── baixar ─────────────────────────────────────────── -->
+<section class="download wrap" id="download" aria-labelledby="dlTitle">
+  <div class="dl-box">
+    <p class="eyebrow" style="color:var(--red)" data-i18n="dl.eyebrow">Download</p>
+    <h2 class="h2" id="dlTitle" data-i18n="dl.title">Take your PC <em>anywhere.</em></h2>
+    <p class="lede" data-i18n="dl.lede">Install on the PC, get the app on the phone, scan once. Empowering anyone to stream anywhere.</p>
+    <div class="plat">
+      <a class="btn red" href="https://github.com/berelels/openalt/releases"><svg aria-hidden="true"><use href="#i-down"/></svg><span data-i18n="dl.linux">PC · Linux</span></a>
+      <a class="btn" href="https://github.com/berelels/openalt/releases"><svg aria-hidden="true"><use href="#i-down"/></svg><span data-i18n="dl.android">Phone · Android</span></a>
+      <a class="btn" aria-disabled="true" tabindex="-1"><span data-i18n="dl.windows">Windows · coming soon</span></a>
+      <a class="btn" href="https://github.com/berelels/openalt"><svg aria-hidden="true"><use href="#i-gh"/></svg>GitHub</a>
+    </div>
+    <div class="stamp" aria-hidden="true" data-i18n="stamp">One QR<br>No PIN<br>No account<br>GPL-3.0</div>
+    <div class="dl-tiles" aria-hidden="true">
+      <div class="tile t-red"><svg viewBox="0 0 120 120"><path d="M0 120A120 120 0 0 1 120 0V120Z" fill="#26211B"/></svg></div><div class="tile t-sun"></div><div class="tile t-sage"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="34" fill="#EFE6D6"/><circle cx="60" cy="60" r="14" fill="#4A7350"/></svg></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot wrap">
+  <div class="cols">
+    <div>
+      <a class="logo" href="#top"><svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg><span>Open<em>Alt</em></span></a>
+      <p class="sig"><span data-i18n="foot.by">Made by</span> <a href="https://berelels.github.io">Catta Studios</a> · \ catta studios</p>
+    </div>
+    <div><h4 data-i18n="foot.project">Project</h4><ul>
+      <li><a href="https://github.com/berelels/openalt" data-i18n="foot.source">Source code</a></li>
+      <li><a href="https://github.com/berelels/openalt/releases" data-i18n="foot.releases">Releases</a></li>
+      <li><a href="https://github.com/berelels/openalt/blob/main/LICENSE">GPL-3.0</a></li></ul></div>
+    <div><h4 data-i18n="foot.built">Built on</h4><ul>
+      <li><a href="https://github.com/moonlight-stream/moonlight-android">Moonlight Android</a></li>
+      <li><a href="https://github.com/moonlight-stream/moonlight-common-c">moonlight-common-c</a></li>
+      <li><a href="https://github.com/LizardByte/Sunshine">Sunshine</a></li>
+      <li><a href="https://github.com/tailscale/tailscale">Tailscale</a></li></ul></div>
+  </div>
+</footer>
+</body>
+</html>

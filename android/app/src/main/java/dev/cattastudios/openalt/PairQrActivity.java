@@ -25,6 +25,7 @@ import com.limelight.R;
 import com.limelight.binding.PlatformBinding;
 import com.limelight.computers.ComputerManagerService;
 import com.limelight.nvstream.http.ComputerDetails;
+import com.limelight.nvstream.http.HostHttpResponseException;
 import com.limelight.nvstream.http.NvHTTP;
 import com.limelight.nvstream.http.PairingManager;
 import com.limelight.nvstream.http.PairingManager.PairState;
@@ -100,6 +101,7 @@ public class PairQrActivity extends Activity {
         progress = findViewById(R.id.pairProgress);
         primaryButton = findViewById(R.id.pairPrimaryButton);
         cancelButton = findViewById(R.id.pairCancelButton);
+        UiSounds.warmUp(this);
 
         primaryButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -201,6 +203,15 @@ public class PairQrActivity extends Activity {
         }
     }
 
+    /**
+     * 409: o Sunshine já tem um pedido de pareamento aberto com o mesmo uniqueid. Todos os clientes
+     * Moonlight do aparelho (este e o Moonlight original) usam o mesmo, então costuma ser um pedido
+     * por PIN deixado aberto no Moonlight original. Desligar e Ligar no PC limpa o pedido.
+     */
+    static int messageForHttpError(int code) {
+        return code == 409 ? R.string.openalt_pair_pending_elsewhere : R.string.openalt_pair_error;
+    }
+
     private String pcLabel(PairingUri uri) {
         return uri.pcName.isEmpty() ? getString(R.string.openalt_pc_unnamed) : uri.pcName;
     }
@@ -287,6 +298,9 @@ public class PairQrActivity extends Activity {
         PairState state;
         try {
             state = pm.pair(serverInfo, uri.pin);
+        } catch (HostHttpResponseException e) {
+            LimeLog.warning("OpenAlt: pairing error: " + e.getErrorCode() + " " + e.getMessage());
+            return getString(messageForHttpError(e.getErrorCode()), String.valueOf(e.getMessage()));
         } catch (IOException | XmlPullParserException e) {
             LimeLog.warning("OpenAlt: pairing error: " + e.getMessage());
             return getString(R.string.openalt_pair_error, String.valueOf(e.getMessage()));
@@ -322,6 +336,8 @@ public class PairQrActivity extends Activity {
             return getString(R.string.openalt_pair_save_failed);
         }
         stored.serverCert = pm.getPairedCert();
+        // Todos os endereços do QR, para achar o PC também fora de casa (pelo Tailscale)
+        KnownAddresses.save(this, details.uuid, uri.port, uri.hosts);
         binder.invalidateStateForComputer(details.uuid);
         return null;
     }
@@ -358,6 +374,7 @@ public class PairQrActivity extends Activity {
 
     private void showFailure(String text) {
         screen = Screen.FAILED;
+        UiSounds.play(this, UiSoundSynth.Sound.ERROR);
         progress.setVisibility(View.GONE);
         status.setText(text);
         primaryButton.setText(hasCamera() ? R.string.openalt_pair_scan_again : R.string.openalt_pair_done);
@@ -368,6 +385,7 @@ public class PairQrActivity extends Activity {
 
     private void showDone(String text) {
         screen = Screen.DONE;
+        UiSounds.play(this, UiSoundSynth.Sound.LAUNCH);
         progress.setVisibility(View.GONE);
         status.setText(text);
         primaryButton.setText(R.string.openalt_pair_done);

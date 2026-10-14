@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- OpenAlt: ícone de traço (Configurações) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:pathData="M4,6h16a1,1 0 0 1 1,1v10a1,1 0 0 1 -1,1h-16a1,1 0 0 1 -1,-1v-10a1,1 0 0 1 1,-1zM8,21h8"
+        android:strokeColor="@color/oa_text" android:strokeWidth="1.7" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" />
+</vector>

@@ -5,6 +5,8 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('openaltWindow', {
   toggleFullscreen: () => ipcRenderer.invoke('window:toggle-fullscreen'),
   isFullscreen: () => ipcRenderer.invoke('window:is-fullscreen'),
+  // labels: os textos do menu da bandeja, já no idioma do app (o processo principal não traduz)
+  toTray: (labels) => ipcRenderer.invoke('window:to-tray', labels),
   onFullscreen: (cb) => {
     if (typeof cb !== 'function') return;
     ipcRenderer.on('window:fullscreen', (_e, on) => cb(Boolean(on)));
@@ -27,12 +29,13 @@ contextBridge.exposeInMainWorld('openalt', {
   setMode: call('setMode'),
   setMirrorOf: call('setMirrorOf'),
   setOrientation: call('setOrientation'),
-  setAudio: call('setAudio'),
-  setUiScale: call('setUiScale'),
   setPreviewKind: call('setPreviewKind'),
   setPref: call('setPref'),
   esquecer: call('esquecer'),
   instalarSunshine: call('instalarSunshine'),
   instalarPermissao: call('instalarPermissao'),
   plan: call('plan'),
+  remote: call('remote'),
+  tailscaleSignIn: call('tailscaleSignIn'),
+  openLink: call('openLink'),
 });

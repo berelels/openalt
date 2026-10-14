@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>07 Uma área de trabalho só</title>
+<link rel="stylesheet" href="base.css"><link rel="stylesheet" href="devices.css">
+<style>
+body { background: linear-gradient(180deg, #FBF8F2, #EFE8DA); }
+nav { position: absolute; top: 32px; left: 64px; right: 64px; display: flex; justify-content: space-between; align-items: center; }
+nav ul { display: flex; gap: 30px; list-style: none; font-size: 15px; color: var(--muted); }
+nav .b { padding: 12px 22px; border-radius: 999px; background: var(--ink); color: var(--paper); font-weight: 600; font-size: 14px; }
+.top { position: absolute; top: 112px; left: 0; right: 0; text-align: center; }
+.chip { display: inline-flex; gap: 8px; align-items: center; padding: 7px 14px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: 13px; font-weight: 600; }
+.chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--sage); }
+h1 { margin-top: 18px; font-size: 68px; font-weight: 700; letter-spacing: -0.045em; line-height: 1.02; }
+h1 em { font-family: 'Newsreader'; font-weight: 400; font-style: italic; color: var(--red-ink); letter-spacing: -0.02em; }
+.top p { margin: 16px auto 0; width: 640px; font-size: 18px; line-height: 1.5; color: var(--muted); }
+.ctas { margin-top: 26px; display: inline-flex; gap: 12px; }
+.ctas > span { display: inline-flex; gap: 8px; align-items: center; padding: 14px 24px; border-radius: 999px; font-weight: 600; font-size: 15px; }
+.ctas .red { background: var(--red); } .ctas .out { border: 1.5px solid var(--ink); }
+/* papel de parede contínuo: preso à janela, aparece em todas as telas como uma só */
+.cont { position: absolute; inset: 0; background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900'><rect width='1440' height='900' fill='%23FBE3D6'/><path d='M0 760C220 600 420 820 720 640S1180 520 1440 700V900H0Z' fill='%23FF746C'/><path d='M0 840C260 700 520 900 820 760S1220 660 1440 800V900H0Z' fill='%234A7350'/><path d='M120 620C360 540 560 700 780 600S1140 480 1340 560' fill='none' stroke='%2326211B' stroke-width='14' stroke-linecap='round'/><circle cx='1180' cy='610' r='46' fill='%23F2B33D'/></svg>") 0 0 / 1440px 900px no-repeat;
+  background-attachment: fixed; }
+.stage { position: absolute; left: 0; right: 0; top: 460px; height: 440px; }
+.L { position: absolute; left: 400px; top: 0; }
+.T { position: absolute; left: 1060px; top: 70px; }
+.P { position: absolute; left: 250px; top: 60px; }
+.wn { position: absolute; border-radius: 6px; background: #FFFDF8; box-shadow: 0 10px 24px -10px rgba(0,0,0,.35); overflow: hidden; }
+.wn::before { content: ''; display: block; height: 14px; background: #EFE8DA; }
+.wn .ln { margin: 8px 10px; height: 6px; border-radius: 3px; background: #E3DACB; }
+.wn .ln.s { width: 50%; }
+.label { position: absolute; font-family: 'JetBrains Mono'; font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+svg.drag { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; pointer-events: none; }
+</style></head><body>
+<nav>
+  <span class="logo"><svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg><span>Open<em>Alt</em></span></span>
+  <ul><li>New screen</li><li>Mirror</li><li>Games</li><li>Away</li><li>FAQ</li></ul>
+  <span class="b">Download</span>
+</nav>
+<div class="top">
+  <span class="chip"><i></i>Freedom to stream anywhere, for anyone</span>
+  <h1>One desktop. <em>Every screen</em> you own.</h1>
+  <p>Drag a window from your monitor to your tablet like it was always there. OpenAlt makes your phone or tablet part of the same desktop.</p>
+  <div class="ctas"><span class="red"><span class="ms">download</span>Download for Linux</span><span class="out">See it in action</span></div>
+</div>
+<div class="stage">
+  <div class="P"><div class="phn" style="--w:140px"><i class="btn-l1"></i><i class="btn-l2"></i><i class="btn-r"></i><div class="bz"><div class="scr"><div class="cont"></div><div class="island"></div><div class="status" style="color:#26211B"><span>9:41</span><span class="ms">battery_full</span></span></div><div class="wn" style="left:10%;right:10%;top:22%;height:30%"><div class="ln"></div><div class="ln s"></div></div><div class="home"></div></div></div></div></div>
+  <div class="L"><div class="lap" style="--w:640px"><div class="lid"><div class="scr"><div class="cont"></div>
+    <div class="wn" style="left:8%;top:12%;width:44%;height:58%"><div class="ln"></div><div class="ln"></div><div class="ln s"></div></div>
+    <div class="wn" style="left:58%;top:30%;width:52%;height:46%"><div class="ln"></div><div class="ln s"></div></div></div></div><div class="deck"></div><div class="shadow"></div></div></div>
+  <div class="T"><div class="tab" style="--w:300px"><div class="bz"><div class="scr"><div class="cont"></div>
+    <div class="wn" style="left:-8%;top:30%;width:60%;height:48%"><div class="ln"></div><div class="ln s"></div></div></div></div></div></div>
+  <span class="label" style="left:258px;top:-26px">PHONE · LEFT</span><span class="label" style="left:1066px;top:44px">TABLET · RIGHT</span>
+</div>
+</body></html>

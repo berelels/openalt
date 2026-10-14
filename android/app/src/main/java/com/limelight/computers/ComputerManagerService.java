@@ -638,6 +638,14 @@ public class ComputerManagerService extends Service {
         startParallelPollThread(remoteInfo, uniqueAddresses);
         startParallelPollThread(ipv6Info, uniqueAddresses);
 
+        // OpenAlt: também os endereços do QR (casa e Tailscale), depois dos do Moonlight
+        java.util.List<ParallelPollTuple> openAltInfo = new java.util.ArrayList<>();
+        for (dev.cattastudios.openalt.KnownAddresses.Entry e : dev.cattastudios.openalt.KnownAddresses.get(this, details.uuid)) {
+            ParallelPollTuple t = new ParallelPollTuple(new ComputerDetails.AddressTuple(e.host, e.port), details);
+            startParallelPollThread(t, uniqueAddresses);
+            openAltInfo.add(t);
+        }
+
         try {
             // Check local first
             synchronized (localInfo) {
@@ -686,7 +694,25 @@ public class ComputerManagerService extends Service {
                     return ipv6Info.returnedDetails;
                 }
             }
+
+            // OpenAlt: os endereços do QR, na ordem dele
+            for (ParallelPollTuple t : openAltInfo) {
+                synchronized (t) {
+                    while (!t.complete) {
+                        t.wait();
+                    }
+
+                    if (t.returnedDetails != null) {
+                        t.returnedDetails.activeAddress = t.address;
+                        return t.returnedDetails;
+                    }
+                }
+            }
         } finally {
+            // OpenAlt
+            for (ParallelPollTuple t : openAltInfo) {
+                t.interrupt();
+            }
             // Stop any further polling if we've found a working address or we've been
             // interrupted by an attempt to stop polling.
             localInfo.interrupt();

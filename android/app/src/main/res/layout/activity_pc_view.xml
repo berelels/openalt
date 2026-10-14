@@ -27,29 +27,11 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <LinearLayout
+            <!-- "Open" + "Alt" num texto só: nunca quebra linha, diminui se não couber -->
+            <dev.cattastudios.openalt.WordmarkView
+                style="@style/OpenAlt.Wordmark"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:contentDescription="@string/openalt_app_name"
-                android:importantForAccessibility="yes">
-                <TextView
-                    style="@style/OpenAlt.Wordmark"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:importantForAccessibility="no"
-                    android:text="Open"
-                    tools:ignore="HardcodedText" />
-                <TextView
-                    style="@style/OpenAlt.Wordmark"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:importantForAccessibility="no"
-                    android:text="Alt"
-                    android:textColor="@color/oa_accent"
-                    android:textStyle="italic"
-                    tools:ignore="HardcodedText" />
-            </LinearLayout>
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:layout_width="wrap_content"

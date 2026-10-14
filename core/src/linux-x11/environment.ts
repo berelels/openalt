@@ -5,7 +5,7 @@ import { access, readdir, readlink } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import type { Runner } from '../proc.ts';
 import { drmConnectorFor, listDrmConnectors, parseConnectorIds } from './drm.ts';
-import { DEFAULT_HELPER } from './extend.ts';
+import { DEFAULT_HELPER, helperAuthorized } from './extend.ts';
 import { getMutterState } from './mutter.ts';
 import { pickOutput } from './virtual-display.ts';
 import { parseXrandrQuery } from './xrandr.ts';
@@ -31,7 +31,11 @@ export type Support = 'ok' | 'untested' | 'needs-setup' | 'unsupported';
 export interface Check {
   id: string;
   status: Support;
+  /** em pt-BR (CLI e registros) */
   message: string;
+  /** para a interface traduzir: chave do texto e os valores que entram nele */
+  key: string;
+  vars?: Record<string, string>;
 }
 
 export interface Assessment {
@@ -50,38 +54,46 @@ const worst = (...s: Support[]): Support =>
 
 export function assessEnvironment(f: EnvFacts): Assessment {
   const checks: Check[] = [];
-  const add = (id: string, status: Support, message: string) => checks.push({ id, status, message });
+  const add = (id: string, status: Support, message: string, key: string, vars?: Record<string, string>) =>
+    checks.push({ id, status, message, key: `env.${id}.${key}`, ...(vars ? { vars } : {}) });
 
   const x11 = f.sessionType === 'x11';
   add('session', x11 ? 'ok' : 'unsupported',
-    x11 ? 'Sessão X11.' : `Sessão "${f.sessionType || 'desconhecida'}": por enquanto o OpenAlt funciona só em X11 (Wayland está nos planos).`);
+    x11 ? 'Sessão X11.' : `Sessão "${f.sessionType || 'desconhecida'}": por enquanto o OpenAlt funciona só em X11 (Wayland está nos planos).`,
+    x11 ? 'ok' : 'bad', { session: f.sessionType });
 
   const gnome = /gnome/i.test(f.desktop);
   const mutterOk = gnome && f.mutter;
   add('desktop', mutterOk ? 'ok' : 'unsupported',
     mutterOk ? 'Área de trabalho GNOME.'
       : gnome ? 'GNOME detectado, mas ele não respondeu sobre os monitores.'
-      : `Área de trabalho "${f.desktop || 'desconhecida'}": a "Nova tela" por enquanto só funciona no GNOME.`);
+      : `Área de trabalho "${f.desktop || 'desconhecida'}": a "Nova tela" por enquanto só funciona no GNOME.`,
+    mutterOk ? 'ok' : gnome ? 'mute' : 'bad', { desktop: f.desktop });
 
   const untestedGpus = f.gpuDrivers.filter((d) => !TESTED_DRIVERS.includes(d));
   add('gpu', f.gpuDrivers.length === 0 ? 'untested' : untestedGpus.length ? 'untested' : 'ok',
     f.gpuDrivers.length === 0 ? 'Placa de vídeo não identificada.'
       : untestedGpus.length ? `Placa de vídeo (${untestedGpus.join(', ')}) ainda não testada com o OpenAlt; pode funcionar.`
-      : `Placa de vídeo testada (${f.gpuDrivers.join(', ')}).`);
-  if (f.gpuDrivers.length > 1) add('multi-gpu', 'untested', 'Mais de uma placa de vídeo: combinação ainda não testada.');
+      : `Placa de vídeo testada (${f.gpuDrivers.join(', ')}).`,
+    f.gpuDrivers.length === 0 ? 'unknown' : untestedGpus.length ? 'untested' : 'ok',
+    { drivers: (untestedGpus.length ? untestedGpus : f.gpuDrivers).join(', ') });
+  if (f.gpuDrivers.length > 1) add('multi-gpu', 'untested', 'Mais de uma placa de vídeo: combinação ainda não testada.', 'untested');
 
   const hasFree = f.freeOutputs.length > 0;
   add('free-output', hasFree ? 'ok' : 'unsupported',
     hasFree ? `Saída de vídeo livre: ${f.freeOutputs[0]}.`
-      : 'Nenhuma saída de vídeo livre (todas em uso). Um adaptador "dummy" HDMI/DisplayPort resolve.');
+      : 'Nenhuma saída de vídeo livre (todas em uso). Um adaptador "dummy" HDMI/DisplayPort resolve.',
+    hasFree ? 'ok' : 'bad', { output: f.freeOutputs[0] ?? '' });
 
   if (hasFree) {
     add('connector', f.connectorMapped ? 'ok' : 'unsupported',
-      f.connectorMapped ? 'Saída livre identificada no sistema.' : 'Não foi possível identificar com segurança a saída livre no sistema.');
+      f.connectorMapped ? 'Saída livre identificada no sistema.' : 'Não foi possível identificar com segurança a saída livre no sistema.',
+      f.connectorMapped ? 'ok' : 'bad');
   }
 
   add('helper', f.helperInstalled ? 'ok' : 'needs-setup',
-    f.helperInstalled ? 'Permissão do sistema instalada.' : 'Falta instalar a permissão do sistema (pedida uma vez, na instalação).');
+    f.helperInstalled ? 'Permissão do sistema instalada.' : 'Falta instalar a permissão do sistema (pedida uma vez, na instalação).',
+    f.helperInstalled ? 'ok' : 'missing');
 
   const status = (id: string) => checks.find((c) => c.id === id)?.status ?? 'ok';
   const base = worst(status('session'), status('gpu'), status('multi-gpu'), status('free-output'));
@@ -135,6 +147,8 @@ export async function gatherFacts(run: Runner, env: NodeJS.ProcessEnv = process.
     }
   }
 
-  facts.helperInstalled = await access(process.env.OPENALT_HELPER ?? DEFAULT_HELPER).then(() => true, () => false);
+  // Instalada = o ajudante roda sem senha (a política do polkit libera), não só o arquivo existir
+  facts.helperInstalled = await access(process.env.OPENALT_HELPER ?? DEFAULT_HELPER).then(() => true, () => false)
+    && await helperAuthorized(run);
   return facts;
 }

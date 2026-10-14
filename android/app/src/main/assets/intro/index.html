@@ -1,0 +1,28 @@
+<!doctype html>
+<!-- OpenAlt: a abertura do app do PC dentro do app Android (StartActivity). intro.js é cópia de
+     desktop/dist/renderer/intro.js (scripts/sync-android-intro.mjs); intro.css é cópia de
+     desktop/src/renderer/styles/intro.css. Sem rede: só esta página e o intro.js. -->
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
+<style>
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+</style>
+<link rel="stylesheet" href="intro.css">
+</head>
+<body>
+<div class="intro boot" id="intro"></div>
+<script src="intro.js"></script>
+<script>
+  (function () {
+    // ?music=0 quando os "Sons da interface" estão desligados
+    var music = new URLSearchParams(location.search).get('music') !== '0';
+    var root = document.getElementById('intro');
+    var done = function () { location.href = 'openalt-intro:done'; };
+    playIntro(root, function () {}, { music: music }).then(done, done);
+  })();
+</script>
+</body>
+</html>

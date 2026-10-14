@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- OpenAlt: assistente "Mapear botões" (ButtonMapActivity) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/oa_bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="32dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxWidth="640dp"
+        android:background="@drawable/oa_accent_card_bg"
+        android:orientation="vertical"
+        android:padding="28dp">
+
+        <TextView
+            android:id="@+id/oaMapStep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:textColor="@color/oa_accent_ink"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/oaMapTitle"
+            style="@style/OpenAlt.Wordmark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/oa_accent_ink"
+            android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/oaMapHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/oa_accent_ink"
+            android:textSize="15sp" />
+
+        <ProgressBar
+            android:id="@+id/oaMapProgress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_marginTop="18dp"
+            android:progressTint="@color/oa_accent_ink" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/oaMapSkip"
+                style="@style/OpenAlt.PillButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:text="@string/openalt_map_skip" />
+
+            <Button
+                android:id="@+id/oaMapCancel"
+                style="@style/OpenAlt.PillButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:text="@string/openalt_map_cancel" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

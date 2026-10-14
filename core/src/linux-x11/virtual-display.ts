@@ -58,15 +58,6 @@ export function requestFromEnv(env: NodeJS.ProcessEnv): DisplayRequest {
   return normalizeRequest({ ...size, fps: inRange(fps, LIMITS.fps) ? fps : DEFAULT_REQUEST.fps });
 }
 
-/** Resolução do monitor virtual para a interface ficar `percent`% maior no aparelho. */
-export function scaleRequest(req: DisplayRequest, percent: number): DisplayRequest {
-  if (!(percent >= 100 && percent <= 300)) throw new RangeError(`Escala fora do suportado: ${percent}`);
-  const k = 100 / percent;
-  const width = Math.max(LIMITS.width[0], Math.round(req.width * k));
-  const height = Math.max(LIMITS.height[0], Math.round(req.height * k));
-  return normalizeRequest({ width, height, fps: req.fps });
-}
-
 export function modeName(req: DisplayRequest): string {
   return `${MODE_PREFIX}${req.width}x${req.height}_${req.fps}`;
 }

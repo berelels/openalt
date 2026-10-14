@@ -20,6 +20,9 @@ genéricos, não só o do PC de testes.
 - **Não crie arquivos fora desta pasta** (`~/Documentos/Projetos/Apps/OpenAlt`). Nada em Downloads. Temporários vão para o scratchpad da sessão.
 - **Backup** antes de editar configs de terceiros (`apps.json`, `sunshine.conf` etc.) em `.backup/` (fora do git).
 - Avise o usuário sempre que usar uma skill.
+- **Respostas diretas:** mostre só o que mudou (trechos ou diffs), sem introdução nem recap do que foi feito.
+- **Sem resumos automáticos:** não crie `.md` de resumo, changelog ou relatório sem pedido explícito. Documentação só quando estiver prevista na seção Skills ou for pedida.
+- **Refatoração ampla:** liste o plano em até 5 itens e aguarde confirmação. Não altere código fora do escopo pedido.
 
 ## Segurança (obrigatório; ver ADR-0006)
 - Credenciais aleatórias, arquivos 0600, nunca em log, tela ou saída da CLI.
@@ -32,7 +35,8 @@ genéricos, não só o do PC de testes.
 - `core/`: `@openalt/core`, TypeScript rodando direto no Node ≥ 24 (sem build). Só sintaxe apagável (`erasableSyntaxOnly`), imports com `.ts`. Código por plataforma em `core/src/<plataforma>/`; `core/src/layout.ts` é independente de plataforma. CLI: `core/src/cli.ts` (`display extend|layout|mirror|down|status|up`, saída JSON; `--help`).
 - "Nova tela" no GNOME exige o ajudante root `core/helper/openalt-helper` (ADR-0009). Nunca rodar `extend` sem avisar: as telas do usuário podem piscar e se mover.
 - O celular pode ficar à direita, à esquerda, acima ou abaixo de qualquer monitor (`--anchor --side --align`); "Espelhar" pode espelhar qualquer monitor (`--of`).
-- Áudio: tocar no celular **e** no PC (opção "áudio no host" ligada por padrão). Testar no próprio PC causa eco em loop; é esperado.
+- Áudio: o Sunshine sempre transmite o som; onde ele toca é a opção "Tocar áudio no PC" do app do aparelho (ADR-0013).
+- Reinício do GNOME (X11) depois que a Nova tela entra/sai: pela extensão do OpenAlt (`core/gnome-shell/openalt@cattastudios.dev`, D-Bus `dev.cattastudios.OpenAlt.Shell.Restart`); reserva: Alt+F2 → r. O app instala a extensão ao Ligar. **Nunca** testar GNOME aninhado com `dbus-run-session`: o dconf ativado grava no dconf real.
 - Nunca capturar a tela inteira do usuário (pode haver reunião/dados); no máximo a área do monitor virtual.
 - Testes: `npm test` (unidade, executor falso, não mexe na tela) · `npm run typecheck`.
 - `core` compila para `core/dist` (`npm run build -w @openalt/core`); o app (desktop) e a ponte do Sunshine usam o JS compilado, rodado pelo Node do Electron (`ELECTRON_RUN_AS_NODE=1`).
@@ -40,13 +44,14 @@ genéricos, não só o do PC de testes.
 - `desktop/`: `src/main` (processo principal + `controller.ts`), `src/preload/preload.cjs` (ponte mínima), `src/renderer` (interface + `intro.ts`).
 - Monitor virtual: modos com prefixo `OA_`; a remoção apaga tudo com esse prefixo.
 - `android/`: fork do Moonlight Android 12.2 (ADR-0012; `moonlight-common-c` é submódulo). Código novo em `android/app/src/main/java/dev/cattastudios/openalt/`; mudanças em arquivos do Moonlight marcadas com "OpenAlt:" e mínimas (para `git subtree pull`). A nuvem não alcança `dl.google.com`: o build e os testes Android rodam no GitHub Actions (`.github/workflows/android.yml`).
-- Textos da interface em pt-BR primeiro (en/es depois).
+- Idiomas: pt-BR, espanhol e inglês; vale o do sistema (se não for nenhum dos três, inglês), e a pessoa troca na aba Sobre. PC: `desktop/src/renderer/i18n.ts` (`t('chave', {valores})`); o processo principal e o núcleo mandam CHAVES (`UiText`, `Check.key`, `LayoutError.code`), não frases. Android: `values/strings_openalt.xml` (inglês, padrão), `values-pt/`, `values-es/`. Texto novo entra nos três; `desktop/test/i18n.test.mjs` confere.
 
 ## Design
+- **Site** (`site/`, GitHub Pages, sem build): estilo "papel quadriculado" (proposta 20), slogan **"Empowering anyone to stream anywhere"**. Aparelhos PLANOS (`.fd-*`, traço de tinta), não realistas. GSAP 3.13 local em `site/vendor/` (licença própria, não GPL). Revisar com `scripts/capture-site.mjs` (desktop/mobile/reduced). Ver `site/README.md`.
 - App: família Respiro/Pauca, em **painel de cartões** (trilho de ícones à esquerda, título grande + pílulas no topo, grade de cartões; aprovado pelo usuário em 2026-10-12). Papel #F6F1E7, tinta #26211B, Newsreader + Plus Jakarta Sans locais, raios 12/20/28, easing cubic-bezier(0.22,1,0.36,1), textura de papel, claro/escuro.
 - **Destaque vermelho #FF746C** (pedido do usuário). Contraste AA medido: #FF746C só como FUNDO com texto escuro; texto vermelho no papel claro = `--accent-text` #B8372F; erro = vinho (#8E2A47 / #F59BB0). Segundo cartão de destaque: sálvia (#4A7350 claro / #8FBF92 escuro).
 - **Logo:** traço feito à mão que se bifurca (o caminho do Alt) e termina na laçada do Respiro. Ícone: **traço escuro #26211B sobre #FF746C** (`docs/design/logo/`).
-- **Abertura toda vez que abre** (como o Big Picture): os mesmos dois traços pastel se redesenham controle → monitor → celular → logo; a cortina vermelha sobe como gelatina (borda ondulada, imperfeita) e o painel entra junto. Pula com clique/tecla; respeita "reduzir movimento". `desktop/src/renderer/intro.ts`.
+- **Abertura toda vez que abre** (como o Big Picture): os mesmos dois traços pastel se redesenham controle → monitor → celular → logo; a cortina vermelha sobe como gelatina (borda ondulada, imperfeita) e o painel entra junto. Pula com clique/tecla (no site não); respeita "reduzir movimento". Música curta feita em Web Audio, presa aos traços; embaixo, "Made by Catta Studios". `desktop/src/renderer/intro.ts`, copiada para o Android e o site por `scripts/sync-android-intro.mjs`.
 - **Abre em tela cheia**; Esc, F11 ou botão saem.
 - Aparelho = **celular ou tablet, em pé ou deitado** — nunca assumir celular em pé.
 - Catta Studios (site/créditos): `../berelels/css/style.css` (papel #F4F2EC, azul #3F6CA8, Inter + JetBrains Mono, gato); assinatura "\ catta studios".

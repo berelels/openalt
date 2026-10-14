@@ -351,12 +351,6 @@ button.tile.compact small, button.tile.tiny span { display: none; }
 .rail-end { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .theme-toggle.vertical { flex-direction: column; }
 .theme-toggle.vertical button { width: 30px; height: 30px; }
-.rail-catta {
-  width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center;
-  font-family: var(--font-serif); font-style: italic; font-size: 20px; color: var(--accent-text);
-  border: 1.5px solid var(--border-strong); background: var(--card-solid);
-}
-
 .main { position: relative; min-width: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 .scroller { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 26px 34px 56px; }
 .scroller::-webkit-scrollbar { width: 12px; }
@@ -522,6 +516,7 @@ button.tile.compact small, button.tile.tiny span { display: none; }
 .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
 .switch-title { display: block; font-weight: 600; font-size: 13px; }
 .switch-hint { display: block; font-size: 11.5px; color: var(--muted); }
+.audio-note { margin-top: 8px; }
 .switch {
   appearance: none; flex-shrink: 0; width: 38px; height: 22px; border-radius: 99px;
   background: var(--border-strong); position: relative; cursor: pointer; transition: background 0.3s var(--ease);
@@ -543,25 +538,8 @@ button.tile.compact small, button.tile.tiny span { display: none; }
 .device-illu { border-color: #1f1b16; background: #1f1b16; }
 :root[data-theme='dark'] .device-illu { box-shadow: 0 0 0 1px rgba(255, 240, 220, 0.14), 0 24px 48px -20px rgba(0, 0, 0, 0.7); }
 
-/* ══ Abertura ═══════════════════════════════════════════════════════════════ */
-.intro { position: fixed; inset: 0; z-index: 1000; cursor: pointer; }
-.intro.boot { background: #ff746c; }
-.intro-curtain { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.intro-curtain path { fill: #ff746c; }
-.intro-mark {
-  position: absolute; left: 50%; top: 50%; width: min(44vmin, 360px); height: min(44vmin, 360px);
-  margin: calc(min(44vmin, 360px) / -2) 0 0 calc(min(44vmin, 360px) / -2);
-  fill: none; stroke: #fff0e6; stroke-width: 30; stroke-linecap: round; stroke-linejoin: round;
-  overflow: visible; will-change: transform, opacity;
-}
-.intro-skip {
-  position: absolute; left: 0; right: 0; bottom: 36px; text-align: center;
-  font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em; color: rgba(38, 33, 27, 0.78);
-  opacity: 0; animation: introHint 0.6s var(--ease) 1.4s forwards; transition: opacity 0.2s;
-}
-@keyframes introHint { to { opacity: 1; } }
-.intro.fade-out { animation: introFade 0.9s var(--ease) forwards; }
-@keyframes introFade { 0%, 45% { opacity: 1; } 100% { opacity: 0; } }
+/* ══ Abertura: styles/intro.css (só aqui: clicar pula) ══ */
+.intro { cursor: pointer; }
 
 /* As entradas do painel esperam a cortina subir */
 body:not(.ready) .fade-up { animation-play-state: paused; }
@@ -580,3 +558,49 @@ body:not(.ready) .fade-up { animation-play-state: paused; }
 #view.settled .fade-up { animation: none; }
 .pin-name { width: 17ch; font: inherit; font-size: 14px; padding: 8px 10px; border-radius: 10px; border: 1.5px solid var(--border-strong); background: transparent; color: inherit; }
 .pin-name:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
+
+/* Fora de casa (Tailscale) */
+.remote-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 12px; margin-top: 14px; position: relative; z-index: 1; }
+@media (max-width: 860px) { .remote-grid { grid-template-columns: 1fr; } }
+.remote-box { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: var(--r-sm); background: color-mix(in srgb, currentColor 10%, transparent); }
+.remote-label { font-size: 12px; font-weight: 600; opacity: 0.9; }
+.remote-ip { font-family: ui-monospace, 'JetBrains Mono', monospace; font-size: 17px; }
+.remote-devices { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.remote-devices li { display: flex; align-items: center; gap: 10px; font-size: 13.5px; }
+.remote-devices .ms { font-size: 20px; }
+.remote-dev-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.remote-dev-state { font-size: 12.5px; opacity: 0.9; }
+.card.sage .pill.remote-ok { background: color-mix(in srgb, currentColor 16%, transparent); color: inherit; }
+.remote-cmd-row { list-style: none; padding: 0 0 12px 46px; }
+.remote-cmd { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.remote-cmd code { font-family: ui-monospace, 'JetBrains Mono', monospace; font-size: 13px; padding: 8px 12px; border-radius: var(--r-xs); background: var(--bg-deep); }
+.remote-auto { margin-top: 10px; }
+.card-hint + .checks { margin-top: 10px; }
+
+/* ══ Tour guiado (tour.ts) ═════════════════════════════════════════════════
+   A tela escurece em volta do recorte; o cartão é o do site: canto reto, contorno de tinta,
+   sombra dura. A camada por cima pega os cliques: o tour só mostra, não mexe no app. */
+.tour { position: fixed; inset: 0; z-index: 900; }
+.tour-shade { position: absolute; inset: 0; }
+.tour.no-hole .tour-shade { background: rgba(20, 17, 13, 0.62); }
+.tour-hole {
+  position: fixed; box-shadow: 0 0 0 200vmax rgba(20, 17, 13, 0.62);
+  outline: 2px solid var(--accent); outline-offset: 0; pointer-events: none;
+  transition: left 0.35s var(--ease), top 0.35s var(--ease), width 0.35s var(--ease), height 0.35s var(--ease);
+}
+.tour-card {
+  position: fixed; width: min(360px, calc(100vw - 32px)); box-sizing: border-box; padding: 20px 20px 16px;
+  background: var(--card-solid); color: var(--text); border: 1.5px solid var(--hard, #26211b);
+  box-shadow: 6px 6px 0 var(--hard, #26211b);
+  transition: left 0.35s var(--ease), top 0.35s var(--ease);
+}
+.tour-count {
+  margin: 0 0 8px; font-family: var(--font-mono, ui-monospace, monospace); font-size: 11.5px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-text);
+}
+.tour-title { margin: 0 0 8px; font-family: var(--font-serif); font-weight: 400; font-size: 30px; line-height: 1.05; letter-spacing: -0.02em; }
+.tour-text { margin: 0 0 18px; font-size: 14.5px; line-height: 1.5; color: var(--text-soft); }
+.tour-actions { display: flex; align-items: center; gap: 8px; }
+.tour-gap { flex: 1; }
+.tour-actions .btn.ghost { padding-left: 0; }
+@media (prefers-reduced-motion: reduce) { .tour-hole, .tour-card { transition: none; } }

@@ -57,6 +57,14 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/category_gamepad_settings"
         android:key="category_gamepad_settings">
+        <!-- OpenAlt: nomes dos botões no launcher (Xbox, PlayStation ou Nintendo) -->
+        <ListPreference
+            android:key="openalt_controller_style"
+            android:defaultValue="auto"
+            android:entries="@array/openalt_controller_style_names"
+            android:entryValues="@array/openalt_controller_style_values"
+            android:summary="@string/openalt_pref_controller_summary"
+            android:title="@string/openalt_pref_controller_title" />
         <com.limelight.preferences.SeekBarPreference
             android:key="seekbar_deadzone"
             android:defaultValue="7"
@@ -204,6 +212,12 @@
             android:title="@string/title_checkbox_host_audio"
             android:summary="@string/summary_checkbox_host_audio"
             android:defaultValue="false" />
+        <!-- OpenAlt: sons da interface (mover, escolher, voltar, conectar) -->
+        <CheckBoxPreference
+            android:key="openalt_ui_sounds"
+            android:title="@string/openalt_pref_ui_sounds_title"
+            android:summary="@string/openalt_pref_ui_sounds_summary"
+            android:defaultValue="true" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/category_ui_settings"
         android:key="category_ui_settings">
@@ -293,5 +307,25 @@
             android:persistent="false"
             android:title="@string/openalt_app_name"
             android:summary="@string/openalt_about_text"/>
+        <com.limelight.preferences.WebLauncherPreference
+            android:title="@string/openalt_link_openalt"
+            android:summary="@string/openalt_link_openalt_summary"
+            url="https://github.com/berelels/openalt"/>
+        <com.limelight.preferences.WebLauncherPreference
+            android:title="@string/openalt_link_moonlight"
+            android:summary="@string/openalt_link_moonlight_summary"
+            url="https://github.com/moonlight-stream/moonlight-android"/>
+        <com.limelight.preferences.WebLauncherPreference
+            android:title="@string/openalt_link_common"
+            android:summary="@string/openalt_link_common_summary"
+            url="https://github.com/moonlight-stream/moonlight-common-c"/>
+        <com.limelight.preferences.WebLauncherPreference
+            android:title="@string/openalt_link_sunshine"
+            android:summary="@string/openalt_link_sunshine_summary"
+            url="https://github.com/LizardByte/Sunshine"/>
+        <com.limelight.preferences.WebLauncherPreference
+            android:title="@string/openalt_link_catta"
+            android:summary="@string/openalt_link_catta_summary"
+            url="https://berelels.github.io"/>
     </PreferenceCategory>
 </PreferenceScreen>

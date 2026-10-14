@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- OpenAlt: opção das Configurações; foco = sombra dura -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true"><layer-list>
+    <item android:left="4dp" android:top="4dp"><shape android:shape="rectangle"><solid android:color="@color/oa_hard" /></shape></item>
+    <item android:right="4dp" android:bottom="4dp"><shape android:shape="rectangle"><solid android:color="@color/oa_surface" /><stroke android:width="1.5dp" android:color="@color/oa_border" /></shape></item>
+</layer-list></item>
+    <item android:state_pressed="true"><shape android:shape="rectangle"><solid android:color="@color/oa_bg" /><stroke android:width="1.5dp" android:color="@color/oa_border" /></shape></item>
+    <item><shape android:shape="rectangle"><solid android:color="@color/oa_surface" /><stroke android:width="1.5dp" android:color="@color/oa_border" /></shape></item>
+</selector>

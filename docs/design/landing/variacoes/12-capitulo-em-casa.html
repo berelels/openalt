@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>12 Capítulo 1: em casa</title>
+<link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="../devices.css">
+<style>
+body { background: #0E0C0B; color: #F3EEE6; }
+.room { position: absolute; inset: 0; background: radial-gradient(60% 70% at 76% 30%, rgba(255,116,108,.28), transparent 70%), radial-gradient(40% 50% at 10% 100%, rgba(143,191,146,.22), transparent 70%); }
+.window { position: absolute; left: 860px; top: 120px; width: 300px; height: 260px; border-radius: 150px 150px 12px 12px; background: linear-gradient(180deg, #2b2448, #8b3a62 70%, #ff746c); border: 6px solid #2A231D; overflow: hidden; }
+.window::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 6px; background: #2A231D; transform: translateX(-50%); }
+.window::after { content: ''; position: absolute; left: 60px; top: 46px; width: 54px; height: 54px; border-radius: 50%; background: #F3EEE6; box-shadow: 0 0 40px rgba(243,238,230,.6); }
+.window i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff; }
+.floor { position: absolute; left: 0; right: 0; bottom: 0; height: 170px; background: #1A1512; border-top: 1px solid rgba(255,255,255,.06); }
+.mesa { position: absolute; left: 700px; right: 140px; bottom: 170px; height: 18px; background: #6B4A33; border-radius: 4px; }
+.mesa::before, .mesa::after { content: ''; position: absolute; top: 18px; width: 14px; height: 152px; background: #4E3626; }
+.mesa::before { left: 30px; } .mesa::after { right: 30px; }
+.pc { position: absolute; left: 740px; bottom: 188px; z-index: 2; }
+.char { left: 940px; top: 300px; transform: scale(.8); transform-origin: top center; z-index: 3;
+  --ln: #F3EEE6; --ft: #26211B; --face: #F3EEE6; --hair: #3A322B; --b1: #4A7350; --b2: #FF746C; --in: #0E0C0B; }
+.char .bubbles path:nth-child(1), .char .bubbles rect, .char .bubbles path:nth-child(3) { display: none; }
+nav { position: absolute; top: 34px; left: 64px; right: 64px; display: flex; align-items: center; justify-content: space-between; z-index: 5; }
+.logo { color: #F3EEE6; } .logo em { color: var(--red); }
+nav .dl { padding: 11px 20px; border-radius: 999px; background: #F6F1E7; color: #14110E; font-weight: 600; font-size: 14px; }
+.copy { position: absolute; left: 64px; top: 170px; width: 560px; z-index: 5; }
+.eyebrow { font-family: 'JetBrains Mono'; font-size: 13px; letter-spacing: .1em; color: var(--red); }
+h1 { margin-top: 16px; font-size: 72px; font-weight: 500; letter-spacing: -0.045em; line-height: 1.02; }
+h1 .fade { background: linear-gradient(90deg, #fff 30%, rgba(255,255,255,.4)); -webkit-background-clip: text; color: transparent; }
+.ch { margin-top: 40px; padding: 22px 24px; border-radius: 20px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); width: 440px; }
+.ch b { font-family: 'Newsreader'; font-weight: 400; font-size: 30px; letter-spacing: -0.02em; }
+.ch p { margin-top: 8px; font-size: 15px; line-height: 1.55; color: rgba(243,238,230,.7); }
+.rail { position: absolute; left: 64px; bottom: 56px; z-index: 5; display: flex; gap: 28px; align-items: center; font-size: 13px; color: rgba(243,238,230,.45); }
+.rail span { display: inline-flex; gap: 8px; align-items: center; }
+.rail i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid rgba(243,238,230,.4); }
+.rail .on { color: #F3EEE6; } .rail .on i { background: var(--red); border-color: var(--red); box-shadow: 0 0 12px var(--red); }
+.rail em { width: 40px; height: 1px; background: rgba(243,238,230,.2); }
+.scroll { position: absolute; right: 64px; bottom: 50px; z-index: 5; display: flex; gap: 10px; align-items: center; font-size: 13px; color: rgba(243,238,230,.8); }
+.scroll .ms { width: 34px; height: 34px; border-radius: 50%; background: #F6F1E7; color: #14110E; display: grid; place-items: center; font-size: 18px; }
+</style></head><body>
+<div class="room"></div>
+<div class="window"><i style="left:180px;top:40px"></i><i style="left:220px;top:90px"></i><i style="left:250px;top:30px"></i></div>
+<div class="floor"></div><div class="mesa"></div>
+<div class="pc"><div class="lap" style="--w:280px"><div class="lid"><div class="scr"><div class="game"><div class="sun"></div><div class="mt"></div><div class="car"></div></div></div></div><div class="deck"></div></div></div>
+<div class="char">
+<svg viewBox="0 0 600 560" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <g class="bubbles" transform="translate(-30 100)">
+    <path class="ln f-b1" d="M40 140c0-40 30-60 70-60s70 20 70 60-30 60-70 60c-12 0-22-2-30-6l-30 22 8-34c-12-12-18-26-18-42z"/>
+    <rect class="ln f-in" x="80" y="112" width="60" height="44" rx="6"/><path class="ln" d="M96 168h28"/>
+    <path class="ln f-b2" d="M380 110c0-44 34-70 80-70s80 26 80 70-34 70-80 70c-14 0-26-3-36-8l-34 24 8-38c-12-14-18-30-18-48z"/>
+    <path class="ln f-in" d="M418 98h84c14 0 22 12 22 26s-10 26-22 26c-10 0-16-8-22-14h-40c-6 6-12 14-22 14-12 0-22-12-22-26s8-26 22-26z"/>
+    <path class="ln" d="M432 116v14M425 123h14"/><circle class="f-ln" cx="486" cy="118" r="3"/><circle class="f-ln" cx="496" cy="128" r="3"/>
+  </g>
+  <path class="ln f-body" d="M150 560c-10-120 40-220 150-220s170 100 160 220z"/>
+  <path class="ln" d="M250 352c-10 60 0 120 40 200M340 350c10 60 0 120-30 200"/>
+  <path class="ln f-face" d="M262 250c0-34 18-58 46-58s46 24 46 58-18 64-46 64-46-30-46-64z"/>
+  <path class="ln f-hair" d="M262 236c-6-40 20-66 50-62 30 4 48 30 40 58-14-16-34-22-56-18-14 2-26 10-34 22z"/>
+  <path class="ln ft" d="M296 262c2 10 8 16 14 16M330 258h0M290 258h0" style="stroke-width:5"/>
+  <path class="ln ft" d="M300 286c8 6 18 6 26 0"/><path class="ln" d="M300 314v28M316 314v28"/>
+  <path class="ln f-face" d="M206 470c-20 10-30 30-20 46s40 12 50-6M424 430c20 6 30 26 22 44s-36 18-46 0"/>
+</svg>
+<div class="inphone"><div class="phn land dark" style="--w:96px"><div class="bz"><div class="scr"><div class="island"></div><div class="game"><div class="sun"></div><div class="mt"></div><div class="car"></div></div></div></div></div></div>
+</div>
+<nav><span class="logo"><svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg><span>Open<em>Alt</em></span></span><span class="dl">Download</span></nav>
+<div class="copy"><p class="eyebrow">CHAPTER 01 · 07:55 · AT HOME</p>
+  <h1>Freedom to stream<br><span class="fade">anywhere, for anyone.</span></h1>
+  <div class="ch"><b>The game is on the PC.</b><p>It’s time to leave — but the race isn’t over. Grab your phone: the PC keeps running at home and streams the game to you.</p></div></div>
+<div class="rail"><span class="on"><i></i>Home</span><em></em><span><i></i>On the way</span><em></em><span><i></i>Café</span><em></em><span><i></i>Anywhere</span></div>
+<div class="scroll"><span class="ms">south</span>Scroll to leave home</div>
+</body></html>

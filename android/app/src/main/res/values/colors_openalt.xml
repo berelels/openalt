@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Cores do OpenAlt: as mesmas do app do PC (desktop/src/renderer/styles/app.css). -->
+<!-- Cores do OpenAlt: as do site (site/css/site.css) e do app do PC (styles/site.css). -->
 <resources>
-    <color name="oa_bg">#F6F1E7</color>
-    <color name="oa_surface">#FCF9F3</color>
-    <color name="oa_border">#E6DDCB</color>
-    <color name="oa_border_strong">#D7CCB6</color>
+    <!-- papel quadriculado (planta baixa) -->
+    <color name="oa_bg">#EFE6D6</color>
+    <color name="oa_surface">#FBF6EE</color>
+    <!-- contorno de tinta (cartões, botões) e sombra dura -->
+    <color name="oa_border">#26211B</color>
+    <color name="oa_border_strong">#26211B</color>
+    <color name="oa_hard">#26211B</color>
+    <color name="oa_grid_1">#1F26211B</color>
+    <color name="oa_grid_2">#0D26211B</color>
     <color name="oa_text">#26211B</color>
-    <color name="oa_muted">#A326211B</color>
+    <color name="oa_muted">#6A6156</color>
     <!-- vermelho da marca: só como fundo, com texto escuro (6,05:1) -->
     <color name="oa_accent">#FF746C</color>
     <color name="oa_accent_ink">#26211B</color>
@@ -15,5 +20,5 @@
     <color name="oa_sage">#4A7350</color>
     <color name="oa_sage_ink">#FFFAF3</color>
     <color name="oa_pill">#26211B</color>
-    <color name="oa_pill_ink">#FFFAF3</color>
+    <color name="oa_pill_ink">#EFE6D6</color>
 </resources>

@@ -18,7 +18,9 @@ interface Monitor extends Rect { id: string; name: string; primary: boolean }
 interface Placement { anchor: string; side: Side; align: Align; offset: number }
 interface Device { name: string; kind: Kind; width: number; height: number; fps: number; network: 'local' | 'tailscale' }
 interface PairedDevice { id: string; name: string; kind: Kind; width: number; height: number; network: 'local' | 'tailscale'; lastSeen: string; live: boolean }
-interface Check { id: string; status: Support; message: string }
+interface Check { id: string; status: Support; message: string; key?: string; vars?: Record<string, string> }
+/** Texto vindo do processo principal: chave do i18n (com valores) ou texto cru. */
+type UiText = { key: string; vars?: Record<string, string | number> } | { text: string };
 
 interface State {
   phase: Phase;
@@ -27,13 +29,10 @@ interface State {
   placement: Placement;
   mode: Mode;
   mirrorOf: string;
-  audio: 'device' | 'pc' | 'both';
   rememberLayout: boolean;
   orientation: Orientation;
   /** Tipo usado na prévia enquanto nenhum aparelho está conectado. */
   previewKind: Kind;
-  /** tamanho da interface no aparelho, em % */
-  uiScale: number;
   maximizeOnDevice?: boolean;
   device: Device | null;
   paired: PairedDevice[];
@@ -43,10 +42,19 @@ interface State {
   setup: { sunshine: 'ok' | 'missing'; helper: 'ok' | 'missing' };
   checks: Check[];
   /** última falha a mostrar (ex.: portas do Sunshine em uso) */
-  error: string | null;
+  error: UiText | string | null;
 }
 
-type Plan = { layout: Record<string, Rect>; error?: undefined } | { layout?: undefined; error: string };
+/** "Fora de casa": o Tailscale oficial, como o processo principal o leu. */
+interface Remote {
+  state: 'missing' | 'stopped' | 'needs-login' | 'running' | 'unknown';
+  ip: string | null;
+  devices: { name: string; os: string; online: boolean; path: 'direct' | 'relay' | null }[];
+  /** o "Entrar" está rodando (senha do sistema ou login no navegador) */
+  signingIn?: boolean;
+}
+
+type Plan = { layout: Record<string, Rect>; error?: undefined } | { layout?: undefined; error: UiText | string };
 
 interface OpenAltApi {
   getState(): Promise<State>;
@@ -54,19 +62,20 @@ interface OpenAltApi {
   ligar(): Promise<void>;
   desligar(): Promise<void>;
   novoQr(): Promise<void>;
-  parearPin(pin: string, name?: string): Promise<{ ok: boolean; message: string }>;
+  parearPin(pin: string, name?: string): Promise<{ ok: boolean; message: UiText | string }>;
   setPlacement(p: Placement): Promise<void>;
   setMode(m: Mode): Promise<void>;
   setMirrorOf(id: string): Promise<void>;
   setOrientation(o: Orientation): Promise<void>;
-  setAudio(v: 'device' | 'pc' | 'both'): Promise<void>;
-  setUiScale(v: number): Promise<void>;
   setPreviewKind(k: Kind): Promise<void>;
   setPref(key: 'rememberLayout' | 'maximizeOnDevice', value: boolean): Promise<void>;
   esquecer(id: string): Promise<void>;
   instalarSunshine(): Promise<void>;
   instalarPermissao(): Promise<void>;
   plan(p: Placement, size: { width: number; height: number }): Promise<Plan>;
+  openLink?(name: string): Promise<void>;
+  remote?(): Promise<Remote>;
+  tailscaleSignIn?(): Promise<{ ok: boolean; message: UiText }>;
 }
 
 // ── utilidades ──────────────────────────────────────────────────────────────
@@ -78,17 +87,30 @@ function esc(s: unknown): string {
   return String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 }
 
-const SIDE_LABEL: Record<Side, string> = { right: 'à direita', left: 'à esquerda', above: 'acima', below: 'abaixo' };
+/** Texto do processo principal no idioma da interface (texto cru vem escapado). */
+function uiText(m: UiText | string | null | undefined): string {
+  if (!m) return '';
+  if (typeof m === 'string') return esc(m);
+  if ('key' in m) return t(m.key, Object.fromEntries(Object.entries(m.vars ?? {}).map(([k, v]) => [k, esc(v)])));
+  return esc(m.text);
+}
+
+const cap = (x: string) => (x ? x[0].toUpperCase() + x.slice(1) : x);
 const SIDE_ICON: Record<Side, string> = { right: 'east', left: 'west', above: 'north', below: 'south' };
-const ALIGN_LABEL: Record<Side, Record<Align, string>> = {
-  right: { start: 'Topo', center: 'Centro', end: 'Base' },
-  left: { start: 'Topo', center: 'Centro', end: 'Base' },
-  above: { start: 'Esquerda', center: 'Centro', end: 'Direita' },
-  below: { start: 'Esquerda', center: 'Centro', end: 'Direita' },
-};
-const KIND_LABEL: Record<Kind, string> = { phone: 'Celular', tablet: 'Tablet' };
+/** Alinhar ao longo do lado: em cima/embaixo para os lados, esquerda/direita para acima/abaixo. */
+function alignLabel(side: Side, a: Align): string {
+  const vertical = side === 'right' || side === 'left';
+  return t(a === 'center' ? 'align.middle' : vertical ? (a === 'start' ? 'align.top' : 'align.bottom') : a === 'start' ? 'align.left' : 'align.right');
+}
+const kindLabel = (k: Kind) => t(`kind.${k}`);
+const orientWord = (size: { width: number; height: number }) => t(size.width > size.height ? 'orient.landscape.lc' : 'orient.portrait.lc');
 const KIND_ICON: Record<Kind, string> = { phone: 'smartphone', tablet: 'tablet' };
-const ORIENT_LABEL: Record<Orientation, string> = { auto: 'Automática', portrait: 'Em pé', landscape: 'Deitado' };
+/** Só "Em pé" e "Deitado" na tela; o antigo "automático" aparece como o que ele dava (tablet deitado, celular em pé). */
+function effectiveOrientation(s: State): 'portrait' | 'landscape' {
+  if (s.orientation === 'portrait' || s.orientation === 'landscape') return s.orientation;
+  return (s.device?.kind ?? s.previewKind) === 'tablet' ? 'landscape' : 'portrait';
+}
+
 const ORIENT_ICON: Record<Orientation, string> = { auto: 'screen_rotation', portrait: 'stay_current_portrait', landscape: 'stay_current_landscape' };
 
 /** Tamanho típico, só para a prévia antes de conectar (o certo vem do aparelho). */
@@ -107,15 +129,16 @@ function monitorName(s: State, id: string): string {
   return s.monitors.find((m) => m.id === id)?.name ?? id;
 }
 
+/** "o tablet" / "o celular" / "o aparelho" no idioma atual, para entrar nas frases. */
 function noun(s: State): string {
-  return s.device ? (s.device.kind === 'tablet' ? 'o tablet' : 'o celular') : 'o aparelho';
+  return t(s.device ? (s.device.kind === 'tablet' ? 'dev.tablet' : 'dev.phone') : 'dev.generic');
 }
 
 // ── simulação (protótipo de design) ─────────────────────────────────────────
 function placeBesideMock(mons: Monitor[], size: { width: number; height: number }, p: Placement): Plan {
   // Mesma regra do núcleo (core/src/layout.ts), só para a demonstração.
   const a = mons.find((m) => m.id === p.anchor);
-  if (!a) return { error: 'Monitor de referência não encontrado' };
+  if (!a) return { error: { key: 'layout.no-anchor', vars: { monitor: p.anchor } } };
   const out: Record<string, Rect> = {};
   for (const m of mons) out[m.id] = { x: m.x, y: m.y, width: m.width, height: m.height };
   const cross = (len: number, l: number) => (p.align === 'start' ? 0 : p.align === 'end' ? len - l : Math.floor((len - l) / 2));
@@ -137,7 +160,7 @@ function placeBesideMock(mons: Monitor[], size: { width: number; height: number 
       const pos = hz ? r.x : r.y;
       const len = hz ? r.width : r.height;
       if (!(fw ? pos >= edge : pos + len <= edge)) {
-        return { error: `Não cabe aí: ficaria por cima de ${mons.find((x) => x.id === n)?.name ?? n}` };
+        return { error: { key: 'layout.overlap', vars: { monitor: mons.find((x) => x.id === n)?.name ?? n } } };
       }
       if (hz) r.x = fw ? m.x + m.width : m.x - r.width;
       else r.y = fw ? m.y + m.height : m.y - r.height;
@@ -179,8 +202,17 @@ function fakeQr(seed: number): string {
     `<rect x="${cx}" y="${cy}" width="7" height="7" fill="#26211b"/><rect x="${cx + 1}" y="${cy + 1}" width="5" height="5" fill="#fffdf8"/><rect x="${cx + 2}" y="${cy + 2}" width="3" height="3" fill="#26211b"/>`;
   const inFinder = (i: number, j: number) => (i < 8 && j < 8) || (i > n - 9 && j < 8) || (i < 8 && j > n - 9);
   for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) if (!inFinder(i, j) && rnd() > 0.52) cells.push(`<rect x="${i}" y="${j}" width="1" height="1"/>`);
-  return `<svg viewBox="-1 -1 ${n + 2} ${n + 2}" role="img" aria-label="Código QR de pareamento (exemplo)" shape-rendering="crispEdges"><g fill="#26211b">${cells.join('')}</g>${finder(0, 0)}${finder(n - 7, 0)}${finder(0, n - 7)}</svg>`;
+  return `<svg viewBox="-1 -1 ${n + 2} ${n + 2}" role="img" aria-label="${t('pair.qrAria')}" shape-rendering="crispEdges"><g fill="#26211b">${cells.join('')}</g>${finder(0, 0)}${finder(n - 7, 0)}${finder(0, n - 7)}</svg>`;
 }
+
+/** Só para o protótipo no navegador; no app, quem abre é o processo principal (lista fixa em main.ts). */
+const DEMO_LINKS: Record<string, string> = {
+  openalt: 'https://github.com/berelels/openalt', catta: 'https://berelels.github.io',
+  'moonlight-android': 'https://github.com/moonlight-stream/moonlight-android',
+  'moonlight-common-c': 'https://github.com/moonlight-stream/moonlight-common-c',
+  sunshine: 'https://github.com/LizardByte/Sunshine', tailscale: 'https://github.com/tailscale/tailscale',
+  'tailscale-pc': 'https://tailscale.com/download/linux', 'tailscale-device': 'https://tailscale.com/download',
+};
 
 type DemoPatch = Partial<State> & { monitorsKey?: string; deviceKey?: string | null };
 
@@ -193,25 +225,23 @@ function mockApi(): OpenAltApi & { demo(patch: DemoPatch): void } {
     placement: { anchor: 'DisplayPort-2', side: 'right', align: 'start', offset: 0 },
     mode: 'extend',
     mirrorOf: 'DisplayPort-2',
-    audio: 'pc',
     rememberLayout: false,
     orientation: 'auto',
     previewKind: 'phone',
-    uiScale: 125,
     device: null,
     paired: [
-      { id: 'a1', name: 'Moto g84', kind: 'phone', width: 1080, height: 2400, network: 'local', lastSeen: 'hoje, 17:57', live: false },
-      { id: 'b2', name: 'Galaxy Tab S9', kind: 'tablet', width: 2560, height: 1600, network: 'tailscale', lastSeen: 'ontem', live: false },
+      { id: 'a1', name: 'Moto g84', kind: 'phone', width: 1080, height: 2400, network: 'local', lastSeen: '17:57', live: false },
+      { id: 'b2', name: 'Galaxy Tab S9', kind: 'tablet', width: 2560, height: 1600, network: 'tailscale', lastSeen: '12/10', live: false },
     ],
     pairing: null,
     setup: { sunshine: 'ok', helper: 'missing' },
     checks: [
-      { id: 'session', status: 'ok', message: 'Sessão X11.' },
-      { id: 'desktop', status: 'ok', message: 'Área de trabalho GNOME.' },
-      { id: 'gpu', status: 'ok', message: 'Placa de vídeo testada (amdgpu).' },
-      { id: 'free-output', status: 'ok', message: 'Saída de vídeo livre: DisplayPort-0.' },
-      { id: 'connector', status: 'ok', message: 'Saída livre identificada no sistema.' },
-      { id: 'helper', status: 'needs-setup', message: 'Falta instalar a permissão do sistema (pedida uma vez, na instalação).' },
+      { id: 'session', status: 'ok', message: '', key: 'env.session.ok' },
+      { id: 'desktop', status: 'ok', message: '', key: 'env.desktop.ok' },
+      { id: 'gpu', status: 'ok', message: '', key: 'env.gpu.ok', vars: { drivers: 'amdgpu' } },
+      { id: 'free-output', status: 'ok', message: '', key: 'env.free-output.ok', vars: { output: 'DisplayPort-0' } },
+      { id: 'connector', status: 'ok', message: '', key: 'env.connector.ok' },
+      { id: 'helper', status: 'needs-setup', message: '', key: 'env.helper.missing' },
     ],
     error: null,
   };
@@ -227,23 +257,32 @@ function mockApi(): OpenAltApi & { demo(patch: DemoPatch): void } {
     },
     async desligar() { s.phase = 'off'; s.device = null; s.pairing = null; s.paired.forEach((d) => (d.live = false)); emit(); },
     async novoQr() { qr(); emit(); },
-    async parearPin(pin: string) { return /^\d{4}$/.test(pin) ? { ok: true, message: 'Pareado! (exemplo)' } : { ok: false, message: 'O PIN tem 4 números.' }; },
+    async parearPin(pin: string) { return { ok: /^\d{4}$/.test(pin), message: { key: /^\d{4}$/.test(pin) ? 'pin.ok' : 'pin.format' } }; },
     async setPlacement(p) { s.placement = p; emit(); },
     async setMode(m) { s.mode = m; emit(); },
     async setMirrorOf(id) { s.mirrorOf = id; emit(); },
     async setOrientation(o) { s.orientation = o; emit(); },
-    async setAudio(v) { s.audio = v; emit(); },
-    async setUiScale(v) { s.uiScale = v; emit(); },
     async setPreviewKind(k) { s.previewKind = k; emit(); },
     async setPref(k, v) { s[k] = v; emit(); },
     async esquecer(id) { s.paired = s.paired.filter((d) => d.id !== id); emit(); },
     async instalarSunshine() { s.setup.sunshine = 'ok'; emit(); },
     async instalarPermissao() {
       s.setup.helper = 'ok';
-      s.checks = s.checks.map((c) => (c.id === 'helper' ? { ...c, status: 'ok', message: 'Permissão do sistema instalada.' } : c));
+      s.checks = s.checks.map((c) => (c.id === 'helper' ? { ...c, status: 'ok', key: 'env.helper.ok' } : c));
       emit();
     },
     async plan(p, size) { return placeBesideMock(s.monitors, size, p); },
+    async tailscaleSignIn() {
+      await new Promise((r) => setTimeout(r, 1500));
+      history.replaceState(null, '', location.search.replace(/remote=[\w-]+/, 'remote=running'));
+      return { ok: true, message: { key: 'remote.signin.ok' } };
+    },
+    async remote() {
+      const k = new URLSearchParams(location.search).get('remote') ?? 'needs-login';
+      const devices = [{ name: 'galaxy-tab-s9', os: 'android', online: true, path: k === 'relay' ? 'relay' as const : 'direct' as const }, { name: 'moto-g84', os: 'android', online: false, path: null }];
+      return k === 'running' || k === 'relay' ? { state: 'running', ip: '100.101.102.103', devices } : { state: k as Remote['state'], ip: null, devices: [] };
+    },
+    async openLink(name) { const url = DEMO_LINKS[name]; if (url) window.open(url, '_blank', 'noopener'); },
     demo(patch) {
       if (patch.monitorsKey) {
         s.monitors = DEMO_MONITORS[patch.monitorsKey];
@@ -268,6 +307,7 @@ interface WindowApi {
   toggleFullscreen(): Promise<boolean>;
   isFullscreen(): Promise<boolean>;
   onFullscreen(cb: (on: boolean) => void): void;
+  toTray(labels: { show: string; quit: string }): Promise<'tray' | 'minimized'>;
 }
 const winApi = (window as unknown as { openaltWindow?: WindowApi }).openaltWindow;
 let fullscreen = false;
@@ -317,7 +357,8 @@ function initTheme() {
 // ── pedaços ─────────────────────────────────────────────────────────────────
 function topbar(title: string, sub: string, live = false): string {
   const s = state;
-  const net = s.device?.network === 'tailscale' ? 'Fora de casa' : 'Rede local';
+  const net = t(s.device?.network === 'tailscale' ? 'net.away' : 'net.local');
+  const fsLabel = t(fullscreen ? 'top.exitFullscreen' : 'top.fullscreen');
   return `
     <header class="topbar">
       <div>
@@ -327,14 +368,14 @@ function topbar(title: string, sub: string, live = false): string {
       <div class="top-actions fade-up d2">
         <span class="pill-btn"><span class="ms" aria-hidden="true">computer</span><strong>${esc(s.pcName)}</strong></span>
         <span class="pill-btn"><span class="ms" aria-hidden="true">${s.device?.network === 'tailscale' ? 'public' : 'wifi'}</span>${net}</span>
-        <button class="icon-btn" data-goto="pc" aria-label="O que funciona neste PC"><span class="ms" aria-hidden="true">tune</span></button>
-        <button class="icon-btn" id="btnFullscreen" aria-label="${fullscreen ? 'Sair da tela cheia (Esc)' : 'Tela cheia (F11)'}" title="${fullscreen ? 'Sair da tela cheia (Esc)' : 'Tela cheia (F11)'}"><span class="ms" aria-hidden="true">${fullscreen ? 'fullscreen_exit' : 'fullscreen'}</span></button>
+        <button class="icon-btn" data-goto="pc" aria-label="${t('top.pcChecks')}"><span class="ms" aria-hidden="true">tune</span></button>
+        <button class="icon-btn" id="btnTray" aria-label="${t('top.toTray')}" title="${t('top.toTray')}"><span class="ms" aria-hidden="true">minimize</span></button>
+        <button class="icon-btn" id="btnFullscreen" aria-label="${fsLabel}" title="${fsLabel}"><span class="ms" aria-hidden="true">${fullscreen ? 'fullscreen_exit' : 'fullscreen'}</span></button>
       </div>
     </header>
-    ${s.error ? `<p class="error-banner fade-up" role="alert"><span class="ms" aria-hidden="true">error</span>${esc(s.error)}</p>` : ''}`;
+    ${s.error ? `<p class="error-banner fade-up" role="alert"><span class="ms" aria-hidden="true">error</span>${uiText(s.error)}</p>` : ''}`;
 }
 
-const AUDIO_LABEL: Record<string, string> = { device: 'Aparelho', pc: 'PC', both: 'Os dois' };
 
 function seg(name: string, label: string, items: [string, string, string?][], current: string, attr: string): string {
   return `<div class="seg" role="radiogroup" aria-label="${label}" data-group="${name}">${items.map(([v, text, icon]) =>
@@ -345,25 +386,25 @@ function connectionCard(): string {
   const s = state;
   const d = s.device;
   const [word, sub] = {
-    setup: ['Preparar', 'Primeira vez neste PC'],
-    off: ['Desligado', 'Nada ligado sem você pedir'],
-    starting: ['Ligando…', 'Iniciando o Sunshine'],
-    waiting: ['Esperando', `Escaneie o código com ${noun(s)}`],
-    connected: ['Conectado', s.mode === 'mirror' ? `Espelhando ${esc(monitorName(s, s.mirrorOf))}` : 'Mais uma tela'],
+    setup: [t('conn.setup'), t('conn.setup.sub')],
+    off: [t('conn.off'), t('conn.off.sub')],
+    starting: [t('conn.starting'), t('conn.starting.sub')],
+    waiting: [t('conn.waiting'), t('conn.waiting.sub', { dev: noun(s) })],
+    connected: [t('conn.connected'), s.mode === 'mirror' ? t('conn.mirroring', { m: esc(monitorName(s, s.mirrorOf)) }) : t('conn.extra')],
   }[s.phase];
   const stats = d
-    ? [[`${d.width}×${d.height}`, 'resolução'], [`${d.fps} Hz`, 'taxa'], [d.network === 'tailscale' ? 'Remota' : 'Local', 'conexão']]
-    : [[String(s.monitors.length), s.monitors.length === 1 ? 'monitor' : 'monitores'], [s.mode === 'mirror' ? 'Espelho' : 'Nova', 'modo'], [AUDIO_LABEL[s.audio] ?? 'PC', 'som']];
+    ? [[`${d.width}×${d.height}`, t('stat.resolution')], [`${d.fps} Hz`, t('stat.rate')], [t(d.network === 'tailscale' ? 'stat.remote' : 'stat.local'), t('stat.connection')]]
+    : [[String(s.monitors.length), t(s.monitors.length === 1 ? 'stat.monitor' : 'stat.monitors')], [t(s.mode === 'mirror' ? 'stat.mirror' : 'stat.new'), t('stat.mode')]];
   const on = s.phase === 'waiting' || s.phase === 'connected';
   return `
     <section class="card accent c4 fade-up d1" aria-labelledby="connTitle">
-      <div class="card-top"><h2 class="card-name" id="connTitle">Conexão</h2>
+      <div class="card-top"><h2 class="card-name" id="connTitle">${t('conn.title')}</h2>
         <span class="corner-btn" aria-hidden="true"><span class="ms">${on ? 'cast_connected' : 'cast'}</span></span></div>
       <p class="big" aria-live="polite">${word}</p>
       <p class="big-sub">${sub}</p>
       <div class="stats">${stats.map(([b, t]) => `<div class="stat"><b>${b}</b><span>${t}</span></div>`).join('')}</div>
       <button class="power-round" id="btnPower" ${s.phase === 'starting' ? 'disabled' : ''}>
-        <span class="ms" aria-hidden="true">power_settings_new</span>${on ? 'Desligar' : 'Ligar'}</button>
+        <span class="ms" aria-hidden="true">power_settings_new</span>${t(on ? 'power.off' : 'power.on')}</button>
     </section>`;
 }
 
@@ -373,11 +414,11 @@ function modeCard(): string {
     `<li><button class="mode-opt" role="radio" data-mode="${m}" aria-checked="${s.mode === m}"><span class="dot" aria-hidden="true"></span><span>${title}<small>${hint}</small></span></button></li>`;
   return `
     <section class="card sage c3 fade-up d2" aria-labelledby="modeTitle">
-      <div class="card-top"><h2 class="card-name" id="modeTitle">Modo</h2>
+      <div class="card-top"><h2 class="card-name" id="modeTitle">${t('mode.title')}</h2>
         <span class="corner-btn" aria-hidden="true"><span class="ms">${s.mode === 'mirror' ? 'screen_share' : 'add_to_queue'}</span></span></div>
       <ul class="mode-list" role="radiogroup" aria-labelledby="modeTitle">
-        ${opt('extend', 'Nova tela', 'Um monitor a mais')}
-        ${opt('mirror', 'Espelhar', 'Mostra um monitor')}
+        ${opt('extend', t('mode.extend'), t('mode.extend.hint'))}
+        ${opt('mirror', t('mode.mirror'), t('mode.mirror.hint'))}
       </ul>
     </section>`;
 }
@@ -385,7 +426,7 @@ function modeCard(): string {
 function deviceIllu(kind: Kind, size: { width: number; height: number }, max = 190): string {
   const k = Math.min(max / size.width, max / size.height);
   return `<div class="device-illu ${kind}" data-size="${Math.round(size.width * k)},${Math.round(size.height * k)}" role="img"
-    aria-label="${KIND_LABEL[kind]} ${size.width > size.height ? 'deitado' : 'em pé'}"></div>`;
+    aria-label="${kindLabel(kind)}, ${orientWord(size)}"></div>`;
 }
 
 function showcaseCard(): string {
@@ -394,19 +435,19 @@ function showcaseCard(): string {
     const expired = !s.pairing || s.pairing.expiresAt <= Date.now();
     return `
       <section class="card c5 r2 fade-up d3" aria-labelledby="pairTitle">
-        <div class="card-top"><div><h2 class="card-name" id="pairTitle">Parear</h2>
-          <p class="card-hint">App OpenAlt → “Parear” → aponte para o código</p></div></div>
+        <div class="card-top"><div><h2 class="card-name" id="pairTitle">${t('pair.title')}</h2>
+          <p class="card-hint">${t('pair.hint')}</p></div></div>
         <div class="qr-wrap">
-          <div class="qr-box ${expired ? 'expired' : ''}">${s.pairing?.qrSvg ?? ''}${expired ? '<div class="qr-expired">Código vencido</div>' : ''}</div>
-          <p class="qr-meta" aria-live="polite"><span>Vale por <span class="countdown" id="countdown">—</span> · uma vez só</span>
-            <button class="btn outline small" id="btnNewQr"><span class="ms" aria-hidden="true">refresh</span>Gerar outro</button></p>
-          <p class="card-hint">Mesmo Wi-Fi deste PC, ou Tailscale para fora de casa.</p>
+          <div class="qr-box ${expired ? 'expired' : ''}" role="img" aria-label="${t('pair.qrAria')}">${s.pairing?.qrSvg ?? ''}${expired ? `<div class="qr-expired">${t('pair.expired')}</div>` : ''}</div>
+          <p class="qr-meta" aria-live="polite"><span>${t('pair.validFor', { t: '<span class="countdown" id="countdown">—</span>' })}</span>
+            <button class="btn outline small" id="btnNewQr"><span class="ms" aria-hidden="true">refresh</span>${t('pair.newCode')}</button></p>
+          <p class="card-hint">${t('pair.network')}</p>
           <form class="pin-form" id="pinForm" autocomplete="off">
-            <label class="card-hint" for="pinInput">Usando o Moonlight? Digite o PIN que ele mostra:</label>
+            <label class="card-hint" for="pinInput">${t('pair.pinLabel')}</label>
             <div class="pin-row"><input id="pinInput" class="pin-input" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="0000" aria-describedby="pinMsg">
-              <input id="pinName" class="pin-name" maxlength="32" placeholder="Nome (ex.: Tablet)" aria-label="Nome do aparelho (opcional)">
-              <button class="btn outline small" type="submit">Parear</button></div>
-            <p class="card-hint" id="pinMsg" aria-live="polite">${s.addresses?.length ? `Endereço deste PC: ${s.addresses.map(esc).join(' · ')}` : ''}</p>
+              <input id="pinName" class="pin-name" maxlength="32" placeholder="${t('pair.namePlaceholder')}" aria-label="${t('pair.nameAria')}">
+              <button class="btn outline small" type="submit">${t('pair.submit')}</button></div>
+            <p class="card-hint" id="pinMsg" aria-live="polite">${s.addresses?.length ? t('pair.address', { a: s.addresses.map(esc).join(' · ') }) : ''}</p>
           </form>
         </div>
       </section>`;
@@ -414,18 +455,18 @@ function showcaseCard(): string {
   const d = s.device;
   const kind = d?.kind ?? s.previewKind;
   const size = deviceSize(s);
-  const orientText = size.width > size.height ? 'deitado' : 'em pé';
+  const orientText = orientWord(size);
   return `
     <section class="card c5 r2 fade-up d3" aria-labelledby="devTitle">
       <div class="showcase">
         <div class="card-top">
-          <span class="tag ${d ? 'live' : ''}"><span class="ms" aria-hidden="true">${d ? 'bolt' : 'visibility'}</span>${d ? 'Conectado' : 'Prévia'}</span>
-          <button class="corner-btn" data-goto="devices" aria-label="Ver aparelhos pareados"><span class="ms" aria-hidden="true">devices</span></button>
+          <span class="tag ${d ? 'live' : ''}"><span class="ms" aria-hidden="true">${d ? 'bolt' : 'visibility'}</span>${t(d ? 'show.connected' : 'show.preview')}</span>
+          <button class="corner-btn" data-goto="devices" aria-label="${t('show.pairedAria')}"><span class="ms" aria-hidden="true">devices</span></button>
         </div>
         <div class="device-stage">${deviceIllu(kind, size)}</div>
-        <h2 class="device-title" id="devTitle">${d ? esc(d.name) : 'Nenhum aparelho'}</h2>
-        <p class="device-sub">${KIND_LABEL[kind]} · ${orientText} · ${size.width} × ${size.height}${d ? ` · ${d.fps} Hz` : ' (estimado)'}</p>
-        ${d ? '' : `<div class="device-actions">${seg('kind', 'Tipo de aparelho na prévia', [['phone', 'Celular', 'smartphone'], ['tablet', 'Tablet', 'tablet']], s.previewKind, 'data-kind')}</div>`}
+        <h2 class="device-title" id="devTitle">${d ? esc(d.name) : t('show.none')}</h2>
+        <p class="device-sub">${kindLabel(kind)} · ${orientText} · ${size.width} × ${size.height}${d ? ` · ${d.fps} Hz` : ` ${t('show.estimated')}`}</p>
+        ${d ? '' : `<div class="device-actions">${seg('kind', t('show.kindAria'), [['phone', kindLabel('phone'), 'smartphone'], ['tablet', kindLabel('tablet'), 'tablet']], s.previewKind, 'data-kind')}</div>`}
       </div>
     </section>`;
 }
@@ -434,22 +475,16 @@ function prefsCard(): string {
   const s = state;
   return `
     <section class="card c7 fade-up d4" aria-labelledby="prefTitle">
-      <div class="card-top"><div><h2 class="card-name" id="prefTitle">Como ${noun(s)} fica</h2>
-        <p class="card-hint">A orientação vale a partir da próxima conexão.</p></div></div>
+      <div class="card-top"><div><h2 class="card-name" id="prefTitle">${t('prefs.title', { dev: noun(s) })}</h2>
+        <p class="card-hint">${t('prefs.hint')}</p></div></div>
       <div class="pref-grid">
         <div>
-          <p class="mini-label">Orientação</p>
-          ${seg('orient', 'Orientação', (['auto', 'portrait', 'landscape'] as Orientation[]).map((o) => [o, ORIENT_LABEL[o], ORIENT_ICON[o]] as [string, string, string]), s.orientation, 'data-orient')}
-          <p class="mini-label">Tamanho das coisas na Nova tela</p>
-          ${seg('uiscale', 'Tamanho das coisas na Nova tela', ([100, 125, 150, 200]).map((v) => [String(v), `${v}%`] as [string, string]), String(s.uiScale ?? 125), 'data-uiscale')}
+          <p class="mini-label">${t('prefs.orientation')}</p>
+          ${seg('orient', t('prefs.orientation'), (['portrait', 'landscape'] as Orientation[]).map((o) => [o, t(`orient.${o}`), ORIENT_ICON[o]] as [string, string, string]), effectiveOrientation(s), 'data-orient')}
         </div>
-        <div>
-          <p class="mini-label">Onde sai o som</p>
-          ${seg('audio', 'Onde sai o som', [['device', 'Aparelho', 'smartphone'], ['pc', 'PC', 'computer'], ['both', 'Os dois', 'speaker_group']], s.audio ?? 'pc', 'data-audio')}
-        </div>
-        <label class="switch-row"><span><span class="switch-title">Maximizar janelas ${s.previewKind === 'tablet' ? 'no tablet' : 'no aparelho'}</span><span class="switch-hint">Ao levar uma janela para a Nova tela</span></span>
+        <label class="switch-row"><span><span class="switch-title">${t('prefs.maximize', { dev: noun(s) })}</span><span class="switch-hint">${t('prefs.maximize.hint')}</span></span>
           <input type="checkbox" class="switch" id="optMaximize" ${s.maximizeOnDevice !== false ? 'checked' : ''}></label>
-        <label class="switch-row"><span><span class="switch-title">Lembrar o arranjo</span><span class="switch-hint">Menos piscadas; grava no GNOME</span></span>
+        <label class="switch-row"><span><span class="switch-title">${t('prefs.remember')}</span><span class="switch-hint">${t('prefs.remember.hint')}</span></span>
           <input type="checkbox" class="switch" id="optRemember" ${s.rememberLayout ? 'checked' : ''} ${s.mode === 'mirror' ? 'disabled' : ''}></label>
       </div>
     </section>`;
@@ -462,19 +497,17 @@ function placementCard(): string {
   return `
     <section class="card c12 fade-up d4" aria-labelledby="placeTitle">
       <div class="place-head">
-        <div><h2 class="card-name" id="placeTitle">${mirror ? `O que ${noun(s)} espelha` : `Onde ${noun(s)} fica`}</h2>
-          <p class="card-hint">${mirror ? 'Escolha o monitor; ele aparece igualzinho no aparelho.'
-            : s.phase === 'connected' ? 'Muda na hora, sem senha. Clique num monitor e escolha o lado.'
-            : 'Clique num monitor e escolha o lado. Vale para a próxima conexão.'}</p></div>
+        <div><h2 class="card-name" id="placeTitle">${cap(t(mirror ? 'place.mirrorTitle' : 'place.title', { dev: noun(s) }))}</h2>
+          <p class="card-hint">${t(mirror ? 'place.mirrorHint' : s.phase === 'connected' ? 'place.liveHint' : 'place.hint')}</p></div>
         <div class="place-filters">
-          ${seg('anchor', mirror ? 'Monitor espelhado' : 'Ao lado de qual monitor',
+          ${seg('anchor', t(mirror ? 'place.mirrorOf' : 'place.anchor'),
             s.monitors.map((m) => [m.id, `${esc(m.name)}${m.primary ? ' ★' : ''}`] as [string, string]), mirror ? s.mirrorOf : p.anchor, 'data-anchor')}
         </div>
       </div>
-      <div class="stage" id="stage" role="group" aria-label="Prévia da área de trabalho"></div>
+      <div class="stage" id="stage" role="group" aria-label="${t('place.stageAria')}"></div>
       ${mirror ? '' : `<div class="place-controls inline">
-        <div><span class="mini-label">Lado</span>${seg('side', 'Lado', (['left', 'right', 'above', 'below'] as Side[]).map((sd) => [sd, SIDE_LABEL[sd][0].toUpperCase() + SIDE_LABEL[sd].slice(1), SIDE_ICON[sd]] as [string, string, string]), p.side, 'data-side')}</div>
-        <div><span class="mini-label">Alinhar</span>${seg('align', 'Alinhar', (['start', 'center', 'end'] as Align[]).map((al) => [al, ALIGN_LABEL[p.side][al]] as [string, string]), p.align, 'data-align')}</div>
+        <div><span class="mini-label">${t('place.side')}</span>${seg('side', t('place.side'), (['left', 'right', 'above', 'below'] as Side[]).map((sd) => [sd, t(`side.${sd}`), SIDE_ICON[sd]] as [string, string, string]), p.side, 'data-side')}</div>
+        <div><span class="mini-label">${t('place.align')}</span>${seg('align', t('place.align'), (['start', 'center', 'end'] as Align[]).map((al) => [al, alignLabel(p.side, al)] as [string, string]), p.align, 'data-align')}</div>
       </div>`}
       <p class="place-msg" id="placeMsg" aria-live="polite"></p>
     </section>`;
@@ -485,19 +518,19 @@ function devicesTable(compact = false): string {
   const rows = s.paired.map((d) => `
     <tr>
       <td><div class="dev-cell"><span class="dev-ico" aria-hidden="true"><span class="ms">${KIND_ICON[d.kind]}</span></span>
-        <div><p class="dev-name">${esc(d.name)}</p><p class="dev-kind">${KIND_LABEL[d.kind]}</p></div></div></td>
+        <div><p class="dev-name">${esc(d.name)}</p><p class="dev-kind">${kindLabel(d.kind)}</p></div></div></td>
       <td>${d.width ? `${d.width} × ${d.height}` : '—'}</td>
-      <td>${d.width ? (d.width > d.height ? 'Deitado' : 'Em pé') : '—'}</td>
-      <td><span class="tag ${d.network === 'local' ? 'ok' : ''}"><span class="ms" aria-hidden="true">${d.network === 'local' ? 'wifi' : 'public'}</span>${d.network === 'local' ? 'Rede local' : 'Fora de casa'}</span></td>
-      <td>${d.live ? '<span class="tag live"><span class="ms" aria-hidden="true">bolt</span>Agora</span>' : esc(d.lastSeen || '—')}</td>
-      <td><button class="btn ghost small danger" data-forget="${esc(d.id)}" aria-label="Esquecer ${esc(d.name)}"><span class="ms" aria-hidden="true">link_off</span>${compact ? '' : 'Esquecer'}</button></td>
+      <td>${d.width ? t(d.width > d.height ? 'orient.landscape' : 'orient.portrait') : '—'}</td>
+      <td><span class="tag ${d.network === 'local' ? 'ok' : ''}"><span class="ms" aria-hidden="true">${d.network === 'local' ? 'wifi' : 'public'}</span>${t(d.network === 'local' ? 'net.local' : 'net.away')}</span></td>
+      <td>${d.live ? '<span class="tag live"><span class="ms" aria-hidden="true">bolt</span>' + t('devs.now') + '</span>' : esc(d.lastSeen || '—')}</td>
+      <td><button class="btn ghost small danger" data-forget="${esc(d.id)}" aria-label="${t('devs.forgetAria', { name: esc(d.name) })}"><span class="ms" aria-hidden="true">link_off</span>${compact ? '' : t('devs.forget')}</button></td>
     </tr>`).join('');
   return `
     <section class="card c12 fade-up d4" aria-labelledby="pairedTitle">
-      <div class="card-top"><div><h2 class="card-name" id="pairedTitle">Aparelhos pareados</h2>
-        <p class="card-hint">Celulares e tablets que já escanearam o código deste PC.</p></div></div>
-      ${s.paired.length ? `<table class="table"><thead><tr><th scope="col">Aparelho</th><th scope="col">Resolução</th><th scope="col">Orientação</th><th scope="col">Rede</th><th scope="col">Última vez</th><th scope="col"><span class="sr-only">Ações</span></th></tr></thead><tbody>${rows}</tbody></table>`
-        : '<p class="table-empty">Nenhum ainda. Ligue e escaneie o código com o app OpenAlt.</p>'}
+      <div class="card-top"><div><h2 class="card-name" id="pairedTitle">${t('devs.title')}</h2>
+        <p class="card-hint">${t('devs.hint')}</p></div></div>
+      ${s.paired.length ? `<table class="table"><thead><tr><th scope="col">${t('devs.device')}</th><th scope="col">${t('devs.resolution')}</th><th scope="col">${t('devs.orientation')}</th><th scope="col">${t('devs.network')}</th><th scope="col">${t('devs.lastSeen')}</th><th scope="col"><span class="sr-only">${t('devs.actions')}</span></th></tr></thead><tbody>${rows}</tbody></table>`
+        : `<p class="table-empty">${t('devs.empty')}</p>`}
     </section>`;
 }
 
@@ -513,10 +546,10 @@ function renderHome(): string {
   const s = state;
   if (s.phase === 'setup') return renderSetup();
   const sub = {
-    off: 'Celular ou tablet como mais uma tela — ou espelho deste PC.',
-    starting: 'Ligando…',
-    waiting: `Ligado · esperando ${noun(s)}`,
-    connected: s.device ? `${esc(s.device.name)} conectado · ${s.mode === 'mirror' ? 'Espelhar' : 'Nova tela'}` : '',
+    off: t('home.off'),
+    starting: t('home.starting'),
+    waiting: t('home.waiting', { dev: noun(s) }),
+    connected: s.device ? t('home.connected', { name: esc(s.device.name), mode: t(s.mode === 'mirror' ? 'mode.mirror' : 'mode.extend') }) : '',
     setup: '',
   }[s.phase];
   return topbar('Open<em>Alt</em>', sub, s.phase === 'waiting' || s.phase === 'connected')
@@ -534,47 +567,210 @@ function renderSetup(): string {
       <h2 class="card-name">${title}</h2><p class="card-hint">${text}</p>
       <div class="device-actions">${action}</div>
     </section>`;
-  return topbar('Vamos preparar <em>este PC</em>', 'Dois passos, uma vez só. Nada muda sem você apertar o botão.')
+  return topbar(t('setup.title'), t('setup.sub'))
     + `<div class="bento">
-        ${step(1, sun, 'accent', 'Sunshine', sun ? 'Instalado. O OpenAlt usa uma configuração só dele; a sua fica intacta.' : 'O programa que transmite a tela. Pelo Flathub, sem senha.',
-          sun ? '' : '<button class="power-round" id="btnSunshine"><span class="ms" aria-hidden="true">download</span>Instalar</button>')}
-        ${step(2, helper, sun ? 'accent' : 'sage', 'Permissão do sistema', helper ? 'Instalada. Ligar e desligar não pede mais senha.' : 'Para criar o monitor do aparelho. Pede sua senha uma vez. “Espelhar” funciona sem ela.',
-          helper ? '' : '<button class="btn outline" id="btnHelper"><span class="ms" aria-hidden="true">shield</span>Instalar</button>')}
-        ${step(3, false, 'plain', 'Fora de casa', 'Opcional: Tailscale no PC e no aparelho. Dá para fazer depois.', '<button class="btn ghost" data-goto="pc">Ver este PC</button>')}
+        ${step(1, sun, 'accent', 'Sunshine', t(sun ? 'setup.sunshine.ok' : 'setup.sunshine.todo'),
+          sun ? '' : `<button class="power-round" id="btnSunshine"><span class="ms" aria-hidden="true">download</span>${t('setup.install')}</button>`)}
+        ${step(2, helper, sun ? 'accent' : 'sage', t('setup.helper'), t(helper ? 'setup.helper.ok' : 'setup.helper.todo'),
+          helper ? '' : `<button class="btn outline" id="btnHelper"><span class="ms" aria-hidden="true">shield</span>${t('setup.install')}</button>`)}
+        ${step(3, false, 'plain', t('setup.away'), t('setup.away.text'), `<button class="btn ghost" data-goto="pc">${t('setup.seePc')}</button>`)}
       </div>
-      <div class="actions fade-up d4"><button class="btn primary" id="btnSetupDone" ${sun ? '' : 'disabled'}>Continuar<span class="ms" aria-hidden="true">arrow_forward</span></button></div>`;
+      <div class="actions fade-up d4"><button class="btn primary" id="btnSetupDone" ${sun ? '' : 'disabled'}>${t('setup.continue')}<span class="ms" aria-hidden="true">arrow_forward</span></button></div>`;
 }
 
 function renderDevices(): string {
-  return topbar('<em>Aparelhos</em>', 'Celulares e tablets pareados com este PC.') + `<div class="bento">${devicesTable()}</div>`;
+  return topbar(t('devices.title'), t('devices.sub')) + `<div class="bento">${devicesTable()}</div>`;
 }
 
 function renderPc(): string {
   const map: Record<Support, ['ok' | 'todo' | 'warn' | 'bad', string]> = {
     ok: ['ok', 'check'], untested: ['warn', 'help'], 'needs-setup': ['todo', 'shield'], unsupported: ['bad', 'close'],
   };
-  const TITLES: Record<string, string> = {
-    session: 'Sessão', desktop: 'Área de trabalho', gpu: 'Placa de vídeo', 'multi-gpu': 'Várias placas',
-    'free-output': 'Saída de vídeo livre', connector: 'Identificação da saída', helper: 'Permissão do sistema',
-  };
-  return topbar('Este <em>PC</em>', 'O OpenAlt é para qualquer PC, mas cada um é de um jeito. Isto vale para este.')
+  return topbar(t('pc.title'), t('pc.sub'))
     + `<div class="bento"><section class="card c8 fade-up d2"><ul class="checks">
-        ${state.checks.map((c) => { const [cls, icon] = map[c.status]; return checkRow(cls, icon, TITLES[c.id] ?? c.id, esc(c.message)); }).join('')}
+        ${state.checks.map((c) => { const [cls, icon] = map[c.status]; return checkRow(cls, icon, t(`check.${c.id}`), c.key ? uiText({ key: c.key, vars: c.vars }) : esc(c.message)); }).join('')}
       </ul></section>
-      <section class="card sage c4 fade-up d3"><div class="card-top"><h2 class="card-name">Resumo</h2></div>
-        <p class="big">2/2</p><p class="big-sub">“Nova tela” e “Espelhar” funcionam aqui</p></section></div>`;
+      <section class="card sage c4 fade-up d3"><div class="card-top"><h2 class="card-name">${t('pc.summary')}</h2></div>
+        <p class="big">2/2</p><p class="big-sub">${t('pc.summary.text')}</p></section>
+      ${remoteCard()}</div>`;
 }
 
+/** O mesmo que o botão "Entrar" faz, para quem prefere o terminal (ou se o pkexec faltar). */
+function remoteCommand(r: Remote): string {
+  return r.state === 'stopped' ? 'sudo systemctl enable --now tailscaled' : 'sudo tailscale up';
+}
+
+/**
+ * "Fora de casa". Confere sozinho a cada poucos segundos (sem botão "conferir"): a pessoa só faz
+ * o passo que falta, e o cartão avança. Pronto = cartão sálvia com o endereço e os aparelhos.
+ */
+function remoteCard(): string {
+  const r = remote;
+  const head = (pill: string) => `<div class="card-top"><div><h2 class="card-name" id="remoteTitle">${t('remote.title')}</h2></div>${pill}</div>`;
+  if (!r) return `<section class="card c12 fade-up d4" aria-labelledby="remoteTitle">${head('')}<p class="card-hint">${t('remote.checking')}</p></section>`;
+  const deviceLink = `<button class="btn outline small" data-link="tailscale-device"><span class="ms" aria-hidden="true">open_in_new</span>${t('remote.getDevice')}</button>`;
+  if (r.state === 'running') {
+    const relay = state.phase === 'connected' && r.devices.some((d) => d.online && d.path === 'relay');
+    const devs = r.devices.length
+      ? `<ul class="remote-devices">${r.devices.map((d) => `<li><span class="ms" aria-hidden="true">${/ios/i.test(d.os) ? 'smartphone' : 'tablet_android'}</span><span class="remote-dev-name">${esc(d.name)}</span><span class="remote-dev-state">${t(d.online ? (d.path === 'relay' ? 'remote.dev.relay' : 'remote.dev.online') : 'remote.dev.offline')}</span></li>`).join('')}</ul>`
+      : `<p class="card-hint">${t('remote.noDevice')}</p><div class="device-actions">${deviceLink}</div>`;
+    return `<section class="card ${relay ? '' : 'sage'} c12 fade-up d4" aria-labelledby="remoteTitle">
+      ${head(`<span class="pill ${relay ? 'wait' : 'ok remote-ok'}">${t(relay ? 'remote.pill.relay' : 'remote.pill.ready')}</span>`)}
+      <p class="card-hint">${t(relay ? 'remote.relay' : 'remote.ready')}</p>
+      <div class="remote-grid">
+        <div class="remote-box"><span class="remote-label">${t('remote.pcAddress')}</span><span class="remote-ip">${esc(r.ip ?? '—')}</span></div>
+        <div class="remote-box"><span class="remote-label">${t('remote.devices')}</span>${devs}</div>
+      </div></section>`;
+  }
+  const installed = r.state !== 'missing';
+  const cmd = remoteCommand(r);
+  const busy = r.signingIn || signInPending;
+  const signIn = installed
+    ? `<button class="btn primary small" id="btnSignIn" ${busy ? 'disabled' : ''}><span class="ms" aria-hidden="true">${busy ? 'hourglass_top' : 'login'}</span>${t(busy ? 'remote.signin.waiting' : r.state === 'stopped' ? 'remote.signin.start' : 'remote.signin')}</button>`
+    : '';
+  const step2 = installed
+    ? `<div class="remote-cmd"><span class="card-hint">${t('remote.orTerminal')}</span><code>${esc(cmd)}</code><button class="btn outline small" id="btnCopyCmd" data-cmd="${esc(cmd)}"><span class="ms" aria-hidden="true">content_copy</span>${t('remote.copy')}</button></div>`
+    : '';
+  return `<section class="card c12 fade-up d4" aria-labelledby="remoteTitle">
+    ${head(`<span class="pill wait">${t(installed ? (r.state === 'stopped' ? 'remote.pill.stopped' : 'remote.pill.login') : 'remote.pill.install')}</span>`)}
+    <p class="card-hint">${t('remote.hint')}</p>
+    <ul class="checks">
+      ${checkRow(installed ? 'ok' : 'todo', installed ? 'check' : 'download', t('remote.step.install'), t(installed ? 'remote.step.install.ok' : 'remote.step.install.todo'),
+        installed ? '' : `<button class="btn primary small" data-link="tailscale-pc"><span class="ms" aria-hidden="true">open_in_new</span>${t('remote.howInstall')}</button>`)}
+      ${checkRow(installed ? 'todo' : 'warn', installed ? 'login' : 'more_horiz', t(r.state === 'stopped' ? 'remote.step.start' : 'remote.step.login'), t(r.state === 'stopped' ? 'remote.step.start.text' : 'remote.step.login.text'), signIn)}
+      ${step2 ? `<li class="remote-cmd-row">${step2}</li>` : ''}
+      ${checkRow('warn', 'more_horiz', t('remote.step.device'), t('remote.step.device.text'), deviceLink)}
+    </ul>
+    <p class="card-hint remote-auto" aria-live="polite">${signInMsg ? uiText(signInMsg) : t('remote.auto')}</p></section>`;
+}
+
+let signInPending = false;
+let signInMsg: UiText | null = null;
+async function signInTailscale() {
+  if (!api.tailscaleSignIn || signInPending) return;
+  signInPending = true;
+  signInMsg = { key: 'remote.signin.browser' };
+  render();
+  const r = await api.tailscaleSignIn().catch((e) => ({ ok: false, message: { text: String(e?.message ?? e) } as UiText }));
+  signInPending = false;
+  signInMsg = r.ok ? null : r.message;
+  await refreshRemote();
+  render();
+}
+
+// O cartão "Fora de casa" confere o Tailscale sozinho enquanto a tela "Este PC" está aberta
+let remote: Remote | null = null;
+let remoteTimer: number | undefined;
+async function refreshRemote() {
+  if (!api.remote) return;
+  const r = await api.remote().catch(() => null);
+  if (!r || JSON.stringify(r) === JSON.stringify(remote)) return;
+  remote = r;
+  if (view === 'pc') render();
+}
+/**
+ * Consulta o Tailscale só com a tela "Este PC" à vista (não na bandeja nem minimizado): a cada 4 s,
+ * ou a cada 30 s se ele nem está instalado.
+ */
+let remoteRound = 0;
+function watchRemote() {
+  const want = view === 'pc' && !document.hidden;
+  if (want && remoteTimer === undefined) {
+    const round = ++remoteRound;
+    remoteTimer = 0;
+    const tick = async () => {
+      await refreshRemote();
+      if (round !== remoteRound) return; // parou (ou recomeçou) enquanto consultava
+      remoteTimer = window.setTimeout(() => void tick(), remote?.state === 'missing' ? 30_000 : 4000);
+    };
+    void tick();
+  } else if (!want && remoteTimer !== undefined) {
+    remoteRound++;
+    window.clearTimeout(remoteTimer);
+    remoteTimer = undefined;
+  }
+}
+document.addEventListener('visibilitychange', watchRemote);
+
 function renderAbout(): string {
-  return topbar('Sobre o <em>OpenAlt</em>', 'Celular ou tablet como monitor extra, espelho ou tela de jogo. Código aberto (GPL-3.0).')
+  const link = (name: string, label: string, who: string, icon = 'open_in_new') =>
+    `<button class="btn outline small" data-link="${name}" aria-label="${t('about.openAria', { name: who })}"><span class="ms" aria-hidden="true">${icon}</span>${label}</button>`;
+  const project = (icon: string, title: string, text: string, name: string) =>
+    checkRow('ok', icon, title, text, link(name, t('about.repo'), title));
+  const pref = langPref();
+  return topbar(t('about.title'), t('about.sub'))
     + `<div class="bento">
       <section class="card accent c4 fade-up d1"><div class="card-top"><h2 class="card-name">Catta Studios</h2></div>
-        <p class="big">\\</p><p class="big-sub">Feito com carinho, para qualquer pessoa.</p></section>
+        <p class="big">\\</p><p class="big-sub">${t('about.catta')}</p>
+        <div class="device-actions">${link('catta', t('about.cattaSite'), 'Catta Studios', 'language')}</div></section>
       <section class="card c8 fade-up d2"><ul class="checks">
-        ${checkRow('ok', 'cast', 'Sunshine', 'Transmissão da tela, por LizardByte (GPL-3.0). Usado sem modificações.')}
-        ${checkRow('ok', 'smartphone', 'Moonlight', 'O app do celular e do tablet é baseado no Moonlight (GPL-3.0).')}
-        ${checkRow('ok', 'lan', 'Tailscale', 'Acesso fora de casa, com a sua conta.')}
-      </ul></section></div>`;
+        ${project('code', t('about.ours'), t('about.ours.text'), 'openalt')}
+        ${project('smartphone', 'Moonlight Android', t('about.moonlight'), 'moonlight-android')}
+        ${project('settings_ethernet', 'moonlight-common-c', t('about.common'), 'moonlight-common-c')}
+        ${project('cast', 'Sunshine', t('about.sunshine'), 'sunshine')}
+        ${project('lan', 'Tailscale', t('about.tailscale'), 'tailscale')}
+      </ul></section>
+      <section class="card c12 fade-up d3" aria-labelledby="tourCardTitle">
+        <div class="card-top"><div><h2 class="card-name" id="tourCardTitle">${t('about.tour')}</h2>
+          <p class="card-hint">${t('about.tour.hint')}</p></div></div>
+        <div class="device-actions"><button class="btn outline" id="btnTour"><span class="ms" aria-hidden="true">tour</span>${t('about.tour.button')}</button></div>
+      </section>
+      <section class="card c12 fade-up d4" aria-labelledby="langTitle">
+        <div class="card-top"><div><h2 class="card-name" id="langTitle">${t('about.language')}</h2>
+          <p class="card-hint">${t('about.language.hint')}</p></div></div>
+        ${seg('lang', t('about.language'), [['system', `${t('lang.system')} · ${LANG_NAME[systemLang()]}`, 'translate'], ...LANGS.map((l) => [l, LANG_NAME[l]] as [string, string])], pref, 'data-lang')}
+      </section></div>`;
+}
+
+// ── tour guiado (tour.ts) ───────────────────────────────────────────────────
+// Sozinho na primeira vez (depois da abertura e do "Primeiros passos"); de novo pela aba Sobre.
+
+const TOUR_SEEN = 'openalt-tour-done';
+let tour: TourHandle | null = null;
+let introDone = false;
+
+function tourSeen(): boolean {
+  try { return localStorage.getItem(TOUR_SEEN) === '1'; } catch { return true; } // sem armazenamento: não insiste
+}
+
+function goView(v: View) {
+  if (view !== v) { view = v; render(); }
+}
+
+/** O cartão inteiro em volta de um título. */
+function cardOf(sel: string): () => Element[] {
+  return () => { const c = document.querySelector(sel)?.closest('.card'); return c ? [c] : []; };
+}
+
+function startTour() {
+  if (tour) return;
+  const from = view;
+  const dev = noun(state);
+  const steps: TourStep[] = [
+    { before: () => goView('home'), targets: cardOf('#connTitle'), title: t('tour.power.title'), text: t('tour.power.text') },
+    { before: () => goView('home'), targets: cardOf('#modeTitle'), title: t('tour.mode.title'), text: t('tour.mode.text') },
+    { before: () => goView('home'), targets: cardOf('#placeTitle'), title: t('tour.place.title', { dev }), text: t('tour.place.text') },
+    { before: () => goView('home'), targets: cardOf('#prefTitle'), title: t('tour.prefs.title'), text: t('tour.prefs.text') },
+    { before: () => goView('home'), targets: () => [...document.querySelectorAll('.rail-btn[data-view="devices"]')], title: t('tour.devices.title'), text: t('tour.devices.text') },
+    { before: () => goView('pc'), targets: cardOf('#remoteTitle'), title: t('tour.remote.title'), text: t('tour.remote.text') },
+    { before: () => goView('home'), targets: () => ['#btnTray', '#btnFullscreen'].map((q) => document.querySelector(q)).filter((e): e is Element => !!e), title: t('tour.tray.title'), text: t('tour.tray.text') },
+  ];
+  tour = runTour(steps, {
+    step: (n, total) => t('tour.count', { n, total }),
+    back: t('tour.back'), next: t('tour.next'), done: t('tour.done'), skip: t('tour.skip'),
+  }, () => {
+    tour = null;
+    try { localStorage.setItem(TOUR_SEEN, '1'); } catch { /* sem armazenamento */ }
+    goView(from);
+  });
+}
+
+/** Na primeira vez, o tour começa sozinho quando o painel aparece (não no "Primeiros passos"). */
+function maybeStartTour() {
+  const q = new URLSearchParams(location.search);
+  if (!introDone) return;
+  if (q.has('tour')) { q.delete('tour'); history.replaceState(null, '', `?${q}`); startTour(); return; }
+  if (introDone && !tour && state.phase !== 'setup' && !q.has('nointro') && !tourSeen()) startTour();
 }
 
 // ── desenho e eventos ───────────────────────────────────────────────────────
@@ -590,20 +786,20 @@ async function renderStage() {
   if (mirror) {
     layout = Object.fromEntries(s.monitors.map((m) => [m.id, m]));
     msg.className = 'place-msg';
-    msg.innerHTML = `<span class="ms" aria-hidden="true">screen_share</span>${noun(s)[0].toUpperCase()}${noun(s).slice(1)} vai mostrar ${esc(monitorName(s, s.mirrorOf))}.`;
+    msg.innerHTML = `<span class="ms" aria-hidden="true">screen_share</span>${t('place.mirrorMsg', { Dev: cap(noun(s)), m: esc(monitorName(s, s.mirrorOf)) })}`;
   } else {
     const plan = await api.plan(s.placement, size);
     if (plan.error !== undefined) {
       msg.className = 'place-msg error';
-      msg.innerHTML = `<span class="ms" aria-hidden="true">error</span>${esc(plan.error)}. Tente outro lado ou alinhamento.`;
+      msg.innerHTML = `<span class="ms" aria-hidden="true">error</span>${t('place.tryOther', { err: uiText(plan.error) })}`;
       stage.innerHTML = '';
       return;
     }
     layout = plan.layout;
     msg.className = 'place-msg';
     msg.innerHTML = `<span class="ms" aria-hidden="true">${s.device ? 'check_circle' : 'info'}</span>`
-      + `${esc(SIDE_LABEL[s.placement.side])} de ${esc(monitorName(s, s.placement.anchor))}`
-      + (s.device ? '' : ' · tamanho estimado; o certo vem do aparelho ao conectar');
+      + t(`place.at.${s.placement.side}`, { m: esc(monitorName(s, s.placement.anchor)) })
+      + (s.device ? '' : t('place.estimated'));
   }
 
   const rects = Object.values(layout);
@@ -623,14 +819,14 @@ async function renderStage() {
     const r = layout[m.id];
     const chosen = (mirror ? s.mirrorOf : s.placement.anchor) === m.id;
     html.push(`<button class="tile" data-anchor="${esc(m.id)}" aria-pressed="${chosen}" ${box(r)}
-      aria-label="${esc(m.name)}${m.primary ? ', principal' : ''}, ${m.width} por ${m.height}">
+      aria-label="${t(m.primary ? 'place.tilePrimaryAria' : 'place.tileAria', { name: esc(m.name), w: m.width, h: m.height })}">
       <span>${esc(m.name)}${m.primary ? ' <span class="star" aria-hidden="true">★</span>' : ''}</span><small>${m.width}×${m.height}</small></button>`);
   }
   if (mirror) {
     const r = layout[s.mirrorOf];
     if (r) html.push(`<div class="tile mirror" aria-hidden="true" ${box({ x: r.x + r.width * 0.06, y: r.y + r.height * 0.1, width: r.width * 0.88, height: r.height * 0.8 })}><span class="ms">${KIND_ICON[kind]}</span></div>`);
   } else {
-    html.push(`<div class="tile phone" role="img" aria-label="${KIND_LABEL[kind]}, ${size.width} por ${size.height}" ${box(layout.cel)}>
+    html.push(`<div class="tile phone" role="img" aria-label="${t('place.deviceAria', { kind: kindLabel(kind), w: size.width, h: size.height })}" ${box(layout.cel)}>
       <span class="ms" aria-hidden="true">${KIND_ICON[kind]}</span><small>${size.width}×${size.height}</small></div>`);
   }
   stage.innerHTML = html.join('');
@@ -688,8 +884,10 @@ function render() {
     else b.removeAttribute('aria-current');
   });
   bindView();
+  watchRemote();
   sizeIllustrations();
   void renderStage();
+  tour?.relayout();
   tickCountdown();
 }
 
@@ -698,15 +896,24 @@ function bindView() {
     document.querySelectorAll<HTMLButtonElement>(sel).forEach((b) => b.addEventListener('click', () => fn(b)));
   $('#btnPower')?.addEventListener('click', () => void (state.phase === 'waiting' || state.phase === 'connected' ? api.desligar() : api.ligar()));
   $('#btnNewQr')?.addEventListener('click', () => void api.novoQr());
+  $('#btnTour')?.addEventListener('click', () => startTour());
   $('#pinForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const input = $('#pinInput') as HTMLInputElement | null;
     const msg = $('#pinMsg');
     if (!input || !msg) return;
     const nameInput = $('#pinName') as HTMLInputElement | null;
-    void api.parearPin(input.value.trim(), nameInput?.value.trim() ?? '').then((r) => { msg.textContent = r.message; if (r.ok) { input.value = ''; if (nameInput) nameInput.value = ''; } }, (err) => { msg.textContent = String(err?.message ?? err); });
+    void api.parearPin(input.value.trim(), nameInput?.value.trim() ?? '').then((r) => { msg.innerHTML = uiText(r.message); if (r.ok) { input.value = ''; if (nameInput) nameInput.value = ''; } }, (err) => { msg.textContent = String(err?.message ?? err); });
+  });
+  on('#view [data-link]', (b) => void api.openLink?.(b.dataset.link!));
+  on('#view [data-lang]', (b) => { setLangPref(b.dataset.lang as LangPref); render(); });
+  $('#btnSignIn')?.addEventListener('click', () => void signInTailscale());
+  $('#btnCopyCmd')?.addEventListener('click', (e) => {
+    const b = e.currentTarget as HTMLButtonElement;
+    void navigator.clipboard.writeText(b.dataset.cmd ?? '').then(() => { b.lastChild!.textContent = t('remote.copied'); });
   });
   $('#btnFullscreen')?.addEventListener('click', () => void toggleFullscreen());
+  $('#btnTray')?.addEventListener('click', () => void winApi?.toTray({ show: t('tray.show'), quit: t('tray.quit') }));
   $('#btnSunshine')?.addEventListener('click', () => void api.instalarSunshine());
   $('#btnHelper')?.addEventListener('click', () => void api.instalarPermissao());
   $('#btnSetupDone')?.addEventListener('click', () => { if (isDemo) (api as ReturnType<typeof mockApi>).demo({ phase: 'off' }); });
@@ -716,10 +923,8 @@ function bindView() {
   on('#view [data-side]', (b) => void api.setPlacement({ ...state.placement, side: b.dataset.side as Side }));
   on('#view [data-align]', (b) => void api.setPlacement({ ...state.placement, align: b.dataset.align as Align }));
   on('#view [data-orient]', (b) => void api.setOrientation(b.dataset.orient as Orientation));
-  on('#view [data-uiscale]', (b) => void api.setUiScale(Number(b.dataset.uiscale)));
   on('#view [data-kind]', (b) => void api.setPreviewKind(b.dataset.kind as Kind));
   on('#view [data-forget]', (b) => void api.esquecer(b.dataset.forget!));
-  on('#view [data-audio]', (b) => void api.setAudio(b.dataset.audio as State['audio']));
   $<HTMLInputElement>('#optRemember')?.addEventListener('change', (e) => void api.setPref('rememberLayout', (e.target as HTMLInputElement).checked));
   $<HTMLInputElement>('#optMaximize')?.addEventListener('change', (e) => void api.setPref('maximizeOnDevice', (e.target as HTMLInputElement).checked));
   // setas do teclado movem a seleção dentro de cada grupo de opções
@@ -782,10 +987,11 @@ function initDemoBar() {
 
 // ── início ──────────────────────────────────────────────────────────────────
 async function main() {
+  applyStaticTexts();
   initTheme();
   bindRail();
   state = await api.getState();
-  api.onState((s) => { state = s; render(); });
+  api.onState((s) => { state = s; render(); maybeStartTour(); });
   initDemoBar();
   initWindow();
   render();
@@ -795,6 +1001,8 @@ async function main() {
   if (new URLSearchParams(location.search).has('nointro')) intro.remove();
   else await playIntro(intro, () => document.body.classList.add('ready'));
   document.body.classList.add('ready');
+  introDone = true;
+  maybeStartTour();
 }
 
 void main();

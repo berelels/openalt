@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>14 Chegada</title>
+<link rel="stylesheet" href="../base.css"><link rel="stylesheet" href="../devices.css">
+<style>
+body { background: #120F0D; color: #F3EEE6; }
+.room { position: absolute; inset: 0; background: radial-gradient(50% 60% at 70% 20%, rgba(255,116,108,.35), transparent 70%), radial-gradient(40% 50% at 100% 90%, rgba(143,191,146,.25), transparent 70%); }
+.lamp { position: absolute; left: 980px; top: 0; width: 2px; height: 120px; background: #4a3f36; }
+.lamp::after { content: ''; position: absolute; left: -46px; top: 120px; width: 94px; height: 46px; border-radius: 94px 94px 0 0; background: #F2B33D; box-shadow: 0 30px 80px 20px rgba(242,179,61,.25); }
+.table { position: absolute; left: 640px; right: 0; bottom: 0; height: 200px; background: linear-gradient(#C98D5E, #A8714A); border-top: 5px solid #8c5c3a; z-index: 4; }
+.cup { position: absolute; left: 1330px; bottom: 196px; width: 50px; height: 46px; border-radius: 0 0 16px 16px; background: #F3EEE6; z-index: 5; }
+.cup::after { content: ''; position: absolute; right: -16px; top: 10px; width: 16px; height: 18px; border: 4px solid #F3EEE6; border-left: 0; border-radius: 0 10px 10px 0; }
+.char { left: 760px; top: 250px; transform: scale(.82); transform-origin: top center; z-index: 3;
+  --ln: #F3EEE6; --ft: #26211B; --face: #F3EEE6; --hair: #3A322B; --b1: #4A7350; --b2: #FF746C; --in: #120F0D; }
+.char .bubbles path:nth-child(4), .char .bubbles path:nth-child(5), .char .bubbles path:nth-child(6), .char .bubbles circle { display: none; }
+.cont { position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900'%3E%3Crect width='1440' height='900' fill='%23FBE3D6'/%3E%3Cpath d='M0 760C220 600 420 820 720 640S1180 520 1440 700V900H0Z' fill='%23FF746C'/%3E%3Cpath d='M0 840C260 700 520 900 820 760S1220 660 1440 800V900H0Z' fill='%234A7350'/%3E%3Cpath d='M620 620C800 560 960 700 1080 620S1300 540 1440 600' fill='none' stroke='%2326211B' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E") 0 0 / 1440px 900px no-repeat fixed; }
+.L { position: absolute; left: 700px; bottom: 196px; z-index: 5; }
+.T { position: absolute; left: 1090px; bottom: 214px; z-index: 5; }
+.T::after { content: ''; position: absolute; left: 50%; bottom: -18px; width: 60px; height: 18px; margin-left: -30px; background: #2a2a2d; clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%); }
+.wn { position: absolute; border-radius: 5px; background: #FFFDF8; box-shadow: 0 8px 18px -8px rgba(0,0,0,.35); overflow: hidden; }
+.wn::before { content: ''; display: block; height: 11px; background: #EFE8DA; }
+.wn .ln { margin: 7px 9px; height: 5px; border-radius: 3px; background: #E3DACB; } .wn .ln.s { width: 50%; }
+nav { position: absolute; top: 34px; left: 64px; right: 64px; display: flex; align-items: center; justify-content: space-between; z-index: 6; }
+.logo { color: #F3EEE6; } .logo em { color: var(--red); }
+nav .dl { padding: 11px 20px; border-radius: 999px; background: var(--red); color: #14110E; font-weight: 600; font-size: 14px; }
+.copy { position: absolute; left: 64px; top: 170px; width: 580px; z-index: 6; }
+.eyebrow { font-family: 'JetBrains Mono'; font-size: 13px; letter-spacing: .1em; color: var(--sage-l); }
+h1 { margin-top: 16px; font-size: 66px; font-weight: 500; letter-spacing: -0.045em; line-height: 1.04; }
+h1 em { font-family: 'Newsreader'; font-weight: 400; color: var(--red); letter-spacing: -0.02em; }
+.copy p { margin-top: 20px; font-size: 17px; line-height: 1.55; color: rgba(243,238,230,.7); width: 500px; }
+.tagline { margin-top: 30px; display: inline-flex; gap: 10px; align-items: center; padding: 10px 16px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); font-size: 14px; }
+.ctas { margin-top: 28px; display: flex; gap: 12px; }
+.ctas > span { display: inline-flex; gap: 8px; align-items: center; padding: 14px 22px; border-radius: 999px; font-weight: 600; font-size: 15px; }
+.ctas .solid { background: #F6F1E7; color: #14110E; } .ctas .ghost { border: 1px solid rgba(255,255,255,.2); }
+.rail { position: absolute; left: 64px; bottom: 56px; z-index: 6; display: flex; gap: 28px; align-items: center; font-size: 13px; color: rgba(243,238,230,.45); }
+.rail span { display: inline-flex; gap: 8px; align-items: center; }
+.rail i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid rgba(243,238,230,.4); }
+.rail .done i { background: rgba(243,238,230,.5); border-color: transparent; }
+.rail .on { color: #F3EEE6; } .rail .on i { background: var(--red); border-color: var(--red); box-shadow: 0 0 12px var(--red); }
+.rail em { width: 40px; height: 1px; background: rgba(243,238,230,.2); }
+</style></head><body>
+<div class="room"></div><div class="lamp"></div>
+<div class="char">
+<svg viewBox="0 0 600 560" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <g class="bubbles" transform="translate(-30 100)">
+    <path class="ln f-b1" d="M40 140c0-40 30-60 70-60s70 20 70 60-30 60-70 60c-12 0-22-2-30-6l-30 22 8-34c-12-12-18-26-18-42z"/>
+    <rect class="ln f-in" x="80" y="112" width="60" height="44" rx="6"/><path class="ln" d="M96 168h28"/>
+    <path class="ln f-b2" d="M380 110c0-44 34-70 80-70s80 26 80 70-34 70-80 70c-14 0-26-3-36-8l-34 24 8-38c-12-14-18-30-18-48z"/>
+    <path class="ln f-in" d="M418 98h84c14 0 22 12 22 26s-10 26-22 26c-10 0-16-8-22-14h-40c-6 6-12 14-22 14-12 0-22-12-22-26s8-26 22-26z"/>
+    <path class="ln" d="M432 116v14M425 123h14"/><circle class="f-ln" cx="486" cy="118" r="3"/><circle class="f-ln" cx="496" cy="128" r="3"/>
+  </g>
+  <path class="ln f-body" d="M150 560c-10-120 40-220 150-220s170 100 160 220z"/>
+  <path class="ln" d="M250 352c-10 60 0 120 40 200M340 350c10 60 0 120-30 200"/>
+  <path class="ln f-face" d="M262 250c0-34 18-58 46-58s46 24 46 58-18 64-46 64-46-30-46-64z"/>
+  <path class="ln f-hair" d="M262 236c-6-40 20-66 50-62 30 4 48 30 40 58-14-16-34-22-56-18-14 2-26 10-34 22z"/>
+  <path class="ln ft" d="M296 262c2 10 8 16 14 16M330 258h0M290 258h0" style="stroke-width:5"/>
+  <path class="ln ft" d="M300 286c8 6 18 6 26 0"/><path class="ln" d="M300 314v28M316 314v28"/>
+  <path class="ln f-face" d="M206 470c-20 10-30 30-20 46s40 12 50-6M424 430c20 6 30 26 22 44s-36 18-46 0"/>
+</svg>
+
+</div>
+<div class="table"></div><div class="cup"></div>
+<div class="L"><div class="lap" style="--w:400px"><div class="lid"><div class="scr"><div class="cont"></div>
+  <div class="wn" style="left:8%;top:14%;width:44%;height:56%"><div class="ln"></div><div class="ln"></div><div class="ln s"></div></div>
+  <div class="wn" style="left:60%;top:34%;width:50%;height:44%"><div class="ln"></div><div class="ln s"></div></div></div></div><div class="deck"></div></div></div>
+<div class="T"><div class="tab" style="--w:240px"><div class="bz"><div class="scr"><div class="cont"></div>
+  <div class="wn" style="left:-10%;top:40%;width:60%;height:46%"><div class="ln"></div><div class="ln s"></div></div></div></div></div></div>
+<nav><span class="logo"><svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg><span>Open<em>Alt</em></span></span><span class="dl">Download</span></nav>
+<div class="copy"><p class="eyebrow">CHAPTER 03 · 09:10 · AT THE CAFÉ</p>
+  <h1>Sit down. Your tablet is <em>one more monitor.</em></h1>
+  <p>Put the tablet next to the laptop and drag a window onto it. Same desktop, same wallpaper — it just grew.</p>
+  <span class="tagline"><span class="ms" style="color:var(--red)">all_inclusive</span>Freedom to stream anywhere, for anyone.</span>
+  <div class="ctas"><span class="solid"><span class="ms">download</span>Download free</span><span class="ghost">Replay the day ↺</span></div></div>
+<div class="rail"><span class="done"><i></i>Home</span><em></em><span class="done"><i></i>On the way</span><em></em><span class="on"><i></i>Café</span><em></em><span><i></i>Anywhere</span></div>
+</body></html>

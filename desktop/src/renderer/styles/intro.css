@@ -1,0 +1,23 @@
+/* ══ Abertura (intro.ts) ═════════════════════════════════════════════════════
+   A mesma nos três lugares: o app do PC usa este arquivo; o app Android (assets/intro/) e o site
+   (site/css/) recebem uma cópia por scripts/sync-android-intro.mjs. Mudou aqui, rode o script. */
+.intro { position: fixed; inset: 0; z-index: 1000; }
+.intro[hidden] { display: none; }
+.intro.boot { background: #ff746c; }
+.intro-curtain { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.intro-curtain path { fill: #ff746c; }
+.intro-mark {
+  position: absolute; left: 50%; top: 50%; width: min(44vmin, 360px); height: min(44vmin, 360px);
+  margin: calc(min(44vmin, 360px) / -2) 0 0 calc(min(44vmin, 360px) / -2);
+  fill: none; stroke: #fff0e6; stroke-width: 30; stroke-linecap: round; stroke-linejoin: round;
+  overflow: visible; will-change: transform, opacity;
+}
+.intro-credit {
+  position: absolute; left: 0; right: 0; bottom: 36px; margin: 0; text-align: center;
+  font-family: 'JetBrains Mono', 'JBMono', ui-monospace, monospace; font-size: 12px; font-weight: 500;
+  letter-spacing: 0.12em; color: rgba(38, 33, 27, 0.82);
+  opacity: 0; animation: introHint 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.4s forwards; transition: opacity 0.2s;
+}
+@keyframes introHint { to { opacity: 1; } }
+.intro.fade-out { animation: introFade 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+@keyframes introFade { 0%, 45% { opacity: 1; } 100% { opacity: 0; } }

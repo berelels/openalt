@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>05 Em qualquer lugar</title>
+<link rel="stylesheet" href="base.css"><link rel="stylesheet" href="devices.css">
+<style>
+body { background: #17201A; color: #EEF2EA; }
+.dots { position: absolute; inset: 0; background-image: radial-gradient(rgba(143,191,146,.28) 1.3px, transparent 1.6px); background-size: 18px 18px;
+  -webkit-mask-image: radial-gradient(60% 70% at 70% 55%, #000 30%, transparent 75%); }
+nav { position: absolute; top: 34px; left: 64px; right: 64px; display: flex; justify-content: space-between; align-items: center; z-index: 3; }
+.logo { color: #EEF2EA; } .logo em { color: var(--red); }
+nav ul { display: flex; gap: 32px; list-style: none; font-size: 15px; color: rgba(238,242,234,.7); }
+nav .gh { padding: 11px 20px; border-radius: 999px; border: 1px solid rgba(238,242,234,.25); font-size: 14px; }
+.copy { position: absolute; left: 64px; top: 170px; width: 560px; z-index: 3; }
+.eyebrow { font-family: 'JetBrains Mono'; font-size: 13px; letter-spacing: .12em; color: var(--sage-l); }
+h1 { margin-top: 18px; font-family: 'Newsreader'; font-weight: 400; font-size: 84px; line-height: .98; letter-spacing: -0.035em; }
+h1 em { color: var(--red); }
+.copy p { margin-top: 24px; font-size: 18px; line-height: 1.55; color: rgba(238,242,234,.72); }
+.ctas { margin-top: 34px; display: flex; gap: 12px; }
+.b { display: inline-flex; gap: 8px; align-items: center; padding: 15px 24px; border-radius: 999px; font-weight: 600; font-size: 15px; }
+.b.red { background: var(--red); color: #1b1512; } .b.out { border: 1px solid rgba(238,242,234,.3); }
+svg.route { position: absolute; inset: 0; z-index: 1; }
+.pin { position: absolute; z-index: 3; display: flex; gap: 10px; align-items: center; padding: 9px 14px 9px 9px; border-radius: 999px; background: rgba(23,32,26,.85); border: 1px solid rgba(143,191,146,.35); font-size: 14px; backdrop-filter: blur(6px); }
+.pin .ms { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--sage); font-size: 17px; }
+.pin small { color: var(--sage-l); font-family: 'JetBrains Mono'; font-size: 11px; margin-left: 4px; }
+.pin.hot .ms { background: var(--red); color: #1b1512; }
+.d1 { position: absolute; left: 820px; top: 380px; z-index: 2; }
+.d2 { position: absolute; left: 1215px; top: 110px; z-index: 2; transform: rotate(8deg); }
+.foot { position: absolute; left: 64px; bottom: 40px; display: flex; gap: 40px; font-family: 'JetBrains Mono'; font-size: 12px; color: rgba(238,242,234,.5); z-index: 3; }
+</style></head><body>
+<div class="dots"></div>
+<nav>
+  <span class="logo"><svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg><span>Open<em>Alt</em></span></span>
+  <ul><li>How it works</li><li>Away from home</li><li>Devices</li><li>Security</li></ul>
+  <span class="gh">GitHub ↗</span>
+</nav>
+<div class="copy">
+  <p class="eyebrow">HOME · CAFÉ · TRAIN · ANYWHERE</p>
+  <h1>Freedom to stream <em>anywhere,</em> for anyone.</h1>
+  <p>Leave the PC at home and take its screen with you. Over your Wi-Fi, or over 4G and 5G with Tailscale — your own account, encrypted end to end.</p>
+  <div class="ctas"><span class="b red"><span class="ms">download</span>Download free</span><span class="b out">How it stays private</span></div>
+</div>
+<svg class="route" viewBox="0 0 1440 900" fill="none">
+  <path d="M760 250C900 200 980 330 1080 300S1170 190 1215 250" stroke="#8FBF92" stroke-width="2" stroke-dasharray="3 9" stroke-linecap="round"/>
+  <path d="M760 250C780 420 760 560 900 640S1200 700 1320 600" stroke="#FF746C" stroke-width="2.5" stroke-dasharray="1 10" stroke-linecap="round"/>
+  <circle cx="760" cy="250" r="7" fill="#8FBF92"/><circle cx="1320" cy="600" r="7" fill="#FF746C"/><circle cx="900" cy="640" r="5" fill="#FF746C"/>
+</svg>
+<div class="pin" style="left:690px;top:196px"><span class="ms">home</span>Home PC<small>Wi-Fi</small></div>
+<div class="pin" style="left:990px;top:270px"><span class="ms">local_cafe</span>Café<small>5G</small></div>
+<div class="pin hot" style="left:1150px;top:640px"><span class="ms">train</span>On the train<small>4G</small></div>
+<div class="pin" style="left:700px;top:700px"><span class="ms">bed</span>Hotel<small>Wi-Fi</small></div>
+<div class="d1"><div class="tab dark" style="--w:360px"><div class="bz"><div class="scr"><img src="img/app-escuro.png" alt=""></div></div></div></div>
+<div class="d2"><div class="phn dark" style="--w:140px"><i class="btn-l1"></i><i class="btn-l2"></i><i class="btn-r"></i><div class="bz"><div class="scr"><div class="island"></div><div class="status"><span>9:41</span><span><span class="ms">wifi</span> <span class="ms">battery_full</span></span></div><div class="app-oa"><div class="wm">Open<em>Alt</em></div><p class="sb">Your phone or tablet as a PC screen</p><div class="pc"><span class="ms">computer</span><div><b>my-pc</b><small>● Paired · tap to connect</small></div></div><div class="qr"><b>Pair a new PC</b><span><span class="ms">qr_code_scanner</span>Scan QR</span></div></div><div class="home"></div></div></div></div></div>
+<div class="foot"><span>● End-to-end encrypted</span><span>● No ports opened</span><span>● Your Tailscale account</span></div>
+</body></html>

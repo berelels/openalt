@@ -50,3 +50,6 @@ export const run: Runner = (cmd, args, { timeoutMs = 10_000, input } = {}) =>
     if (input) child.stdin?.end(input);
     else child.stdin?.end();
   });
+
+/** Espera `ms` milissegundos. */
+export const realSleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));

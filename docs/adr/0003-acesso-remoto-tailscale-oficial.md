@@ -46,10 +46,14 @@ o tráfego passa pelo DERP, com latência e banda piores. Isso é o spike 6 e de
 ## Consequências
 - Fica mais fácil: nada de servidor nosso nem de exposição de portas.
 - Fica mais difícil: depender de um app de terceiros no celular e do estado de login dele.
-- O OpenAlt **não** faz login no Tailscale pelo usuário e não lida com as credenciais dele.
+- O OpenAlt não lida com as credenciais do Tailscale. **Mudança em 13/10 (aprovada pelo usuário):**
+  o botão "Entrar" do cartão "Fora de casa" roda, só com o clique da pessoa e a senha do sistema
+  (pkexec), `tailscale up --operator=<pessoa>`; se o serviço estiver parado, antes
+  `systemctl enable --now tailscaled`. O login em si é no navegador da pessoa (só abrimos endereços
+  `https://*.tailscale.com`). O comando continua visível para quem prefere o terminal.
 - Rever: resultado do spike 6 (direta × relay, latência medida em 4G/5G).
 
 ## Ações
-1. [ ] Spike 6: testar com o celular **em 4G/5G** (Wi-Fi desligado), medindo `tailscale ping`, se a conexão é direta ou por relay, e a latência no Moonlight.
-2. [ ] M3: detecção do estado (`tailscale status --json`) e guia na interface.
+1. [x] Spike 6 (parcial, 13/10): conectou e transmitiu pelo 4G (`docs/m3-resultados.md`); falta medir `tailscale ping`, direta × relay e a latência. Testar com o celular **em 4G/5G** (Wi-Fi desligado), medindo `tailscale ping`, se a conexão é direta ou por relay, e a latência no Moonlight.
+2. [x] M3: detecção do estado (`tailscale status --json`) e guia na interface.
 3. [ ] M7: spike de tsnet embutido e de WebRTC.

@@ -4,20 +4,20 @@
 import { parseArgs } from 'node:util';
 import { isAlign, isSide, type Placement } from './layout.ts';
 import { assessEnvironment, gatherFacts } from './linux-x11/environment.ts';
-import { extendDesktop, moveDesktop, planExtend, retractDesktop } from './linux-x11/extend.ts';
+import { extendDesktop, hasPendingRelease, moveDesktop, planExtend, retractDesktop, retractOnDisconnect } from './linux-x11/extend.ts';
 import {
   createMirrorDisplay,
   createVirtualDisplay,
   listVirtualDisplays,
   requestFromEnv,
   chooseOutput,
-  scaleRequest,
 } from './linux-x11/virtual-display.ts';
 import { parseXrandrQuery } from './linux-x11/xrandr.ts';
 import { run } from './proc.ts';
 import { clearConnection, writeConnection } from './connection.ts';
 import { openaltPaths } from './paths.ts';
 import { readSettings, settingsFor } from './settings.ts';
+import { sunshineClientViaTailscale } from './tailscale.ts';
 
 const USAGE = `uso:
   openalt-core display extend [tamanho] [posição] [--output SAIDA] [--remember]
@@ -65,8 +65,13 @@ async function main(argv: string[]): Promise<unknown> {
     },
   });
   const [group, asked] = positionals;
-  // "auto" (chamado pela ponte do Sunshine): o modo escolhido no app do PC
-  const action = asked === 'auto' ? (await readSettings(openaltPaths().config)).mode : asked;
+  // "auto" (chamado pela ponte do Sunshine): o modo escolhido no app do PC; pelo Tailscale
+  // (fora de casa) sempre "Espelhar", a "Nova tela" é só na mesma rede
+  let action = asked;
+  if (asked === 'auto') {
+    action = (await readSettings(openaltPaths().config)).mode;
+    if (action === 'extend' && await sunshineClientViaTailscale(run)) action = 'mirror';
+  }
   if (values.help || group !== 'display') throw new UsageError();
 
   const env = { ...process.env };
@@ -96,11 +101,9 @@ async function main(argv: string[]): Promise<unknown> {
   const paths = openaltPaths();
   let remember = values.remember;
   let mirrorOf = values.of;
-  let uiScale = 100;
   if (fromSunshine) {
     // as preferências deste aparelho (cada um tem seu lugar e tamanho)
     const s = settingsFor(await readSettings(paths.config), process.env.SUNSHINE_CLIENT_NAME);
-    uiScale = s.uiScale;
     const p = s.placement;
     if (values.anchor === undefined && p.anchor !== 'primary') placement.anchor = p.anchor;
     if (values.anchor === undefined && p.anchorName) placement.anchorName = p.anchorName;
@@ -110,6 +113,9 @@ async function main(argv: string[]): Promise<unknown> {
     remember ??= s.rememberLayout;
     if (mirrorOf === undefined && s.mirrorOf !== 'primary') mirrorOf = s.mirrorOf;
   }
+  // Uma saída que ficou forçada num desconectar sem senha ainda parece "conectada": devolvê-la ANTES de
+  // escolher, senão a escolha pula para outra saída, que o Sunshine (configurado no Ligar) não captura.
+  if (fromSunshine && (action === 'extend' || action === 'mirror') && await hasPendingRelease()) await retractDesktop();
   // a mesma saída que o app escolheu ao ligar (evita a do monitor preferido da dock)
   const output = values.output ?? (fromSunshine ? await chooseOutput() : undefined);
   const connected = async (mode: 'extend' | 'mirror') => {
@@ -122,8 +128,8 @@ async function main(argv: string[]): Promise<unknown> {
 
   switch (action) {
     case 'extend': {
-      // interface maior no aparelho: monitor virtual menor, o Sunshine amplia (settings.uiScale)
-      const r = await extendDesktop(uiScale > 100 ? scaleRequest(request, uiScale) : request, { placement, output: output, remember, deviceName: fromSunshine ? process.env.SUNSHINE_CLIENT_NAME : undefined });
+      // a tela do aparelho na resolução dele (a opção de aumentar as coisas saiu do app)
+      const r = await extendDesktop(request, { placement, output: output, remember, deviceName: fromSunshine ? process.env.SUNSHINE_CLIENT_NAME : undefined });
       await connected('extend');
       return r;
     }
@@ -144,9 +150,14 @@ async function main(argv: string[]): Promise<unknown> {
       return r;
     }
     case 'down': {
-      const r = await retractDesktop();
-      if (fromSunshine) await clearConnection(paths.runtime);
-      return r;
+      // Pela ponte do Sunshine o aparelho desconectou: nunca pedir senha (a pessoa pode estar longe)
+      // o aparelho saiu mesmo que desfazer a tela falhe (ex.: um monitor foi tirado no meio): o app não
+      // pode continuar mostrando "conectado"
+      try {
+        return fromSunshine ? await retractOnDisconnect() : await retractDesktop();
+      } finally {
+        if (fromSunshine) await clearConnection(paths.runtime);
+      }
     }
     case 'check':
       return assessEnvironment(await gatherFacts(run));

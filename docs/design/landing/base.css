@@ -1,0 +1,21 @@
+/* Base comum das 8 propostas de landing page do OpenAlt (só fontes e cores da marca). */
+@font-face { font-family: 'Newsreader'; src: url(fonts/newsreader-latin-opsz-normal.woff2) format('woff2'); font-weight: 200 800; font-style: normal; }
+@font-face { font-family: 'Newsreader'; src: url(fonts/newsreader-latin-opsz-italic.woff2) format('woff2'); font-weight: 200 800; font-style: italic; }
+@font-face { font-family: 'Jakarta'; src: url(fonts/plus-jakarta-sans-latin-wght-normal.woff2) format('woff2'); font-weight: 200 800; }
+@font-face { font-family: 'Symbols'; src: url(fonts/material-symbols-outlined.woff2) format('woff2'); }
+
+:root {
+  --paper: #F6F1E7; --paper-2: #EFE8DA; --card: #FFFDF8; --ink: #26211B; --muted: #6E655A; --line: #E3DACB;
+  --red: #FF746C; --red-ink: #B8372F; --sage: #4A7350; --sage-l: #8FBF92; --night: #14110E; --night-2: #1E1A16;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1440px; height: 900px; overflow: hidden; }
+body { font-family: 'Jakarta', system-ui, sans-serif; color: var(--ink); background: var(--paper); -webkit-font-smoothing: antialiased; }
+.ms { font-family: 'Symbols'; font-weight: normal; font-style: normal; line-height: 1; letter-spacing: normal; text-transform: none; white-space: nowrap; font-feature-settings: 'liga'; -webkit-font-feature-settings: 'liga'; }
+.serif { font-family: 'Newsreader', Georgia, serif; }
+.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.inter { font-family: 'Inter', system-ui, sans-serif; }
+.logo { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; letter-spacing: -0.02em; }
+.logo svg { width: 34px; height: 27px; }
+.logo > span { display: inline; }
+.logo em { font-family: 'Newsreader', serif; font-style: italic; font-weight: 500; color: var(--red-ink); font-size: 1.12em; }

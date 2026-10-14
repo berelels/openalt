@@ -3,7 +3,7 @@
 import { EventEmitter } from 'node:events';
 import { watch, type FSWatcher } from 'node:fs';
 import { mkdir, readFile } from 'node:fs/promises';
-import { hostname } from 'node:os';
+import { hostname, userInfo } from 'node:os';
 import { join } from 'node:path';
 import {
   assessEnvironment,
@@ -20,14 +20,8 @@ import {
   isOpenAltMonitor,
   drmConnectorFor,
   findSunshine,
-  isUiScale,
-  isAudioOut,
-  realSink,
-  startHostEcho,
-  sunshineSink,
-  setDefaultSink,
-  stopHostEcho,
   reloadMonitorSensitiveExtensions,
+  installShellHelper,
   restoreExtensions,
   chooseOutput,
   windowMaximizer,
@@ -39,6 +33,11 @@ import {
   parseConnectorIds,
   type SunshineKind,
   localAddresses,
+  prefersH264,
+  mobilePeers,
+  runSignIn,
+  signInCommands,
+  tailscaleStatus,
   matchPending,
   moveDesktop,
   newPairing,
@@ -53,11 +52,14 @@ import {
   readSettings,
   resolvePlacement,
   retractDesktop,
+  hasPendingRelease,
+  refreshBackgroundsViaHelper,
   run,
   startSunshine,
   stopLeftoverSunshine,
   sunshineApi,
   sunshineDir,
+  LayoutError,
   writeSettings,
   writeSunshineSetup,
   type Assessment,
@@ -70,6 +72,9 @@ import {
   type SunshineApi,
 } from '@openalt/core';
 
+/** Texto para a interface: uma chave do i18n (com valores) ou um texto cru (erro técnico de fora). */
+export type UiText = { key: string; vars?: Record<string, string | number> } | { text: string };
+
 type Phase = 'setup' | 'off' | 'starting' | 'waiting' | 'connected';
 type Kind = 'phone' | 'tablet';
 interface Rect { x: number; y: number; width: number; height: number }
@@ -78,13 +83,11 @@ export interface UiState {
   phase: Phase;
   pcName: string;
   monitors: (Rect & { id: string; name: string; primary: boolean })[];
-  uiScale: number;
   maximizeOnDevice: boolean;
   sunshineKind: SunshineKind | null;
   placement: { anchor: string; side: Settings['placement']['side']; align: Settings['placement']['align']; offset: number };
   mode: Settings['mode'];
   mirrorOf: string;
-  audio: Settings['audio'];
   rememberLayout: boolean;
   orientation: Settings['orientation'];
   previewKind: Kind;
@@ -94,7 +97,15 @@ export interface UiState {
   addresses: string[];
   setup: { sunshine: 'ok' | 'missing'; helper: 'ok' | 'missing' };
   checks: Assessment['checks'];
-  error: string | null;
+  error: UiText | null;
+}
+
+export interface RemoteState {
+  state: 'missing' | 'stopped' | 'needs-login' | 'running' | 'unknown';
+  ip: string | null;
+  devices: { name: string; os: string; online: boolean; path: 'direct' | 'relay' | null }[];
+  /** o "Entrar" está rodando (esperando a senha do sistema ou o login no navegador) */
+  signingIn: boolean;
 }
 
 /** A tela do aparelho é mais "quadrada" num tablet (~1,6) do que num celular (~2,2). */
@@ -124,7 +135,8 @@ export class Controller extends EventEmitter {
   private assessment: Assessment | null = null;
   private sunshineInstalled = false;
   private sunshineKind: SunshineKind | null = null;
-  private error: string | null = null;
+  private error: UiText | null = null;
+  private gpuDrivers: string[] = [];
 
   constructor(private readonly opts: ControllerOptions) {
     super();
@@ -146,7 +158,9 @@ export class Controller extends EventEmitter {
     this.sunshineKind = await findSunshine(run);
     this.sunshineInstalled = this.sunshineKind !== null;
     this.mutter = await getMutterState(run).catch(() => null);
-    this.assessment = assessEnvironment(await gatherFacts(run));
+    const facts = await gatherFacts(run);
+    this.gpuDrivers = facts.gpuDrivers;
+    this.assessment = assessEnvironment(facts);
   }
 
   // ── estado para a interface ─────────────────────────────────────────────
@@ -170,7 +184,7 @@ export class Controller extends EventEmitter {
       const live = !!this.connection && this.connection.name === d.name;
       const w = live ? this.connection!.width : 0;
       const h = live ? this.connection!.height : 0;
-      return { id: d.uuid, name: d.name, kind: w ? kindOf(w, h) : 'phone' as Kind, width: w, height: h, network: 'local' as const, lastSeen: live ? 'agora' : '', live };
+      return { id: d.uuid, name: d.name, kind: w ? kindOf(w, h) : 'phone' as Kind, width: w, height: h, network: 'local' as const, lastSeen: '', live };
     });
     const c = this.connection;
     return {
@@ -180,11 +194,9 @@ export class Controller extends EventEmitter {
       placement: { anchor, side: s.placement.side, align: s.placement.align, offset: s.placement.offset ?? 0 },
       mode: s.mode,
       mirrorOf,
-      audio: s.audio,
       rememberLayout: s.rememberLayout,
       orientation: s.orientation,
       previewKind: s.previewKind,
-      uiScale: s.uiScale,
       maximizeOnDevice: s.maximizeOnDevice,
       sunshineKind: this.sunshineKind,
       device: c ? { name: c.name, kind: kindOf(c.width, c.height), width: c.width, height: c.height, fps: c.fps, network: 'local' } : null,
@@ -200,13 +212,63 @@ export class Controller extends EventEmitter {
     };
   }
 
+  /** "Fora de casa": estado do Tailscale, só leitura. A tela "Este PC" pede a cada poucos segundos. */
+  async remote(): Promise<RemoteState> {
+    const s = await tailscaleStatus(run);
+    return {
+      state: s.state,
+      ip: s.ip,
+      devices: mobilePeers(s).slice(0, 8).map((p) => ({ name: p.name, os: p.os, online: p.online, path: p.path })),
+      signingIn: this.signingIn,
+    };
+  }
+
+  private signingIn = false;
+
+  /**
+   * "Entrar" no Tailscale, só quando a pessoa toca no botão: pkexec pede a senha do sistema, e o
+   * endereço de login abre no navegador dela (evento 'open-url'). O OpenAlt nunca vê a senha da conta.
+   */
+  async tailscaleSignIn(): Promise<{ ok: boolean; message: UiText }> {
+    if (this.signingIn) return { ok: false, message: { key: 'remote.signin.busy' } };
+    const user = userInfo().username;
+    let cmds = signInCommands((await tailscaleStatus(run)).state, user);
+    if (!cmds.length) return { ok: true, message: { key: 'remote.signin.nothing' } };
+    this.signingIn = true;
+    try {
+      while (cmds.length) {
+        const r = await runSignIn(cmds[0], (url) => this.emit('open-url', url));
+        if (!r.ok) {
+          // 126/127 do pkexec = a pessoa cancelou a senha; o resto vira o texto do Tailscale
+          return { ok: false, message: /dismissed|not authorized|126|127/i.test(r.output) ? { key: 'remote.signin.cancelled' } : { key: 'remote.signin.failed' } };
+        }
+        // depois de ligar o serviço, ele pode já entrar sozinho (a pessoa já tinha entrado antes)
+        const state = (await tailscaleStatus(run)).state;
+        cmds = state === 'running' ? [] : cmds.slice(1);
+      }
+      return { ok: true, message: { key: 'remote.signin.ok' } };
+    } finally {
+      this.signingIn = false;
+    }
+  }
+
   private emitState() {
     void this.state().then((s) => this.emit('state', s));
   }
 
   private fail(e: unknown) {
-    this.error = e instanceof Error ? e.message : String(e);
+    this.error = this.uiText(e);
     this.emitState();
+  }
+
+  /** Erro de arranjo vira chave do i18n, com os nomes dos monitores (não os conectores). */
+  private uiText(e: unknown): UiText {
+    if (e instanceof LayoutError) {
+      const name = (id: string) => (id === 'cel' ? '' : this.mutter?.monitors.find((m) => m.connector === id)?.displayName ?? id);
+      return { key: `layout.${e.code}`, vars: Object.fromEntries(Object.entries(e.vars).map(([k, v]) => [k, name(v)])) };
+    }
+    if (e && typeof e === 'object' && 'key' in e && typeof (e as { key: unknown }).key === 'string') return e as UiText;
+    return { text: e instanceof Error ? e.message : String(e) };
   }
 
   // ── Ligar / Desligar ────────────────────────────────────────────────────
@@ -230,6 +292,9 @@ export class Controller extends EventEmitter {
         outputIndex: Math.max(0, outputIndex),
         kmsConnector,
         outputName: output,
+        // o Sunshine sempre transmite o som; onde ele toca é a opção "Tocar áudio no PC" do app do aparelho
+        // placa AMD: só H.264 (o HEVC pela VAAPI deixa faixas verdes, Sunshine#4314)
+        h264Only: prefersH264(this.gpuDrivers),
         name: hostname(),
         prep: {
           runner: this.opts.cli.runner,
@@ -243,11 +308,14 @@ export class Controller extends EventEmitter {
           },
         },
       });
-      this.pcSink = await realSink(run); // antes de o Sunshine trocar a saída padrão
+      // a extensão do OpenAlt reinicia o GNOME sem a caixa do Alt+F2 (GNOME no X11; carrega no 1º reinício)
+      if (process.env.XDG_SESSION_TYPE === 'x11' && /gnome/i.test(process.env.XDG_CURRENT_DESKTOP ?? '')) {
+        void installShellHelper({ run }).catch(() => 'unavailable'); // não segura o Ligar
+      }
       this.sunshine = await startSunshine(setup.confPath, { kind: this.sunshineKind ?? 'flatpak' });
       const mine = this.sunshine;
       // só é "fechou sozinho" se não fomos nós que mandamos parar
-      mine.onExit(() => { if (this.sunshine === mine && !this.stopping) { this.sunshine = null; void this.desligar('O Sunshine fechou sozinho'); } });
+      mine.onExit(() => { if (this.sunshine === mine && !this.stopping) { this.sunshine = null; void this.desligar({ key: 'err.sunshineExited' }); } });
       const pem = await readFile(join(setup.dir, 'credentials', 'cacert.pem'), 'utf8');
       this.api = sunshineApi(httpsTransport({ credentials: await readCredentials(this.paths), fingerprint: certFingerprint(pem) }));
       this.watchConnection();
@@ -262,44 +330,6 @@ export class Controller extends EventEmitter {
   /** Sem reiniciar o GNOME (Wayland, sem xdotool, janela fechada): recarrega as extensões. */
   async reloadExtensions(): Promise<void> {
     await reloadMonitorSensitiveExtensions({ run, runtimeDir: this.paths.runtime }).catch(() => {});
-  }
-
-  private pcSink: string | null = null;
-  private echoId: string | null = null;
-
-  /**
-   * Com o aparelho conectado, põe o som onde a pessoa escolheu (settings.audio), na hora.
-   * O Sunshine escolhe a saída dele um instante depois de conectar, por isso espera ela aparecer.
-   */
-  private audioBusy = false;
-  private async updateAudio() {
-    if (this.audioBusy) return;
-    this.audioBusy = true;
-    try {
-      if (!this.connection || !this.pcSink) {
-        await stopHostEcho(this.echoId, run);
-        this.echoId = null;
-        return;
-      }
-      let sun: string | null = null;
-      for (let i = 0; i < 40 && !sun && this.connection; i++) {
-        sun = await sunshineSink(run);
-        if (!sun) await new Promise((r) => setTimeout(r, 500));
-      }
-      if (!sun || !this.connection) return;
-      const a = this.settings.audio;
-      await setDefaultSink(a === 'pc' ? this.pcSink : sun, run).catch(() => {});
-      if (a === 'both' && !this.echoId) this.echoId = await startHostEcho(this.pcSink, { run }).catch(() => null);
-      if (a !== 'both' && this.echoId) { await stopHostEcho(this.echoId, run); this.echoId = null; }
-    } finally {
-      this.audioBusy = false;
-    }
-  }
-
-  async setAudio(v: unknown) {
-    if (!isAudioOut(v) || v === this.settings.audio) return;
-    await this.save({ audio: v });
-    void this.updateAudio();
   }
 
   private stopping = false;
@@ -318,23 +348,21 @@ export class Controller extends EventEmitter {
     this.maximizeTimer = setInterval(() => void tick().catch(() => {}), 1000);
   }
 
-  async desligar(reason?: string): Promise<void> {
+  async desligar(reason?: UiText): Promise<void> {
     this.stopping = true;
     try { await this.desligarAgora(reason); } finally { this.stopping = false; }
   }
 
-  private async desligarAgora(reason?: string): Promise<void> {
+  private async desligarAgora(reason?: UiText): Promise<void> {
     this.stopPairing();
     if (this.maximizeTimer) clearInterval(this.maximizeTimer);
     this.maximizeTimer = null;
-    await stopHostEcho(this.echoId, run);
-    this.echoId = null;
-    // a saída padrão volta para a do PC (o Sunshine também volta, ao desconectar)
-    if (this.pcSink) await setDefaultSink(this.pcSink, run).catch(() => {});
     this.watcher?.close();
     this.watcher = null;
-    if (this.connection) {
-      const wasExtend = this.connection.mode === 'extend';
+    // também devolve uma saída que ficou forçada num desconectar sem senha (a pessoa está no PC agora)
+    const pending = await hasPendingRelease(this.paths.runtime);
+    if (this.connection || pending) {
+      const wasExtend = this.connection?.mode === 'extend' || pending;
       await retractDesktop().catch(() => {});
       await clearConnection(this.paths.runtime).catch(() => {});
       this.connection = null;
@@ -383,7 +411,7 @@ export class Controller extends EventEmitter {
       p.used = true; // uso único, mesmo que algo dê errado daqui para frente
       this.stopPolling();
       const ok = await this.api.submitPin(mine.id, p.pin, friendlyName(mine.name));
-      if (!ok) this.error = 'O pareamento não foi aceito. Gere outro código e tente de novo.';
+      if (!ok) this.error = { key: 'err.pairRejected' };
       this.emitState();
     } catch (e) {
       this.fail(e);
@@ -394,17 +422,17 @@ export class Controller extends EventEmitter {
    * Pareamento pelo Moonlight oficial (enquanto o app Android do OpenAlt não existe): o
    * Moonlight mostra um PIN de 4 dígitos e a pessoa digita aqui. Só vale com o OpenAlt ligado.
    */
-  async parearPin(pin: unknown, name?: unknown): Promise<{ ok: boolean; message: string }> {
-    if (typeof pin !== 'string' || !/^\d{4}$/.test(pin)) return { ok: false, message: 'O PIN tem 4 números.' };
-    if (!this.api) return { ok: false, message: 'Ligue o OpenAlt primeiro.' };
+  async parearPin(pin: unknown, name?: unknown): Promise<{ ok: boolean; message: UiText }> {
+    if (typeof pin !== 'string' || !/^\d{4}$/.test(pin)) return { ok: false, message: { key: 'pin.format' } };
+    if (!this.api) return { ok: false, message: { key: 'pin.turnOn' } };
     const pending = (await this.api.pendingPairings()).filter((x) => !/^OpenAlt-/.test(x.name));
-    if (pending.length === 0) return { ok: false, message: 'Nenhum pedido ainda. No Moonlight, toque neste PC para aparecer o PIN.' };
+    if (pending.length === 0) return { ok: false, message: { key: 'pin.noRequest' } };
     const req = pending[pending.length - 1];
     // o nome que a pessoa deu; senão o que o Moonlight mandou (o nome interno do aparelho)
     const given = typeof name === 'string' ? name.replace(/[^\p{L}\p{N} ._()+\-]/gu, '').trim().slice(0, 32) : '';
     const ok = await this.api.submitPin(req.id, pin, (given || req.name || 'Aparelho').slice(0, 48));
     this.emitState();
-    return ok ? { ok, message: 'Pareado! No Moonlight, toque em “OpenAlt”.' } : { ok, message: 'PIN não aceito. Confira e tente de novo.' };
+    return { ok, message: { key: ok ? 'pin.ok' : 'pin.rejected' } };
   }
 
   // ── conexão do aparelho (a ponte grava connection.json) ────────────────
@@ -422,9 +450,13 @@ export class Controller extends EventEmitter {
       // (ArcMenu abria o Super no tablet); recarregar só elas
       // O monitor do aparelho entrou ou saiu: o processo principal reinicia o GNOME (Alt+F2 → r). Só
       // recarregar as extensões resolvia o Super, mas não o papel de parede, que só volta reiniciando.
-      if ((c && c.mode !== 'mirror') || (!c && wasExtend)) this.emit('monitors-changed');
+      // Desconectou sem a permissão do sistema: a saída do aparelho ficou forçada (só fora da área de
+      // trabalho). Reiniciar o GNOME agora poderia religá-la; o "Desligar" a devolve e aí reinicia.
+      const pending = !c && wasExtend && await hasPendingRelease(this.paths.runtime);
+      if ((c && c.mode !== 'mirror') || (!c && wasExtend && !pending)) this.emit('monitors-changed');
+      // sem reiniciar, o papel de parede não volta sozinho: a extensão do OpenAlt só refaz os fundos
+      if (pending) void refreshBackgroundsViaHelper(run);
       this.updateMaximizer();
-      void this.updateAudio();
       this.emitState();
     };
     this.watcher = watch(this.paths.runtime, () => void update());
@@ -457,7 +489,6 @@ export class Controller extends EventEmitter {
 
   async setMode(m: unknown) { if (m === 'extend' || m === 'mirror') await this.save({ mode: m }); }
   async setMirrorOf(id: unknown) { if (typeof id === 'string' && /^[\w.\-]{1,64}$/.test(id)) await this.save({ mirrorOf: id }); }
-  async setUiScale(v: unknown) { if (isUiScale(v)) await this.save({ uiScale: v, ...this.forDevice({ uiScale: v }) }); }
 
   /** Grava também nas preferências do aparelho conectado agora. */
   private forDevice(patch: Partial<DeviceSettings>): Partial<Settings> {
@@ -465,9 +496,9 @@ export class Controller extends EventEmitter {
     if (!name) return {};
     const key = deviceKey(name);
     const cur = settingsFor(this.settings, name);
-    return { perDevice: { ...this.settings.perDevice, [key]: { placement: cur.placement, uiScale: cur.uiScale, ...patch } } };
+    return { perDevice: { ...this.settings.perDevice, [key]: { placement: cur.placement, ...patch } } };
   }
-  async setOrientation(o: unknown) { if (o === 'auto' || o === 'portrait' || o === 'landscape') await this.save({ orientation: o }); }
+  async setOrientation(o: unknown) { if (o === 'portrait' || o === 'landscape') await this.save({ orientation: o }); }
   async setPreviewKind(k: unknown) { if (k === 'phone' || k === 'tablet') await this.save({ previewKind: k }); }
   async setPref(key: unknown, value: unknown) {
     if ((key === 'rememberLayout' || key === 'maximizeOnDevice') && typeof value === 'boolean') {
@@ -481,10 +512,10 @@ export class Controller extends EventEmitter {
     try {
       // ligado: pelo Sunshine; desligado: direto no arquivo de estado (é nosso, e o Sunshine não está rodando)
       if (this.api) await this.api.unpair(id);
-      else if (!(await forgetPairedDevice(this.paths, id))) throw new Error('Aparelho não encontrado');
+      else if (!(await forgetPairedDevice(this.paths, id))) throw new Error('not found');
       this.error = null;
     } catch (e) {
-      this.fail(new Error(`Não deu para esquecer o aparelho: ${e instanceof Error ? e.message : e}`));
+      this.fail({ key: 'err.forget', vars: { detail: e instanceof Error ? e.message : String(e) } });
       return;
     }
     this.emitState();
@@ -503,23 +534,23 @@ export class Controller extends EventEmitter {
   }
 
   async instalarPermissao(): Promise<void> {
-    this.fail(new Error('A permissão do sistema é instalada pelo instalador do OpenAlt (próximo marco).'));
+    this.fail({ key: 'err.helperLater' });
   }
 
   /** Prévia de posição: mesma conta do núcleo (layout.ts), com o arranjo atual do GNOME. */
-  async plan(p: unknown, size: unknown): Promise<{ layout?: Record<string, Rect>; error?: string }> {
+  async plan(p: unknown, size: unknown): Promise<{ layout?: Record<string, Rect>; error?: UiText }> {
     const v = p as Record<string, unknown>;
     const z = size as Record<string, unknown>;
-    if (!this.mutter) return { error: 'O GNOME não informou os monitores' };
+    if (!this.mutter) return { error: { key: 'layout.noMonitors' } };
     if (!v || typeof v.side !== 'string' || !isSide(v.side) || typeof v.align !== 'string' || !isAlign(v.align)
-      || !z || !Number.isInteger(z.width) || !Number.isInteger(z.height)) return { error: 'pedido inválido' };
+      || !z || !Number.isInteger(z.width) || !Number.isInteger(z.height)) return { error: { key: 'layout.badRequest' } };
     try {
       const base = layoutFromMutter(this.mutter);
       for (const k of Object.keys(base)) { const mon = this.mutter.monitors.find((m) => m.connector === k); if (mon && isOpenAltMonitor(mon)) delete base[k]; }
       const placement = resolvePlacement(this.mutter, { anchor: typeof v.anchor === 'string' ? v.anchor : undefined, side: v.side, align: v.align, offset: Number.isInteger(v.offset) ? (v.offset as number) : 0 });
       return { layout: placeBeside(base, 'cel', layoutSize(this.mutter, z.width as number, z.height as number), placement) };
     } catch (e) {
-      return { error: e instanceof Error ? e.message : String(e) };
+      return { error: this.uiText(e) };
     }
   }
 

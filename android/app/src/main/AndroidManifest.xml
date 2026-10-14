@@ -89,6 +89,7 @@
 
         <activity
             android:name=".PcView"
+            android:screenOrientation="fullSensor"
             android:exported="true"
             android:resizeableActivity="true"
             android:enableOnBackInvokedCallback="true"
@@ -96,6 +97,27 @@
 
             <meta-data android:name="WindowManagerPreference:FreeformWindowSize" android:value="system-default" />
             <meta-data android:name="WindowManagerPreference:FreeformWindowOrientation" android:value="landscape" />
+            <!-- OpenAlt: a entrada do app passou para StartActivity; esta lista abre pelas opções do PC.
+                 fullSensor aqui e nas outras telas abertas pelo app: seguem o aparelho, como a StartActivity -->
+        </activity>
+        <!-- OpenAlt: Configurações com jeito de console (as opções do Moonlight, outra tela) -->
+        <activity
+            android:name="dev.cattastudios.openalt.SettingsActivity"
+            android:exported="false"
+            android:resizeableActivity="true"
+            android:screenOrientation="fullSensor" />
+        <!-- OpenAlt: assistente "Mapear botões" -->
+        <activity
+            android:name="dev.cattastudios.openalt.ButtonMapActivity"
+            android:exported="false"
+            android:resizeableActivity="true"
+            android:screenOrientation="fullSensor" />
+        <!-- OpenAlt: tela de entrada com jeito de launcher (tela cheia, cartões, controle, abertura) -->
+        <activity
+            android:name="dev.cattastudios.openalt.StartActivity"
+            android:exported="true"
+            android:resizeableActivity="true"
+            android:screenOrientation="fullSensor">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -119,6 +141,7 @@
         </activity>
         <activity
             android:name=".AppView"
+            android:screenOrientation="fullSensor"
             android:resizeableActivity="true"
             android:enableOnBackInvokedCallback="true"
             android:configChanges="mcc|mnc|touchscreen|keyboard|keyboardHidden|navigation|screenLayout|fontScale|uiMode|orientation|screenSize|smallestScreenSize|layoutDirection">
@@ -127,6 +150,7 @@
         </activity>
         <activity
             android:name=".preferences.StreamSettings"
+            android:screenOrientation="fullSensor"
             android:resizeableActivity="true"
             android:enableOnBackInvokedCallback="true"
             android:configChanges="mcc|mnc|touchscreen|keyboard|keyboardHidden|navigation|screenLayout|fontScale|uiMode|orientation|screenSize|smallestScreenSize|layoutDirection"
@@ -136,6 +160,7 @@
         </activity>
         <activity
             android:name=".preferences.AddComputerManually"
+            android:screenOrientation="fullSensor"
             android:resizeableActivity="true"
             android:windowSoftInputMode="stateVisible"
             android:enableOnBackInvokedCallback="true"
@@ -182,6 +207,7 @@
         <!-- OpenAlt: parear com o QR do app do PC -->
         <activity
             android:name="dev.cattastudios.openalt.PairQrActivity"
+            android:screenOrientation="fullSensor"
             android:label="@string/openalt_pair_title"
             android:resizeableActivity="true"
             android:enableOnBackInvokedCallback="true"

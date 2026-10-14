@@ -1,5 +1,8 @@
 # M2: o que decidir (13/10)
 
+> **Decidido e feito em 13/10** (o usuário aprovou as recomendações): som **A + B** e reinício pela
+> **extensão (4)**. Detalhes e o que falta testar em "Feito em 13/10", no fim.
+
 Dois problemas ficaram abertos no teste com o tablet. Abaixo estão as opções de cada um e a
 recomendação.
 
@@ -40,3 +43,45 @@ precisa reiniciar. Enquanto isso, o Alt+F2 atual fica como reserva.
 - Vídeo do Brave/Chrome travando no monitor virtual: falta um teste controlado.
 - Cursor duplicado na borda (bug do Sunshine na captura X11).
 - Mensagem clara para o erro 409 (pareamento aberto no Moonlight original).
+
+## Feito em 13/10 (falta testar com o tablet)
+
+**Som** (`core/src/audio.ts`, `AudioRouter`; 8 testes com um PulseAudio de mentira que reproduz a corrida):
+- "PC": o Sunshine liga com `stream_audio = disabled`, então não transmite som nem troca a saída. Se
+  a pessoa escolher "PC" com o aparelho já conectado, o app devolve a saída para a do PC sempre que
+  ela virar a do Sunshine (confere a cada 1 s).
+- "Aparelho" e "Os dois": o app espera a saída do Sunshine existir. "Os dois" mantém UMA cópia
+  (loopback) para a saída real do PC; se alguém a desligar, ela é religada.
+- Trocar a escolha sem aparelho conectado religa o Sunshine na hora, com novo QR. Se o Sunshine
+  ligou sem som e a pessoa pedir som no aparelho com ele conectado, a tela avisa "desconecte e
+  conecte de novo", e o app religa o Sunshine assim que o aparelho sai.
+- Se a pessoa trocar a saída real (fone → caixa) no GNOME, essa passa a ser "a do PC".
+- Confirmado no código do Sunshine (`src/audio.cpp`): com `stream_audio` desligado, a captura
+  retorna antes de mexer na saída.
+
+**Reinício do GNOME sem a caixa** (`core/gnome-shell/openalt@cattastudios.dev`, `core/src/linux-x11/shell-helper.ts`; 5 testes):
+- O que a extensão faz:
+  - Registra no D-Bus `dev.cattastudios.OpenAlt.Shell`, com `Restart`, `RefreshBackgrounds` e as
+    propriedades `Version` e `CanRestart`.
+  - `Restart` chama o mesmo `Meta.restart` do Alt+F2 → r, mas só até 60 s depois de um monitor
+    entrar ou sair, e uma vez por troca. Assim, outro programa não consegue reiniciar o GNOME à toa.
+- Instalação pelo app:
+  - Ao Ligar (GNOME no X11), copia a extensão para `~/.local/share/gnome-shell/extensions` e a põe
+    nas extensões ligadas, sem perder as da pessoa.
+  - Não liga se a pessoa desligou a extensão ou todas as extensões.
+  - O GNOME só carrega extensões novas ao reiniciar: o **1º** reinício ainda é pelo Alt+F2, e ele
+    já carrega a extensão. Do 2º em diante, nenhuma caixa aparece.
+- `restartShell` (desktop/src/main/main.ts) tenta a extensão primeiro e confere pela troca do dono
+  `org.gnome.Shell` no D-Bus. Se a extensão não responder, usa o Alt+F2.
+
+**Não testado:**
+- A extensão rodando no GNOME de verdade. A tentativa num GNOME isolado (Xvfb +
+  `dbus-run-session`) não carregou a extensão e, pior, gravou no dconf real (ver o incidente abaixo).
+- O som com o tablet: os três modos, mais a troca com o aparelho conectado.
+- `RefreshBackgrounds` (opção 3): testar com a pessoa presente, logo depois de conectar, antes do
+  reinício, para ver se basta para o papel de parede voltar.
+
+**Incidente:**
+- No teste isolado, o `gsettings set` foi parar no dconf real: a lista de extensões ligadas ficou
+  só `['openalt@cattastudios.dev']` **no disco**. A sessão ao vivo não mudou.
+- A restauração é um comando `gsettings set` com a lista original (está na conversa de 13/10).

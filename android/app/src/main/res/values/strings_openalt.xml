@@ -1,54 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Textos do OpenAlt (pt-BR primeiro; en/es depois). Ficam no padrão "values" até haver traduções. -->
+<!-- OpenAlt texts. This default ("values") is English, used for any language without a translation;
+     values-pt is Portuguese and values-es is Spanish. Keep the three in sync. -->
 <resources>
     <string name="openalt_app_name" translatable="false">OpenAlt</string>
 
-    <!-- Tela inicial -->
-    <string name="openalt_home_subtitle">Seu celular ou tablet como tela do PC</string>
-    <string name="openalt_searching_short">Procurando PCs na rede…</string>
-    <string name="openalt_settings">Configurações</string>
-    <string name="openalt_help">Ajuda</string>
-    <string name="openalt_add_pc">Adicionar PC pelo endereço</string>
+    <!-- Home screen -->
+    <string name="openalt_home_subtitle">Your phone or tablet as a PC screen</string>
+    <string name="openalt_searching_short">Looking for PCs on the network…</string>
+    <string name="openalt_settings">Settings</string>
+    <string name="openalt_help">Help</string>
+    <string name="openalt_add_pc">Add a PC by address</string>
 
-    <!-- Tela Parear -->
-    <string name="openalt_pair_title">Parear com o PC</string>
-    <string name="openalt_pair_button">Parear com QR</string>
-    <string name="openalt_pair_button_description">Parear com um PC escaneando o QR do OpenAlt</string>
-    <string name="openalt_pair_intro">No PC, abra o OpenAlt, toque em Ligar e depois em Parear. Aponte a câmera para o QR que aparece na tela.</string>
-    <string name="openalt_pair_scan">Escanear o QR</string>
-    <string name="openalt_pair_scan_again">Escanear de novo</string>
-    <string name="openalt_pair_cancel">Cancelar</string>
-    <string name="openalt_pair_done">Pronto</string>
-    <string name="openalt_scan_prompt">Aponte para o QR na tela do OpenAlt no PC</string>
-    <string name="openalt_pair_searching">Procurando %1$s…</string>
-    <string name="openalt_pair_trying">Tentando %1$s (%2$d de %3$d)</string>
-    <string name="openalt_pair_pairing">Pareando com %1$s… O PC confirma sozinho; não precisa digitar nada.</string>
-    <string name="openalt_pair_saving">Guardando o PC…</string>
-    <string name="openalt_pair_success">Pareado com %1$s! Toque nele na lista para conectar.</string>
-    <string name="openalt_pc_unnamed">o PC</string>
+    <!-- Pair screen -->
+    <string name="openalt_pair_title">Pair with the PC</string>
+    <string name="openalt_pair_button">Pair with QR</string>
+    <string name="openalt_pair_button_description">Pair with a PC by scanning the OpenAlt QR code</string>
+    <string name="openalt_pair_intro">On the PC, open OpenAlt, tap Turn on and then Pair. Point the camera at the QR code on the screen.</string>
+    <string name="openalt_pair_scan">Scan the QR code</string>
+    <string name="openalt_pair_scan_again">Scan again</string>
+    <string name="openalt_pair_cancel">Cancel</string>
+    <string name="openalt_pair_done">Done</string>
+    <string name="openalt_scan_prompt">Point at the QR code on the OpenAlt screen on the PC</string>
+    <string name="openalt_pair_searching">Looking for %1$s…</string>
+    <string name="openalt_pair_trying">Trying %1$s (%2$d of %3$d)</string>
+    <string name="openalt_pair_pairing">Pairing with %1$s… The PC confirms by itself; no need to type anything.</string>
+    <string name="openalt_pair_saving">Saving the PC…</string>
+    <string name="openalt_pair_success">Paired with %1$s! Tap it in the list to connect.</string>
+    <string name="openalt_pc_unnamed">the PC</string>
 
-    <!-- Problemas com o QR -->
-    <string name="openalt_qr_not_openalt">Este QR não é do OpenAlt. No PC, abra o OpenAlt e toque em Parear.</string>
-    <string name="openalt_qr_version">Este QR foi feito por outra versão do OpenAlt. Atualize o app do celular e o do PC.</string>
-    <string name="openalt_qr_invalid">Este QR está incompleto ou danificado. Gere outro no PC.</string>
-    <string name="openalt_qr_expired">Este QR venceu (vale 2 minutos). No PC, gere um QR novo e escaneie de novo.\n\nSe o QR acabou de aparecer, confira se a data e a hora do aparelho estão certas.</string>
+    <!-- QR problems -->
+    <string name="openalt_qr_not_openalt">This QR code is not from OpenAlt. On the PC, open OpenAlt and tap Pair.</string>
+    <string name="openalt_qr_version">This QR code was made by another version of OpenAlt. Update the app on the phone and on the PC.</string>
+    <string name="openalt_qr_invalid">This QR code is incomplete or damaged. Generate another one on the PC.</string>
+    <string name="openalt_qr_expired">This QR code has expired (it lasts 2 minutes). On the PC, generate a new one and scan it again.\n\nIf the code just appeared, check that the device\'s date and time are correct.</string>
 
-    <!-- Problemas no pareamento -->
-    <string name="openalt_pair_unreachable">Não achei o PC em nenhum endereço do QR (%1$s).\n\nConfira se o OpenAlt está ligado no PC e se o aparelho está na mesma rede Wi-Fi. Longe de casa, os dois precisam estar no Tailscale.</string>
-    <string name="openalt_pair_cert_mismatch">O PC que respondeu não é o do QR (o certificado não confere). Por segurança, o pareamento foi cancelado.\n\nGere outro QR no PC e tente de novo.</string>
-    <string name="openalt_pair_pin_wrong">O PC recusou o código. Gere um QR novo no PC e tente de novo.</string>
-    <string name="openalt_pair_failed">O pareamento não deu certo. Gere um QR novo no PC e tente de novo.</string>
-    <string name="openalt_pair_in_progress">Outro aparelho está pareando com este PC agora. Espere um pouco e tente de novo.</string>
-    <string name="openalt_pair_timeout">O PC não confirmou a tempo. O QR pode ter vencido ou já ter sido usado: gere outro no PC.</string>
-    <string name="openalt_pair_error">Erro ao falar com o PC: %1$s</string>
-    <string name="openalt_pair_save_failed">Pareou, mas não consegui guardar o PC na lista. Tente adicionar de novo pelo QR.</string>
-    <string name="openalt_no_camera">Este aparelho não tem câmera para ler o QR. Adicione o PC pelo botão +, com o endereço dele.</string>
+    <!-- Pairing problems -->
+    <string name="openalt_pair_unreachable">Could not reach the PC at any address in the QR code (%1$s).\n\nCheck that OpenAlt is on on the PC and that the device is on the same Wi-Fi network. Away from home, both need to be on Tailscale.</string>
+    <string name="openalt_pair_cert_mismatch">The PC that answered is not the one in the QR code (the certificate does not match). For safety, pairing was cancelled.\n\nGenerate another QR code on the PC and try again.</string>
+    <string name="openalt_pair_pin_wrong">The PC rejected the code. Generate a new QR code on the PC and try again.</string>
+    <string name="openalt_pair_failed">Pairing did not work. Generate a new QR code on the PC and try again.</string>
+    <string name="openalt_pair_in_progress">Another device is pairing with this PC right now. Wait a moment and try again.</string>
+    <string name="openalt_pair_timeout">The PC did not confirm in time. The QR code may have expired or already been used: generate another one on the PC.</string>
+    <string name="openalt_pair_error">Error talking to the PC: %1$s</string>
+    <string name="openalt_pair_pending_elsewhere">The PC already has an unfinished pairing request from this device, probably from the original Moonlight app. Close it there (or wait for it to expire), then on the PC tap Turn off and Turn on in OpenAlt and scan the new QR code.</string>
+    <string name="openalt_pair_save_failed">Paired, but could not save the PC to the list. Try adding it again with the QR code.</string>
+    <string name="openalt_no_camera">This device has no camera to read the QR code. Add the PC with the + button, using its address.</string>
 
-    <!-- Conectar direto no app OpenAlt do PC -->
-    <string name="openalt_connecting">Conectando a %1$s…</string>
-    <string name="openalt_app_missing">Este PC não tem o app OpenAlt no Sunshine. Mostrando os apps disponíveis.</string>
+    <!-- Connect straight to the OpenAlt app on the PC -->
+    <string name="openalt_connecting">Connecting to %1$s…</string>
+    <string name="openalt_app_missing">This PC does not have the OpenAlt app in Sunshine. Showing the available apps.</string>
 
-    <!-- Sobre -->
-    <string name="openalt_about_title">Sobre o OpenAlt</string>
-    <string name="openalt_about_text">OpenAlt, da Catta Studios: o celular ou tablet como outra tela do PC.\n\nBaseado no Moonlight para Android (moonlight-stream.org), de Cameron Gutman e colaboradores, e feito para o Sunshine (LizardByte). Software livre sob a licença GPL-3.0: o código está em github.com/berelels/openalt.\n\nLeitor de QR: ZXing e zxing-android-embedded (Apache-2.0).</string>
+    <!-- About -->
+    <string name="openalt_about_title">About OpenAlt</string>
+    <string name="openalt_about_text">OpenAlt, by Catta Studios: your phone or tablet as another PC screen.\n\nBased on Moonlight for Android (moonlight-stream.org), by Cameron Gutman and contributors, and made for Sunshine (LizardByte). Free software under the GPL-3.0 license.\n\nQR reader: ZXing and zxing-android-embedded (Apache-2.0).</string>
+    <string name="openalt_link_openalt">OpenAlt source code</string>
+    <string name="openalt_link_openalt_summary">Our repository (this app and the PC app)</string>
+    <string name="openalt_link_moonlight">Moonlight Android</string>
+    <string name="openalt_link_moonlight_summary">The app this one is a fork of (GPL-3.0)</string>
+    <string name="openalt_link_common">moonlight-common-c</string>
+    <string name="openalt_link_common_summary">Moonlight\'s streaming protocol (GPL-3.0)</string>
+    <string name="openalt_link_sunshine">Sunshine</string>
+    <string name="openalt_link_sunshine_summary">The streaming server on the PC, by LizardByte (GPL-3.0)</string>
+    <string name="openalt_link_catta">Catta Studios</string>
+    <string name="openalt_link_catta_summary">The website of the people who made OpenAlt</string>
+
+    <!-- Launcher (HomeActivity) -->
+    <string name="openalt_home_settings">Settings</string>
+    <string name="openalt_home_your_pcs">Your PCs</string>
+    <string name="openalt_home_touch_hint">Tap a card, or use a controller</string>
+    <string name="openalt_home_status_home">At home</string>
+    <string name="openalt_home_status_away">Away from home</string>
+    <string name="openalt_home_status_offline">Off</string>
+    <string name="openalt_home_status_searching">Looking…</string>
+    <string name="openalt_home_status_unpaired">Not paired</string>
+    <string name="openalt_home_detail_home">Same network</string>
+    <string name="openalt_home_detail_away">Through Tailscale · mirror only</string>
+    <string name="openalt_home_detail_offline">Turn OpenAlt on on the PC</string>
+    <string name="openalt_home_detail_searching">Looking for this PC…</string>
+    <string name="openalt_home_detail_unpaired">Tap to pair with the QR code</string>
+    <string name="openalt_home_connect">Connect</string>
+    <string name="openalt_home_pair_title">Pair a PC</string>
+    <string name="openalt_home_pair_detail">Point the camera at the QR code in the PC app</string>
+    <string name="openalt_home_offline_toast">%1$s was not found. Turn OpenAlt on on the PC; away from home, Tailscale must be on in both.</string>
+    <string name="openalt_home_net_wifi">Wi-Fi</string>
+    <string name="openalt_home_net_mobile">Mobile data</string>
+    <string name="openalt_home_net_none">No network</string>
+    <string name="openalt_pad_connect">Connect</string>
+    <string name="openalt_pad_options">PC options</string>
+    <string name="openalt_pad_settings">Settings</string>
+    <string name="openalt_pref_controller_title">Controller button style</string>
+    <string name="openalt_pref_controller_summary">The button names shown in OpenAlt.</string>
+    <string name="openalt_controller_auto">Match the controller</string>
+    <string name="openalt_controller_xbox">Xbox (A B X Y)</string>
+    <string name="openalt_controller_playstation">PlayStation (✕ ○ □ △)</string>
+    <string name="openalt_controller_nintendo">Nintendo Switch (A and B swapped)</string>
+    <string-array name="openalt_controller_style_values" translatable="false">
+        <item>auto</item>
+        <item>xbox</item>
+        <item>playstation</item>
+        <item>nintendo</item>
+    </string-array>
+    <string-array name="openalt_controller_style_names">
+        <item>@string/openalt_controller_auto</item>
+        <item>@string/openalt_controller_xbox</item>
+        <item>@string/openalt_controller_playstation</item>
+        <item>@string/openalt_controller_nintendo</item>
+    </string-array>
+
+    <!-- Configurações (SettingsActivity) -->
+    <string name="openalt_settings_back">Back</string>
+    <string name="openalt_settings_next_connection">Applies from the next connection</string>
+    <string name="openalt_cat_video">Video</string>
+    <string name="openalt_cat_audio">Sound</string>
+    <string name="openalt_cat_controller">Controller</string>
+    <string name="openalt_cat_touch">Screen and touch</string>
+    <string name="openalt_cat_more">More</string>
+    <string name="openalt_cat_about">About</string>
+    <string name="openalt_cat_video_sub">Resolution, quality</string>
+    <string name="openalt_cat_audio_sub">Where the sound plays</string>
+    <string name="openalt_cat_controller_sub">Buttons, sticks</string>
+    <string name="openalt_cat_touch_sub">Mouse, on-screen controls</string>
+    <string name="openalt_cat_more_sub">Advanced and everything else</string>
+    <string name="openalt_cat_about_sub">Version, credits</string>
+    <string name="openalt_settings_on">On</string>
+    <string name="openalt_settings_off">Off</string>
+    <string name="openalt_settings_all">All Moonlight settings</string>
+    <string name="openalt_settings_all_summary">The original list: language, help, on-screen control layout and the rest.</string>
+    <string name="openalt_settings_open">Open</string>
+
+    <!-- Mapear botões (ButtonMapActivity) -->
+    <string name="openalt_map_title">Map buttons</string>
+    <string name="openalt_map_summary">For different controllers: press the button that will do each function. Saved for this controller.</string>
+    <string name="openalt_map_reset">Reset to default</string>
+    <string name="openalt_map_reset_summary">Removes the mapping of the connected controller.</string>
+    <string name="openalt_map_reset_done">Controller back to default.</string>
+    <string name="openalt_map_press">Press the button for %1$s</string>
+    <string name="openalt_map_hint">On %1$s. Use Skip (on the screen) for a button you don\'t have.</string>
+    <string name="openalt_map_step">Step %1$d of %2$d</string>
+    <string name="openalt_map_skip">Skip</string>
+    <string name="openalt_map_cancel">Cancel</string>
+    <string name="openalt_map_saved">Buttons saved for this controller.</string>
+    <string name="openalt_map_no_controller">No controller connected</string>
+    <string name="openalt_map_no_controller_hint">Connect a controller (USB or Bluetooth) and open this again.</string>
+    <string name="openalt_map_none">No mapping</string>
+    <string name="openalt_map_custom">Mapped</string>
+    <string name="openalt_pref_ui_sounds_title">Interface sounds</string>
+    <string name="openalt_pref_ui_sounds_summary">Short sounds when you move, choose and go back, like on a console. They follow the media volume.</string>
+    <string name="openalt_tour_count">Step %1$d of %2$d</string>
+    <string name="openalt_tour_next">Next</string>
+    <string name="openalt_tour_back">Back</string>
+    <string name="openalt_tour_done">Done</string>
+    <string name="openalt_tour_skip">Skip tour</string>
+    <string name="openalt_tour_pc_title">Your PC</string>
+    <string name="openalt_tour_pc_text">Tap the card (or press A) to connect. It turns red when the PC is ready.</string>
+    <string name="openalt_tour_options_title">PC options</string>
+    <string name="openalt_tour_options_text">Touch and hold the card (or press X) to wake the PC, see its apps, test the network or remove it.</string>
+    <string name="openalt_tour_pair_title">Pair a PC</string>
+    <string name="openalt_tour_pair_text">Open OpenAlt on the PC, press Turn on and point the camera at the QR code that shows up.</string>
+    <string name="openalt_tour_network_title">Home or away</string>
+    <string name="openalt_tour_network_text">Shows how you are connected: Wi-Fi at home, or Tailscale away from home (mirror only).</string>
+    <string name="openalt_tour_settings_title">Settings</string>
+    <string name="openalt_tour_settings_text">Video, sound, controller and button mapping. You can take this tour again from there, under About.</string>
+    <string name="openalt_tour_pad_title">With a controller</string>
+    <string name="openalt_tour_pad_text">Your controller shortcuts show up down here, with its own button names.</string>
+    <string name="openalt_tour_again">Take the tour again</string>
+    <string name="openalt_tour_again_summary">Shows what each part of the start screen does, in a few steps.</string>
 </resources>

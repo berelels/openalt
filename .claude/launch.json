@@ -4,8 +4,30 @@
     {
       "name": "prototipo-interface",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "5180", "--bind", "127.0.0.1", "--directory", "desktop/dist/renderer"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5180",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "desktop/dist/renderer"
+      ],
       "port": 5180
+    },
+    {
+      "name": "site",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5181",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "site"
+      ],
+      "port": 5181
     }
   ]
 }

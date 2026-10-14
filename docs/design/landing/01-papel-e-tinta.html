@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>01 Papel e tinta</title>
+<link rel="stylesheet" href="base.css"><link rel="stylesheet" href="devices.css">
+<style>
+body { background: var(--paper); position: relative; }
+body::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(38,33,27,.07) 1px, transparent 1px); background-size: 22px 22px; }
+nav { position: absolute; top: 34px; left: 72px; right: 72px; display: flex; align-items: center; justify-content: space-between; z-index: 2; }
+nav ul { display: flex; gap: 34px; list-style: none; font-size: 15px; color: var(--muted); font-weight: 500; }
+.btn { display: inline-flex; align-items: center; gap: 10px; border-radius: 999px; padding: 14px 24px; font-weight: 600; font-size: 15px; }
+.btn.dark { background: var(--ink); color: var(--paper); }
+.btn.red { background: var(--red); color: var(--ink); padding: 18px 30px; font-size: 17px; }
+.btn.line { border: 1.5px solid var(--ink); padding: 17px 28px; font-size: 17px; }
+h1 { position: absolute; left: 72px; top: 150px; width: 720px; font-family: 'Newsreader'; font-weight: 400; font-size: 94px; line-height: .95; letter-spacing: -0.035em; z-index: 2; }
+h1 em { font-style: italic; color: var(--red-ink); }
+.lede { position: absolute; left: 76px; top: 470px; width: 540px; font-size: 20px; line-height: 1.55; color: var(--muted); z-index: 2; }
+.ctas { position: absolute; left: 72px; top: 600px; display: flex; gap: 14px; z-index: 2; }
+.meta { position: absolute; right: 80px; bottom: 50px; display: flex; gap: 48px; font-size: 13px; color: var(--muted); z-index: 2; }
+.meta b { display: block; font-family: 'Newsreader'; font-size: 36px; font-weight: 400; color: var(--ink); letter-spacing: -0.02em; }
+.art { position: absolute; right: 40px; top: 120px; width: 640px; height: 700px; z-index: 1; }
+.art .laptop { position: absolute; left: -10px; top: 150px; }
+.phone { position: absolute; right: 0; top: 300px; transform: rotate(4deg); }
+.stroke { position: absolute; inset: 0; }
+.note { position: absolute; font-family: 'Newsreader'; font-style: italic; font-size: 22px; color: var(--red-ink); }
+</style></head><body>
+<nav>
+  <span class="logo"><svg viewBox="64 120 380 300" fill="none" stroke="currentColor" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"><path d="M86 156c62-2 108-6 136 16 30 24 26 80 40 124 18 56 78 92 126 64 40-24 30-90-14-96-50-8-72 52-40 92 22 28 62 34 92 24"/><path d="M270 152c50-8 96-10 144-6"/></svg><span>Open<em>Alt</em></span></span>
+  <ul><li>How it works</li><li>Modes</li><li>Away from home</li><li>Open source</li></ul>
+  <span class="btn dark"><span class="ms">download</span>Download</span>
+</nav>
+
+<h1>Freedom to stream <em>anywhere,</em> for anyone.</h1>
+<p class="lede">Turn the phone or tablet you already have into a second monitor, a mirror of your PC or a game screen. Scan one QR code. That’s the setup.</p>
+<div class="ctas"><span class="btn red"><span class="ms">download</span>Get it for Linux</span><span class="btn line">See how it works</span></div>
+<div class="meta"><span><b>1 QR</b>to pair, no PIN</span><span><b>Free</b>open source, GPL-3.0</span><span><b>Any</b>phone, tablet, side</span></div>
+
+<div class="art">
+  <svg class="stroke" viewBox="0 0 640 700" fill="none" stroke="#FF746C" stroke-width="5" stroke-linecap="round">
+    <path d="M40 120c80-30 160 10 190 30" stroke-dasharray="2 12"/>
+    
+    <path d="M180 560c70 50 170 50 230 0"/>
+  </svg>
+  <div class="laptop"><div class="lap" style="--w:580px"><div class="lid"><div class="scr"><img src="img/app-claro.png" alt=""></div></div><div class="deck"></div><div class="shadow"></div></div></div>
+  <div class="phone"><div class="phn" style="--w:160px"><i class="btn-l1"></i><i class="btn-l2"></i><i class="btn-r"></i><div class="bz"><div class="scr"><div class="island"></div><div class="status"><span>9:41</span><span><span class="ms">wifi</span> <span class="ms">battery_full</span></span></div><div class="app-oa"><div class="wm">Open<em>Alt</em></div><p class="sb">Your phone or tablet as a PC screen</p><div class="pc"><span class="ms">computer</span><div><b>my-pc</b><small>● Paired · tap to connect</small></div></div><div class="qr"><b>Pair a new PC</b><span><span class="ms">qr_code_scanner</span>Scan QR</span></div></div><div class="home"></div></div></div></div></div>
+  <span class="note" style="left:40px;top:70px">your PC…</span>
+  <span class="note" style="left:190px;top:600px">…one more screen</span>
+</div>
+</body></html>
