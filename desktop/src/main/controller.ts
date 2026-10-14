@@ -20,7 +20,6 @@ import {
   isOpenAltMonitor,
   drmConnectorFor,
   findSunshine,
-  isUiScale,
   reloadMonitorSensitiveExtensions,
   installShellHelper,
   restoreExtensions,
@@ -492,7 +491,6 @@ export class Controller extends EventEmitter {
 
   async setMode(m: unknown) { if (m === 'extend' || m === 'mirror') await this.save({ mode: m }); }
   async setMirrorOf(id: unknown) { if (typeof id === 'string' && /^[\w.\-]{1,64}$/.test(id)) await this.save({ mirrorOf: id }); }
-  async setUiScale(v: unknown) { if (isUiScale(v)) await this.save({ uiScale: v, ...this.forDevice({ uiScale: v }) }); }
 
   /** Grava também nas preferências do aparelho conectado agora. */
   private forDevice(patch: Partial<DeviceSettings>): Partial<Settings> {
@@ -502,7 +500,7 @@ export class Controller extends EventEmitter {
     const cur = settingsFor(this.settings, name);
     return { perDevice: { ...this.settings.perDevice, [key]: { placement: cur.placement, uiScale: cur.uiScale, ...patch } } };
   }
-  async setOrientation(o: unknown) { if (o === 'auto' || o === 'portrait' || o === 'landscape') await this.save({ orientation: o }); }
+  async setOrientation(o: unknown) { if (o === 'portrait' || o === 'landscape') await this.save({ orientation: o }); }
   async setPreviewKind(k: unknown) { if (k === 'phone' || k === 'tablet') await this.save({ previewKind: k }); }
   async setPref(key: unknown, value: unknown) {
     if ((key === 'rememberLayout' || key === 'maximizeOnDevice') && typeof value === 'boolean') {

@@ -217,7 +217,6 @@ const actions: Record<string, (...args: unknown[]) => Promise<unknown>> = {
   setMode: (m) => controller.setMode(m),
   setMirrorOf: (id) => controller.setMirrorOf(id),
   setOrientation: (o) => controller.setOrientation(o),
-  setUiScale: (v) => controller.setUiScale(v),
   setPreviewKind: (k) => controller.setPreviewKind(k),
   setPref: (k, v) => controller.setPref(k, v),
   esquecer: (id) => controller.esquecer(id),

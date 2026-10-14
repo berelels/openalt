@@ -69,7 +69,6 @@ interface OpenAltApi {
   setMode(m: Mode): Promise<void>;
   setMirrorOf(id: string): Promise<void>;
   setOrientation(o: Orientation): Promise<void>;
-  setUiScale(v: number): Promise<void>;
   setPreviewKind(k: Kind): Promise<void>;
   setPref(key: 'rememberLayout' | 'maximizeOnDevice', value: boolean): Promise<void>;
   esquecer(id: string): Promise<void>;
@@ -108,6 +107,12 @@ function alignLabel(side: Side, a: Align): string {
 const kindLabel = (k: Kind) => t(`kind.${k}`);
 const orientWord = (size: { width: number; height: number }) => t(size.width > size.height ? 'orient.landscape.lc' : 'orient.portrait.lc');
 const KIND_ICON: Record<Kind, string> = { phone: 'smartphone', tablet: 'tablet' };
+/** Só "Em pé" e "Deitado" na tela; o antigo "automático" aparece como o que ele dava (tablet deitado, celular em pé). */
+function effectiveOrientation(s: State): 'portrait' | 'landscape' {
+  if (s.orientation === 'portrait' || s.orientation === 'landscape') return s.orientation;
+  return (s.device?.kind ?? s.previewKind) === 'tablet' ? 'landscape' : 'portrait';
+}
+
 const ORIENT_ICON: Record<Orientation, string> = { auto: 'screen_rotation', portrait: 'stay_current_portrait', landscape: 'stay_current_landscape' };
 
 /** Tamanho típico, só para a prévia antes de conectar (o certo vem do aparelho). */
@@ -260,7 +265,6 @@ function mockApi(): OpenAltApi & { demo(patch: DemoPatch): void } {
     async setMode(m) { s.mode = m; emit(); },
     async setMirrorOf(id) { s.mirrorOf = id; emit(); },
     async setOrientation(o) { s.orientation = o; emit(); },
-    async setUiScale(v) { s.uiScale = v; emit(); },
     async setPreviewKind(k) { s.previewKind = k; emit(); },
     async setPref(k, v) { s[k] = v; emit(); },
     async esquecer(id) { s.paired = s.paired.filter((d) => d.id !== id); emit(); },
@@ -477,9 +481,7 @@ function prefsCard(): string {
       <div class="pref-grid">
         <div>
           <p class="mini-label">${t('prefs.orientation')}</p>
-          ${seg('orient', t('prefs.orientation'), (['auto', 'portrait', 'landscape'] as Orientation[]).map((o) => [o, t(`orient.${o}`), ORIENT_ICON[o]] as [string, string, string]), s.orientation, 'data-orient')}
-          <p class="mini-label">${t('prefs.uiScale')}</p>
-          ${seg('uiscale', t('prefs.uiScale'), ([100, 125, 150, 200]).map((v) => [String(v), `${v}%`] as [string, string]), String(s.uiScale ?? 125), 'data-uiscale')}
+          ${seg('orient', t('prefs.orientation'), (['portrait', 'landscape'] as Orientation[]).map((o) => [o, t(`orient.${o}`), ORIENT_ICON[o]] as [string, string, string]), effectiveOrientation(s), 'data-orient')}
         </div>
         <label class="switch-row"><span><span class="switch-title">${t('prefs.maximize', { dev: noun(s) })}</span><span class="switch-hint">${t('prefs.maximize.hint')}</span></span>
           <input type="checkbox" class="switch" id="optMaximize" ${s.maximizeOnDevice !== false ? 'checked' : ''}></label>
@@ -849,7 +851,6 @@ function bindView() {
   on('#view [data-side]', (b) => void api.setPlacement({ ...state.placement, side: b.dataset.side as Side }));
   on('#view [data-align]', (b) => void api.setPlacement({ ...state.placement, align: b.dataset.align as Align }));
   on('#view [data-orient]', (b) => void api.setOrientation(b.dataset.orient as Orientation));
-  on('#view [data-uiscale]', (b) => void api.setUiScale(Number(b.dataset.uiscale)));
   on('#view [data-kind]', (b) => void api.setPreviewKind(b.dataset.kind as Kind));
   on('#view [data-forget]', (b) => void api.esquecer(b.dataset.forget!));
   $<HTMLInputElement>('#optRemember')?.addEventListener('change', (e) => void api.setPref('rememberLayout', (e.target as HTMLInputElement).checked));

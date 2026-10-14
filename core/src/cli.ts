@@ -11,7 +11,6 @@ import {
   listVirtualDisplays,
   requestFromEnv,
   chooseOutput,
-  scaleRequest,
 } from './linux-x11/virtual-display.ts';
 import { parseXrandrQuery } from './linux-x11/xrandr.ts';
 import { run } from './proc.ts';
@@ -100,11 +99,9 @@ async function main(argv: string[]): Promise<unknown> {
   const paths = openaltPaths();
   let remember = values.remember;
   let mirrorOf = values.of;
-  let uiScale = 100;
   if (fromSunshine) {
     // as preferências deste aparelho (cada um tem seu lugar e tamanho)
     const s = settingsFor(await readSettings(paths.config), process.env.SUNSHINE_CLIENT_NAME);
-    uiScale = s.uiScale;
     const p = s.placement;
     if (values.anchor === undefined && p.anchor !== 'primary') placement.anchor = p.anchor;
     if (values.anchor === undefined && p.anchorName) placement.anchorName = p.anchorName;
@@ -129,8 +126,8 @@ async function main(argv: string[]): Promise<unknown> {
 
   switch (action) {
     case 'extend': {
-      // interface maior no aparelho: monitor virtual menor, o Sunshine amplia (settings.uiScale)
-      const r = await extendDesktop(uiScale > 100 ? scaleRequest(request, uiScale) : request, { placement, output: output, remember, deviceName: fromSunshine ? process.env.SUNSHINE_CLIENT_NAME : undefined });
+      // a tela do aparelho na resolução dele (a opção de aumentar as coisas saiu do app)
+      const r = await extendDesktop(request, { placement, output: output, remember, deviceName: fromSunshine ? process.env.SUNSHINE_CLIENT_NAME : undefined });
       await connected('extend');
       return r;
     }
