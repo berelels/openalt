@@ -9,3 +9,4 @@ desktop/dist/
 .dev/
 core/dist/
 core/test/.tmp/
+CLAUDE.md
