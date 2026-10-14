@@ -54,6 +54,8 @@ Decisões: ADR-0003 (Tailscale oficial, atualizado), ADR-0013 (o que o M3 decidi
 - **Depois das correções:** conectar, desconectar (sem senha, papel de parede de volta) e conectar de
   novo funcionaram; a tela do tablet ficou sempre na `DisplayPort-1` com H.264; **a tecla Super
   funcionou** com o tablet conectado. A pessoa usou o tablet como tela extra (Spotify).
+- **Reinício do GNOME pela extensão do OpenAlt:** nos reinícios ao conectar, **nenhuma caixa do
+  Alt+F2 apareceu** (só na 1ª vez, que carrega a extensão).
 - Som: durante a conexão o Sunshine põe a saída `sink-sunshine-stereo` como principal (é assim que o som
   vai ao aparelho) e devolve a anterior ao desconectar.
 
@@ -63,7 +65,6 @@ Decisões: ADR-0003 (Tailscale oficial, atualizado), ADR-0013 (o que o M3 decidi
 - Menu de opções do PC na tela de entrada (toque longo / X) e a orientação seguindo o sensor nas
   telas do Moonlight.
 - "Fora de casa só espelha" no 4G.
-- Se o reinício do GNOME ao conectar foi pela extensão (sem a caixa do Alt+F2) a partir da 2ª vez.
 - O caminho com a permissão do sistema instalada (o ajudante em /usr/libexec): só existe depois do M4.
 - Itens antigos: vídeo do Chromium travando na tela virtual; cursor duplicado na borda.
 - Tablet, outras placas (Intel, NVIDIA) e outros aparelhos.
