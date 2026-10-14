@@ -699,11 +699,67 @@ function renderAbout(): string {
         ${project('cast', 'Sunshine', t('about.sunshine'), 'sunshine')}
         ${project('lan', 'Tailscale', t('about.tailscale'), 'tailscale')}
       </ul></section>
-      <section class="card c12 fade-up d3" aria-labelledby="langTitle">
+      <section class="card c12 fade-up d3" aria-labelledby="tourCardTitle">
+        <div class="card-top"><div><h2 class="card-name" id="tourCardTitle">${t('about.tour')}</h2>
+          <p class="card-hint">${t('about.tour.hint')}</p></div></div>
+        <div class="device-actions"><button class="btn outline" id="btnTour"><span class="ms" aria-hidden="true">tour</span>${t('about.tour.button')}</button></div>
+      </section>
+      <section class="card c12 fade-up d4" aria-labelledby="langTitle">
         <div class="card-top"><div><h2 class="card-name" id="langTitle">${t('about.language')}</h2>
           <p class="card-hint">${t('about.language.hint')}</p></div></div>
         ${seg('lang', t('about.language'), [['system', `${t('lang.system')} · ${LANG_NAME[systemLang()]}`, 'translate'], ...LANGS.map((l) => [l, LANG_NAME[l]] as [string, string])], pref, 'data-lang')}
       </section></div>`;
+}
+
+// ── tour guiado (tour.ts) ───────────────────────────────────────────────────
+// Sozinho na primeira vez (depois da abertura e do "Primeiros passos"); de novo pela aba Sobre.
+
+const TOUR_SEEN = 'openalt-tour-done';
+let tour: TourHandle | null = null;
+let introDone = false;
+
+function tourSeen(): boolean {
+  try { return localStorage.getItem(TOUR_SEEN) === '1'; } catch { return true; } // sem armazenamento: não insiste
+}
+
+function goView(v: View) {
+  if (view !== v) { view = v; render(); }
+}
+
+/** O cartão inteiro em volta de um título. */
+function cardOf(sel: string): () => Element[] {
+  return () => { const c = document.querySelector(sel)?.closest('.card'); return c ? [c] : []; };
+}
+
+function startTour() {
+  if (tour) return;
+  const from = view;
+  const dev = noun(state);
+  const steps: TourStep[] = [
+    { before: () => goView('home'), targets: cardOf('#connTitle'), title: t('tour.power.title'), text: t('tour.power.text') },
+    { before: () => goView('home'), targets: cardOf('#modeTitle'), title: t('tour.mode.title'), text: t('tour.mode.text') },
+    { before: () => goView('home'), targets: cardOf('#placeTitle'), title: t('tour.place.title', { dev }), text: t('tour.place.text') },
+    { before: () => goView('home'), targets: cardOf('#prefTitle'), title: t('tour.prefs.title'), text: t('tour.prefs.text') },
+    { before: () => goView('home'), targets: () => [...document.querySelectorAll('.rail-btn[data-view="devices"]')], title: t('tour.devices.title'), text: t('tour.devices.text') },
+    { before: () => goView('pc'), targets: cardOf('#remoteTitle'), title: t('tour.remote.title'), text: t('tour.remote.text') },
+    { before: () => goView('home'), targets: () => ['#btnTray', '#btnFullscreen'].map((q) => document.querySelector(q)).filter((e): e is Element => !!e), title: t('tour.tray.title'), text: t('tour.tray.text') },
+  ];
+  tour = runTour(steps, {
+    step: (n, total) => t('tour.count', { n, total }),
+    back: t('tour.back'), next: t('tour.next'), done: t('tour.done'), skip: t('tour.skip'),
+  }, () => {
+    tour = null;
+    try { localStorage.setItem(TOUR_SEEN, '1'); } catch { /* sem armazenamento */ }
+    goView(from);
+  });
+}
+
+/** Na primeira vez, o tour começa sozinho quando o painel aparece (não no "Primeiros passos"). */
+function maybeStartTour() {
+  const q = new URLSearchParams(location.search);
+  if (!introDone) return;
+  if (q.has('tour')) { q.delete('tour'); history.replaceState(null, '', `?${q}`); startTour(); return; }
+  if (introDone && !tour && state.phase !== 'setup' && !q.has('nointro') && !tourSeen()) startTour();
 }
 
 // ── desenho e eventos ───────────────────────────────────────────────────────
@@ -820,6 +876,7 @@ function render() {
   watchRemote();
   sizeIllustrations();
   void renderStage();
+  tour?.relayout();
   tickCountdown();
 }
 
@@ -828,6 +885,7 @@ function bindView() {
     document.querySelectorAll<HTMLButtonElement>(sel).forEach((b) => b.addEventListener('click', () => fn(b)));
   $('#btnPower')?.addEventListener('click', () => void (state.phase === 'waiting' || state.phase === 'connected' ? api.desligar() : api.ligar()));
   $('#btnNewQr')?.addEventListener('click', () => void api.novoQr());
+  $('#btnTour')?.addEventListener('click', () => startTour());
   $('#pinForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const input = $('#pinInput') as HTMLInputElement | null;
@@ -922,7 +980,7 @@ async function main() {
   initTheme();
   bindRail();
   state = await api.getState();
-  api.onState((s) => { state = s; render(); });
+  api.onState((s) => { state = s; render(); maybeStartTour(); });
   initDemoBar();
   initWindow();
   render();
@@ -932,6 +990,8 @@ async function main() {
   if (new URLSearchParams(location.search).has('nointro')) intro.remove();
   else await playIntro(intro, () => document.body.classList.add('ready'));
   document.body.classList.add('ready');
+  introDone = true;
+  maybeStartTour();
 }
 
 void main();

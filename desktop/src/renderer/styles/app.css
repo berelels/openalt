@@ -594,3 +594,31 @@ body:not(.ready) .fade-up { animation-play-state: paused; }
 .remote-cmd code { font-family: ui-monospace, 'JetBrains Mono', monospace; font-size: 13px; padding: 8px 12px; border-radius: var(--r-xs); background: var(--bg-deep); }
 .remote-auto { margin-top: 10px; }
 .card-hint + .checks { margin-top: 10px; }
+
+/* ══ Tour guiado (tour.ts) ═════════════════════════════════════════════════
+   A tela escurece em volta do recorte; o cartão é o do site: canto reto, contorno de tinta,
+   sombra dura. A camada por cima pega os cliques: o tour só mostra, não mexe no app. */
+.tour { position: fixed; inset: 0; z-index: 900; }
+.tour-shade { position: absolute; inset: 0; }
+.tour.no-hole .tour-shade { background: rgba(20, 17, 13, 0.62); }
+.tour-hole {
+  position: fixed; box-shadow: 0 0 0 200vmax rgba(20, 17, 13, 0.62);
+  outline: 2px solid var(--accent); outline-offset: 0; pointer-events: none;
+  transition: left 0.35s var(--ease), top 0.35s var(--ease), width 0.35s var(--ease), height 0.35s var(--ease);
+}
+.tour-card {
+  position: fixed; width: min(360px, calc(100vw - 32px)); box-sizing: border-box; padding: 20px 20px 16px;
+  background: var(--card-solid); color: var(--text); border: 1.5px solid var(--hard, #26211b);
+  box-shadow: 6px 6px 0 var(--hard, #26211b);
+  transition: left 0.35s var(--ease), top 0.35s var(--ease);
+}
+.tour-count {
+  margin: 0 0 8px; font-family: var(--font-mono, ui-monospace, monospace); font-size: 11.5px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-text);
+}
+.tour-title { margin: 0 0 8px; font-family: var(--font-serif); font-weight: 400; font-size: 30px; line-height: 1.05; letter-spacing: -0.02em; }
+.tour-text { margin: 0 0 18px; font-size: 14.5px; line-height: 1.5; color: var(--text-soft); }
+.tour-actions { display: flex; align-items: center; gap: 8px; }
+.tour-gap { flex: 1; }
+.tour-actions .btn.ghost { padding-left: 0; }
+@media (prefers-reduced-motion: reduce) { .tour-hole, .tour-card { transition: none; } }

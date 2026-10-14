@@ -164,6 +164,15 @@ const PT: Dict = {
   'layout.no-anchor': 'Monitor de referência não encontrado: {monitor}', 'layout.duplicate': 'Já existe um monitor chamado {monitor}',
   'layout.overlap': 'Não cabe aí: ficaria por cima de {monitor}', 'layout.overlap-pair': 'Os monitores {a} e {b} ficariam sobrepostos',
   'layout.loose': 'O monitor {monitor} ficaria solto, sem encostar em nenhum outro', 'layout.impossible': 'Arranjo impossível de resolver',
+  'tour.count': 'Passo {n} de {total}', 'tour.back': 'Voltar', 'tour.next': 'Próximo', 'tour.done': 'Pronto', 'tour.skip': 'Pular o tour',
+  'tour.power.title': 'Ligar', 'tour.power.text': 'Liga o OpenAlt neste PC. Depois, abra o app no aparelho e leia o QR que aparece aqui.',
+  'tour.mode.title': 'Nova tela ou Espelhar', 'tour.mode.text': 'Nova tela aumenta a sua área de trabalho. Espelhar mostra no aparelho o mesmo que um monitor.',
+  'tour.place.title': 'Onde fica {dev}', 'tour.place.text': 'Escolha de que lado de qual monitor ele está, como na sua mesa. O mouse passa para ele por esse lado.',
+  'tour.prefs.title': 'Preferências', 'tour.prefs.text': 'Em pé ou deitado, e se as janelas já abrem ocupando a tela toda do aparelho.',
+  'tour.devices.title': 'Aparelhos', 'tour.devices.text': 'Aqui ficam os aparelhos pareados. Dá para tirar um quando quiser.',
+  'tour.remote.title': 'Fora de casa', 'tour.remote.text': 'Com o Tailscale, o celular ou tablet espelha este PC de qualquer lugar, até no 4G.',
+  'tour.tray.title': 'Em segundo plano', 'tour.tray.text': 'Mande o OpenAlt para a bandeja do sistema e ele continua funcionando. Ou saia da tela cheia.',
+  'about.tour': 'Tour guiado', 'about.tour.hint': 'Mostra o que cada parte do app faz, em poucos passos.', 'about.tour.button': 'Fazer o tour de novo',
 };
 
 const ES: Dict = {
@@ -303,6 +312,15 @@ const ES: Dict = {
   'layout.no-anchor': 'No se encontró el monitor de referencia: {monitor}', 'layout.duplicate': 'Ya existe un monitor llamado {monitor}',
   'layout.overlap': 'No cabe ahí: quedaría encima de {monitor}', 'layout.overlap-pair': 'Los monitores {a} y {b} quedarían superpuestos',
   'layout.loose': 'El monitor {monitor} quedaría suelto, sin tocar ningún otro', 'layout.impossible': 'Disposición imposible de resolver',
+  'tour.count': 'Paso {n} de {total}', 'tour.back': 'Volver', 'tour.next': 'Siguiente', 'tour.done': 'Listo', 'tour.skip': 'Saltar el tour',
+  'tour.power.title': 'Encender', 'tour.power.text': 'Enciende OpenAlt en este PC. Luego abre la app en el dispositivo y escanea el QR que aparece aquí.',
+  'tour.mode.title': 'Nueva pantalla o Duplicar', 'tour.mode.text': 'Nueva pantalla amplía tu escritorio. Duplicar muestra en el dispositivo lo mismo que un monitor.',
+  'tour.place.title': 'Dónde está {dev}', 'tour.place.text': 'Elige a qué lado de qué monitor está, como en tu mesa. El ratón pasa a él por ese lado.',
+  'tour.prefs.title': 'Preferencias', 'tour.prefs.text': 'Vertical u horizontal, y si las ventanas se abren ocupando toda la pantalla del dispositivo.',
+  'tour.devices.title': 'Dispositivos', 'tour.devices.text': 'Aquí están los dispositivos emparejados. Puedes quitar uno cuando quieras.',
+  'tour.remote.title': 'Fuera de casa', 'tour.remote.text': 'Con Tailscale, el celular o la tableta duplica este PC desde cualquier lugar, incluso con datos móviles.',
+  'tour.tray.title': 'En segundo plano', 'tour.tray.text': 'Envía OpenAlt a la bandeja del sistema y sigue funcionando. O sal de la pantalla completa.',
+  'about.tour': 'Tour guiado', 'about.tour.hint': 'Muestra qué hace cada parte de la app, en pocos pasos.', 'about.tour.button': 'Hacer el tour otra vez',
 };
 
 const EN: Dict = {
@@ -442,6 +460,15 @@ const EN: Dict = {
   'layout.no-anchor': 'Reference monitor not found: {monitor}', 'layout.duplicate': 'There is already a monitor called {monitor}',
   'layout.overlap': 'Doesn’t fit there: it would cover {monitor}', 'layout.overlap-pair': 'Monitors {a} and {b} would overlap',
   'layout.loose': 'Monitor {monitor} would be left loose, not touching any other', 'layout.impossible': 'Arrangement impossible to solve',
+  'tour.count': 'Step {n} of {total}', 'tour.back': 'Back', 'tour.next': 'Next', 'tour.done': 'Done', 'tour.skip': 'Skip tour',
+  'tour.power.title': 'Turn on', 'tour.power.text': 'Turns OpenAlt on for this PC. Then open the app on your device and scan the QR code that shows up here.',
+  'tour.mode.title': 'New screen or Mirror', 'tour.mode.text': 'New screen extends your desktop. Mirror shows the same as one of your monitors.',
+  'tour.place.title': 'Where {dev} sits', 'tour.place.text': 'Pick which side of which monitor it is on, like on your desk. The mouse crosses over on that side.',
+  'tour.prefs.title': 'Preferences', 'tour.prefs.text': 'Portrait or landscape, and whether windows open filling the whole device screen.',
+  'tour.devices.title': 'Devices', 'tour.devices.text': 'Your paired devices live here. You can remove one at any time.',
+  'tour.remote.title': 'Away from home', 'tour.remote.text': 'With Tailscale, your phone or tablet mirrors this PC from anywhere, even on mobile data.',
+  'tour.tray.title': 'In the background', 'tour.tray.text': 'Send OpenAlt to the system tray and it keeps working. Or leave fullscreen.',
+  'about.tour': 'Guided tour', 'about.tour.hint': 'Shows what each part of the app does, in a few steps.', 'about.tour.button': 'Take the tour again',
 };
 
 const DICTS: Record<Lang, Dict> = { pt: PT, es: ES, en: EN };
