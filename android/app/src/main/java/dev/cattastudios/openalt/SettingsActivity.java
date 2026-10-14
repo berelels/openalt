@@ -68,6 +68,7 @@ public class SettingsActivity extends Activity {
         UiHelper.setLocale(this);
         Immersive.prepare(this);
         setContentView(R.layout.oa_settings);
+        GridPaperDrawable.apply(((android.view.ViewGroup) findViewById(android.R.id.content)).getChildAt(0));
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         items = SettingsModel.load(this);

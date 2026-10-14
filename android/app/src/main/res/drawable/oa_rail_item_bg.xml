@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- OpenAlt: item do trilho de categorias (escolhido = vermelho; foco = anel) -->
+<!-- OpenAlt: categoria do trilho (escolhida = vermelho com sombra dura; foco = contorno) -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_selected="true" android:state_focused="true">
-        <shape android:shape="rectangle"><solid android:color="@color/oa_accent" /><stroke android:width="3dp" android:color="@color/oa_text" /><corners android:radius="16dp" /></shape>
-    </item>
-    <item android:state_selected="true">
-        <shape android:shape="rectangle"><solid android:color="@color/oa_accent" /><corners android:radius="16dp" /></shape>
-    </item>
-    <item android:state_focused="true">
-        <shape android:shape="rectangle"><solid android:color="@android:color/transparent" /><stroke android:width="3dp" android:color="@color/oa_text" /><corners android:radius="16dp" /></shape>
-    </item>
+    <item android:state_selected="true"><layer-list>
+    <item android:left="3dp" android:top="3dp"><shape android:shape="rectangle"><solid android:color="@color/oa_hard" /></shape></item>
+    <item android:right="3dp" android:bottom="3dp"><shape android:shape="rectangle"><solid android:color="@color/oa_accent" /><stroke android:width="1.5dp" android:color="@color/oa_border" /></shape></item>
+</layer-list></item>
+    <item android:state_focused="true"><shape android:shape="rectangle"><solid android:color="@android:color/transparent" /><stroke android:width="1.5dp" android:color="@color/oa_border" /></shape></item>
     <item><color android:color="@android:color/transparent" /></item>
 </selector>

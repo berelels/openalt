@@ -48,6 +48,7 @@ public class ButtonMapActivity extends Activity {
         UiHelper.setLocale(this);
         Immersive.prepare(this);
         setContentView(R.layout.oa_button_map);
+        GridPaperDrawable.apply(((android.view.ViewGroup) findViewById(android.R.id.content)).getChildAt(0));
         title = findViewById(R.id.oaMapTitle);
         hint = findViewById(R.id.oaMapHint);
         stepLabel = findViewById(R.id.oaMapStep);

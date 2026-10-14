@@ -43,9 +43,11 @@
                 android:paddingTop="6dp"
                 android:paddingRight="14dp"
                 android:paddingBottom="6dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.06"
+                android:textAllCaps="true"
                 android:textColor="@color/oa_pill_ink"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+                android:textSize="12sp" />
         </LinearLayout>
 
         <View

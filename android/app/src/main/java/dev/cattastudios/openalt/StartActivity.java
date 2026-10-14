@@ -117,6 +117,7 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
         UiHelper.setLocale(this);
         Immersive.prepare(this);
         setContentView(R.layout.oa_home);
+        GridPaperDrawable.apply(findViewById(R.id.oaHomeContent));
 
         cards = findViewById(R.id.oaCards);
         padHints = findViewById(R.id.oaPadHints);

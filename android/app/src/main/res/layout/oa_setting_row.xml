@@ -71,9 +71,10 @@
         android:paddingTop="9dp"
         android:paddingRight="16dp"
         android:paddingBottom="9dp"
+        android:fontFamily="monospace"
+        android:textAllCaps="true"
         android:textColor="@color/oa_text"
-        android:textSize="15sp"
-        android:textStyle="bold" />
+        android:textSize="13sp" />
 
     <ImageButton
         android:id="@+id/oaRowPlus"
