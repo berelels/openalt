@@ -266,8 +266,11 @@ ipcMain.handle('window:to-tray', async (e, labels: unknown) => {
     win.setFullScreen(true); // volta como estava: em tela cheia
     win.focus();
   };
+  // sem o ícone (ex.: faltou no pacote), um item invisível na bandeja deixaria a janela sem volta
+  const icon = nativeImage.createFromPath(join(here, '..', '..', 'build', 'icon.png'));
+  if (icon.isEmpty()) { win.minimize(); return 'minimized'; }
   tray?.destroy();
-  tray = new Tray(nativeImage.createFromPath(join(here, '..', '..', 'build', 'icon.png')).resize({ width: 22, height: 22 }));
+  tray = new Tray(icon.resize({ width: 22, height: 22 }));
   tray.setToolTip('OpenAlt');
   tray.setContextMenu(Menu.buildFromTemplate([
     { label: label(l.show, 'OpenAlt'), click: show },
