@@ -137,5 +137,5 @@
     <string name="openalt_map_none">Sem mapeamento</string>
     <string name="openalt_map_custom">Mapeado</string>
     <string name="openalt_pref_ui_sounds_title">Sons da interface</string>
-    <string name="openalt_pref_ui_sounds_summary">Sons curtos ao mover, escolher e voltar, como num console. Ficam mudos com o aparelho no silencioso ou no vibrar.</string>
+    <string name="openalt_pref_ui_sounds_summary">Sons curtos ao mover, escolher e voltar, como num console. Seguem o volume de mídia.</string>
 </resources>

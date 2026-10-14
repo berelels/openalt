@@ -3,7 +3,6 @@ package dev.cattastudios.openalt;
 import android.app.Activity;
 import android.content.Context;
 import android.media.AudioAttributes;
-import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -16,8 +15,8 @@ import java.io.IOException;
 
 /**
  * Os sons da interface (como nos consoles): mover o foco, escolher, voltar, ligar/desligar,
- * conectar e erro. Baixinhos, no volume de mídia, mudos com o aparelho no silencioso ou no vibrar,
- * e desligáveis em Configurações → Som ("Sons da interface").
+ * conectar e erro. Baixinhos, no volume de mídia (como os jogos: o silencioso e o Não perturbe não
+ * os calam) e desligáveis em Configurações → Som ("Sons da interface").
  */
 public final class UiSounds {
     static final String PREF = "openalt_ui_sounds";
@@ -93,10 +92,6 @@ public final class UiSounds {
 
     public static void play(Context c, UiSoundSynth.Sound s) {
         if (!enabled(c)) {
-            return;
-        }
-        AudioManager am = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
-        if (am != null && am.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) {
             return;
         }
         get(c).playLoaded(s);
