@@ -91,10 +91,10 @@ function introScore(sectionStarts, arrivals, curtainStart) {
         notes.push({ t: sectionStarts[i], kind: 'bass', f: [introHz(c[0] - 12)], d: 900 });
     });
     arrivals.forEach((t, i) => {
-        notes.push({ t: t - 140, kind: 'pluck', f: [introHz(melody[i][1])], d: 400 });
+        notes.push({ t: t - 120, kind: 'pluck', f: [introHz(melody[i][1])], d: 400 });
         notes.push({ t, kind: 'pluck', f: [introHz(melody[i][0])], d: 900 });
     });
-    notes.push({ t: curtainStart - 250, kind: 'whoosh', f: [], d: 1100 });
+    notes.push({ t: curtainStart - 150, kind: 'whoosh', f: [], d: 1000 });
     notes.push({ t: curtainStart, kind: 'bell', f: [72, 76, 79, 84, 88].map(introHz), d: 1900 });
     notes.push({ t: curtainStart, kind: 'bass', f: [introHz(36)], d: 1700 });
     return notes;
@@ -213,12 +213,15 @@ function introMusic(score, clock) {
         b.gain.value = 0.22;
         b.connect(ctx.destination);
         bus = b;
-        const t0 = ctx.currentTime + 0.03;
+        // o som sai do alto-falante `latency` depois de agendado (no celular, ~0,1–0,2 s): agenda antes
+        const latency = (ctx.outputLatency || ctx.baseLatency || 0) * 1000;
+        const t0 = ctx.currentTime + 0.03 - latency / 1000;
         for (const n of score) {
             if (n.t + n.d <= at || (n.t < at && n.kind !== 'pad'))
                 continue;
             const from = Math.max(n.t, at);
-            voice(n, t0 + (from - at) / 1000, (n.t + n.d - from) / 1000, b);
+            const when = Math.max(ctx.currentTime + 0.01, t0 + (from - at) / 1000);
+            voice(n, when, (n.t + n.d - from) / 1000, b);
         }
     }
     return {
@@ -279,7 +282,10 @@ function playIntro(root, onReveal = () => { }, options = {}) {
     const curtainStart = runStart(last - 1) + RUN + LOGO_HOLD;
     // o relógio começa no PRIMEIRO QUADRO desenhado (ver abaixo); -1 = ainda não começou
     let start = -1;
-    const music = options.music === false ? null : introMusic(introScore([0, ...INTRO_SHAPES.slice(1).map((_, i) => runStart(i))], [DRAW, ...INTRO_SHAPES.slice(1).map((_, i) => runStart(i) + RUN)], curtainStart), () => (start < 0 ? 0 : performance.now() - start));
+    const music = options.music === false ? null : introMusic(introScore([0, ...INTRO_SHAPES.slice(1).map((_, i) => runStart(i))], 
+    // a nota cai quando a forma PARECE chegar: o traço desacelera no fim (a 90% do caminho,
+    // ~55% do tempo ao desenhar e ~72% ao correr), e o fim matemático soava atrasado
+    [Math.round(DRAW * 0.55), ...INTRO_SHAPES.slice(1).map((_, i) => runStart(i) + Math.round(RUN * 0.72))], curtainStart), () => (start < 0 ? 0 : performance.now() - start));
     // imperfeições da borda da cortina, diferentes a cada abertura
     const ph = [Math.random() * 6.28, Math.random() * 6.28, Math.random() * 6.28];
     function drawCurtain(p) {

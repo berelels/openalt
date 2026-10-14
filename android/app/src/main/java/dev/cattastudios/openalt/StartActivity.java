@@ -229,10 +229,18 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
     }
 
     private boolean handleIntroUrl(String url) {
-        if (INTRO_DONE.equals(url)) {
+        if (INTRO_DONE.equals(url) && intro.getVisibility() == View.VISIBLE) {
             intro.setVisibility(View.GONE);
-            intro.loadUrl("about:blank");
             focusFirstCard();
+            // escondida, a página ainda toca: o acorde final soa até o fim (~1 s depois da cortina)
+            intro.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (!isDestroyed()) {
+                        intro.loadUrl("about:blank");
+                    }
+                }
+            }, 2000);
         }
         // nenhuma outra navegação sai da página da abertura
         return true;
@@ -631,7 +639,8 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // qualquer botão pula a abertura (o toque é tratado pela própria página)
         if (intro.getVisibility() == View.VISIBLE && keyCode != KeyEvent.KEYCODE_BACK) {
-            handleIntroUrl(INTRO_DONE);
+            // pula pela própria página, como no PC: a cortina sobe e a música toca só o final
+            intro.evaluateJavascript("dispatchEvent(new KeyboardEvent('keydown'))", null);
             return true;
         }
         switch (keyCode) {
