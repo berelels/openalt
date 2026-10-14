@@ -84,6 +84,8 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
     private TourOverlay tour;
     private InputManager inputManager;
     private String focusedKey;
+    /** o que os cartões mostram agora: a consulta ao PC chega a cada poucos segundos, quase sempre igual */
+    private String renderedCards;
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -353,6 +355,18 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
                 return String.valueOf(a.name).compareToIgnoreCase(String.valueOf(b.name));
             }
         });
+
+        // Nada mudou na tela: não refaz (refazer tira o foco do cartão, o que tocava o som de mover
+        // sozinho, e trocaria os cartões que o tour está mostrando)
+        StringBuilder sig = new StringBuilder();
+        for (ComputerDetails d : list) {
+            sig.append(d.uuid).append('|').append(d.name).append('|').append(d.state).append('|')
+                    .append(d.pairState).append('|').append(viaTailscale(d)).append('\n');
+        }
+        if (sig.toString().equals(renderedCards) && cards.getChildCount() > 0) {
+            return;
+        }
+        renderedCards = sig.toString();
 
         cards.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -658,28 +672,38 @@ public class StartActivity extends Activity implements InputManager.InputDeviceL
 
     private void startTour() {
         List<TourOverlay.Step> steps = new ArrayList<>();
-        View pc = null;
-        for (int i = 0; i < cards.getChildCount(); i++) {
-            Object tag = cards.getChildAt(i).getTag();
-            if (tag instanceof String && ((String) tag).startsWith("pc:")) {
-                pc = cards.getChildAt(i);
-                break;
+        // os cartões são procurados a cada passo: se mudarem (o PC ligou, por exemplo), o recorte acompanha
+        TourOverlay.Locator pc = new TourOverlay.Locator() {
+            @Override
+            public View find() {
+                for (int i = 0; i < cards.getChildCount(); i++) {
+                    Object tag = cards.getChildAt(i).getTag();
+                    if (tag instanceof String && ((String) tag).startsWith("pc:")) {
+                        return cards.getChildAt(i);
+                    }
+                }
+                return null;
             }
-        }
-        if (pc != null) {
+        };
+        TourOverlay.Locator pair = new TourOverlay.Locator() {
+            @Override
+            public View find() {
+                return cards.findViewWithTag("pair");
+            }
+        };
+        if (pc.find() != null) {
             steps.add(new TourOverlay.Step(pc, getString(R.string.openalt_tour_pc_title), getString(R.string.openalt_tour_pc_text)));
             steps.add(new TourOverlay.Step(pc, getString(R.string.openalt_tour_options_title), getString(R.string.openalt_tour_options_text)));
         }
-        View pair = cards.findViewWithTag("pair");
-        if (pair != null) {
+        if (pair.find() != null) {
             steps.add(new TourOverlay.Step(pair, getString(R.string.openalt_tour_pair_title), getString(R.string.openalt_tour_pair_text)));
         }
         if (network != null && network.getVisibility() == View.VISIBLE) {
-            steps.add(new TourOverlay.Step(network, getString(R.string.openalt_tour_network_title), getString(R.string.openalt_tour_network_text)));
+            steps.add(new TourOverlay.Step(TourOverlay.fixed(network), getString(R.string.openalt_tour_network_title), getString(R.string.openalt_tour_network_text)));
         }
-        steps.add(new TourOverlay.Step(findViewById(R.id.oaSettings), getString(R.string.openalt_tour_settings_title), getString(R.string.openalt_tour_settings_text)));
+        steps.add(new TourOverlay.Step(TourOverlay.fixed(findViewById(R.id.oaSettings)), getString(R.string.openalt_tour_settings_title), getString(R.string.openalt_tour_settings_text)));
         if (padHints.getVisibility() == View.VISIBLE) {
-            steps.add(new TourOverlay.Step(padHints, getString(R.string.openalt_tour_pad_title), getString(R.string.openalt_tour_pad_text)));
+            steps.add(new TourOverlay.Step(TourOverlay.fixed(padHints), getString(R.string.openalt_tour_pad_title), getString(R.string.openalt_tour_pad_text)));
         }
         tour = TourOverlay.start(this, (android.view.ViewGroup) findViewById(R.id.oaHomeContent), steps, new Runnable() {
             @Override

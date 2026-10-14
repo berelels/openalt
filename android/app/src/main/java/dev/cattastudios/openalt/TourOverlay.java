@@ -25,13 +25,27 @@ import java.util.List;
  * Só olhar e avançar: a camada pega os toques e a tela de trás não recebe o foco do controle.
  */
 final class TourOverlay extends FrameLayout {
+    /** Acha o alvo na hora (a tela pode ter refeito a view desde o começo do tour). */
+    interface Locator {
+        View find();
+    }
+
+    static Locator fixed(final View v) {
+        return new Locator() {
+            @Override
+            public View find() {
+                return v;
+            }
+        };
+    }
+
     static final class Step {
-        /** null = cartão no meio, sem recorte */
-        final View target;
+        /** acha null = cartão no meio, sem recorte */
+        final Locator target;
         final String title;
         final String text;
 
-        Step(View target, String title, String text) {
+        Step(Locator target, String title, String text) {
             this.target = target;
             this.title = title;
             this.text = text;
@@ -150,9 +164,10 @@ final class TourOverlay extends FrameLayout {
         back.setVisibility(i == 0 ? View.GONE : View.VISIBLE);
         next.setText(i == steps.size() - 1 ? R.string.openalt_tour_done : R.string.openalt_tour_next);
         card.setContentDescription(count.getText() + ". " + s.title + ". " + s.text);
-        if (s.target != null) {
+        View target = s.target.find();
+        if (target != null) {
             // traz o alvo para a vista (os cartões rolam para o lado)
-            s.target.requestRectangleOnScreen(new Rect(0, 0, s.target.getWidth(), s.target.getHeight()), true);
+            target.requestRectangleOnScreen(new Rect(0, 0, target.getWidth(), target.getHeight()), true);
         }
         next.requestFocus();
         card.sendAccessibilityEvent(android.view.accessibility.AccessibilityEvent.TYPE_VIEW_FOCUSED);
@@ -180,7 +195,7 @@ final class TourOverlay extends FrameLayout {
         card.measure(MeasureSpec.makeMeasureSpec(cw, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(h, MeasureSpec.AT_MOST));
         int ch = card.getMeasuredHeight();
 
-        View target = steps.get(index).target;
+        View target = steps.get(index).target.find();
         hasHole = target != null && target.isShown() && target.getWidth() > 0;
         float x;
         float y;
