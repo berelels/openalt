@@ -1,6 +1,6 @@
 # Compila o app Android (android/, fork do Moonlight) e roda os testes de unidade.
 # O ambiente de nuvem do Claude não alcança dl.google.com (SDK, NDK e o plugin Android do Gradle),
-# então a prova de que compila vem daqui. O APK de debug fica como artefato da execução.
+# então a prova de que compila vem daqui. Os APKs (debug, e release sem assinatura) ficam como artefatos.
 name: android
 
 on:
@@ -39,13 +39,20 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$ndk" > /dev/null
 
-      - name: Compilar (debug) e testes de unidade
-        run: ./gradlew --no-daemon assembleNonRootDebug testNonRootDebugUnitTest
+      # release SEM assinatura: a chave fica só no PC de quem publica (assinada com apksigner lá)
+      - name: Compilar (debug e release) e testes de unidade
+        run: ./gradlew --no-daemon assembleNonRootDebug assembleNonRootRelease testNonRootDebugUnitTest
 
       - uses: actions/upload-artifact@v4
         with:
           name: openalt-apk-debug
           path: android/app/build/outputs/apk/nonRoot/debug/*.apk
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openalt-apk-release-unsigned
+          path: android/app/build/outputs/apk/nonRoot/release/*.apk
           if-no-files-found: error
 
       - uses: actions/upload-artifact@v4
