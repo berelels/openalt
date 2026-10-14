@@ -1,0 +1,158 @@
+/* ══ OpenAlt — visual do site (papel quadriculado) por cima do app.css ═══════════════════════
+   Só aparência: a estrutura (trilho, topo, grade bento) e as funções são as do app.css/app.ts.
+   Do site (site/css/site.css): papel quadriculado, cantos retos, contorno de tinta 1,5px, sombra dura
+   deslocada (4px 4px 0) no destaque e no foco, rótulos em mono maiúsculo, títulos em serifa com itálico
+   vermelho. No tema escuro, o mesmo papel com fundo tinta e linhas claras.
+   Contraste (medido no site): tinta #26211B no papel #EFE6D6 e no cartão #FBF6EE passa AA com folga;
+   texto apagado #6A6156 no papel: 5,0:1. Escuro: #EFE7DA no #1A1713; apagado a 64% ≈ 6,4:1. */
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('../fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+:root {
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --bg: #efe6d6;
+  --bg-deep: #e6dbc7;
+  --surface: #fbf6ee;
+  --card: #fbf6ee;
+  --card-solid: #fbf6ee;
+  --border: #26211b;
+  --border-strong: #26211b;
+  --muted: #6a6156;
+  --text-soft: #4e463d;
+  --tile: #e6dbc7;
+  --tile-strong: #d9ccb4;
+  --hard: #26211b;
+  --grid-1: rgba(38, 33, 27, 0.12);
+  --grid-2: rgba(38, 33, 27, 0.05);
+  --line: 1.5px;
+  --shadow-sm: none;
+  --shadow: none;
+  --r-xs: 0px;
+  --r-sm: 0px;
+  --r: 0px;
+  --r-lg: 0px;
+}
+
+:root[data-theme='dark'] {
+  --bg: #1a1713;
+  --bg-deep: #14120f;
+  --surface: #221e19;
+  --card: #221e19;
+  --card-solid: #221e19;
+  --border: rgba(239, 231, 218, 0.82);
+  --border-strong: rgba(239, 231, 218, 0.82);
+  --muted: rgba(239, 231, 218, 0.64);
+  --text-soft: rgba(239, 231, 218, 0.82);
+  --tile: #2b261f;
+  --tile-strong: #3a3329;
+  --hard: #efe7da;
+  --grid-1: rgba(239, 231, 218, 0.1);
+  --grid-2: rgba(239, 231, 218, 0.04);
+}
+
+/* o papel quadriculado (planta baixa), no lugar dos brilhos e do grão */
+body {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid-1) 1px, transparent 1px), linear-gradient(90deg, var(--grid-1) 1px, transparent 1px),
+    linear-gradient(var(--grid-2) 1px, transparent 1px), linear-gradient(90deg, var(--grid-2) 1px, transparent 1px);
+  background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+}
+body::before { display: none; }
+:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 3px; border-radius: 0; }
+
+/* ── trilho ── */
+.rail { background: var(--surface); border-right: var(--line) solid var(--hard); box-shadow: none; }
+.rail-btn { border-radius: 0; border: var(--line) solid transparent; }
+.rail-btn:hover { border-color: var(--hard); background: transparent; }
+.rail-btn[aria-current='page'] { background: var(--accent); color: var(--accent-ink); border-color: var(--hard); box-shadow: 3px 3px 0 var(--hard); }
+.theme-toggle.vertical { border-radius: 0; border: var(--line) solid var(--hard); background: var(--surface); }
+.theme-toggle.vertical button { border-radius: 0; }
+
+/* ── topo ── */
+.page-sub { color: var(--muted); }
+.pill-btn, .icon-btn {
+  border-radius: 0; border: var(--line) solid var(--hard); background: var(--surface); box-shadow: none;
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.pill-btn strong { font-weight: 500; }
+.icon-btn:hover, .pill-btn:hover { transform: translate(-2px, -2px); box-shadow: 3px 3px 0 var(--hard); background: var(--surface); }
+
+/* ── cartões ── */
+.bento .card, .card {
+  border-radius: 0; border: var(--line) solid var(--hard); background: var(--card-solid);
+  box-shadow: none; backdrop-filter: none;
+}
+.bento .card.accent, .card.accent { background: var(--accent); color: var(--accent-ink); border: var(--line) solid var(--hard); box-shadow: 6px 6px 0 var(--hard); }
+.bento .card.sage, .card.sage { background: var(--sage-card); color: var(--sage-ink); border: var(--line) solid var(--hard); }
+.card.accent::after, .card.sage::after { display: none; }
+.corner-btn { border-radius: 0; border: var(--line) solid currentColor; background: transparent; }
+.card.accent .corner-btn, .card.sage .corner-btn { background: transparent; }
+.mini-label, .stat span, .big-sub, .eyebrow, .section-sub, .place-controls > span {
+  font-family: var(--font-mono); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.stats { border-top: var(--line) solid currentColor; padding-top: 12px; }
+
+/* ── botões ── */
+.btn, .power-round, .seg, .seg button, .chip, .mode-opt, .tag, .pill, .switch, .switch::after,
+.check-icon, .error-banner, .qr-box, .dev-ico, .demo-bar, .table { border-radius: 0; }
+.btn { border: var(--line) solid var(--hard); box-shadow: none; transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease); }
+.btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 3px 3px 0 var(--hard); }
+.btn.primary { box-shadow: none; }
+.btn.ghost { border-color: transparent; }
+.power-round { border: var(--line) solid var(--hard); box-shadow: none; }
+.power-round .ms { border-radius: 0; }
+.power-round:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--hard); }
+.seg { border: var(--line) solid var(--hard); background: var(--surface); padding: 0; gap: 0; }
+.seg button { border-right: var(--line) solid var(--hard); }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-checked='true'] { background: var(--text); color: var(--bg); box-shadow: none; }
+.card.accent .seg, .card.sage .seg { background: transparent; border-color: currentColor; }
+.mode-opt { border: var(--line) dashed currentColor; background: transparent; }
+.mode-opt[aria-checked='true'] { border-style: solid; background: var(--sage-ink); color: var(--sage-card); }
+.mode-opt .dot { border-radius: 0; }
+.chip { border: var(--line) solid var(--hard); }
+.pill, .tag { border: var(--line) solid currentColor; background: transparent; font-family: var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.pill::before { border-radius: 0; }
+
+/* liga/desliga: retângulo de tinta, como os botões do site */
+.switch { border: var(--line) solid var(--hard); background: transparent; height: 24px; width: 42px; }
+.switch::after { top: 3px; left: 3px; width: 15px; height: 15px; background: var(--hard); box-shadow: none; }
+.switch:checked { background: var(--accent); }
+.switch:checked::after { transform: translateX(18px); background: var(--accent-ink); }
+
+/* ── listas, tabela, avisos ── */
+.check { border-top: var(--line) solid var(--grid-1); }
+.check-icon { border: var(--line) solid currentColor; }
+.table th { font-family: var(--font-mono); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+.table th, .table td { border-color: var(--grid-1); }
+.error-banner { border: var(--line) solid currentColor; box-shadow: 4px 4px 0 currentColor; }
+.qr-box { border: var(--line) solid var(--hard); box-shadow: 6px 6px 0 var(--hard); }
+
+/* ── onde o aparelho fica: planta com quadriculado fino ── */
+.stage {
+  border-radius: 0; border: var(--line) dashed var(--hard);
+  background:
+    linear-gradient(var(--grid-1) 1px, transparent 1px) 0 0 / 16px 16px,
+    linear-gradient(90deg, var(--grid-1) 1px, transparent 1px) 0 0 / 16px 16px,
+    var(--surface);
+}
+.tile { border-radius: 0; border: var(--line) solid var(--hard); box-shadow: none; font-family: var(--font-mono); }
+.tile[aria-pressed='true'] { box-shadow: 3px 3px 0 var(--hard); }
+.tile.phone { box-shadow: 3px 3px 0 var(--hard); }
+
+/* ── aparelho plano (como os do site): traço de tinta, sombra dura, sem brilho ── */
+.device-illu { box-shadow: none; filter: drop-shadow(6px 6px 0 var(--hard)); }
+.device-illu::before { background: var(--bg); }
+.device-stage::before { display: none; }
+
+/* barra de demonstração (?demo) */
+.demo-bar { border: var(--line) solid var(--hard); box-shadow: 4px 4px 0 var(--hard); }
+:root[data-theme='dark'] .device-illu { border-color: var(--hard); background: var(--hard); box-shadow: none; filter: drop-shadow(6px 6px 0 rgba(239, 231, 218, 0.35)); }

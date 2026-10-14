@@ -19,6 +19,8 @@ const fonts = [
   ['material-symbols', 'material-symbols-outlined.woff2'],
 ];
 for (const [pkg, file] of fonts) cpSync(join(pkgDir(pkg), file), join(out, 'fonts', file.split('/').pop()));
+// mono do visual do site (styles/site.css): a mesma fonte do site, já no repositório
+cpSync(join(root, '..', 'site', 'fonts', 'jetbrains-mono-latin-wght-normal.woff2'), join(out, 'fonts', 'jetbrains-mono-latin-wght-normal.woff2'));
 mkdirSync(join(root, 'dist', 'preload'), { recursive: true });
 cpSync(join(root, 'src', 'preload', 'preload.cjs'), join(root, 'dist', 'preload', 'preload.cjs'));
 console.log('estáticos copiados para', out);
