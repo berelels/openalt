@@ -116,9 +116,19 @@ The full list, with what each guess is based on, is in [`docs/compatibilidade.md
 
 Where we want to get: a phone or tablet you already own becomes a second screen, a mirror or a game screen **in under a minute, on any PC**, with nothing to configure and nothing to pay.
 
-## Try it (from source)
+## Download
 
-Packages are coming with M4. Until then, OpenAlt runs from source.
+From the [latest release](https://github.com/berelels/openalt/releases/latest):
+
+| | File |
+|---|---|
+| PC, any Linux (GNOME on X11) | [`openalt-0.1.0-x86_64.AppImage`](https://github.com/berelels/openalt/releases/download/v0.1.0/openalt-0.1.0-x86_64.AppImage): make it executable and run it |
+| PC, Ubuntu / Debian / Zorin / Pop!_OS | [`openalt-0.1.0-amd64.deb`](https://github.com/berelels/openalt/releases/download/v0.1.0/openalt-0.1.0-amd64.deb): `sudo apt install ./openalt-0.1.0-amd64.deb` |
+| Android 5+ | [`openalt-0.1.0.apk`](https://github.com/berelels/openalt/releases/download/v0.1.0/openalt-0.1.0.apk) |
+
+You also need [Sunshine](https://github.com/LizardByte/Sunshine) on the PC (on first run the app can install the Flatpak for you). The `.deb` installs OpenAlt's system helper too; with the AppImage, press **Install** next to *System permission* in **This PC** once (it asks for your password). Checksums are in `SHA256SUMS.txt` on the release page.
+
+## Run from source
 
 **PC requirements:** Linux with GNOME on **X11**, [Node.js](https://nodejs.org) 24 or newer, and [Sunshine](https://github.com/LizardByte/Sunshine) (Flatpak or .deb; on first run the app can install the Flatpak for you). For away from home, [Tailscale](https://tailscale.com/download) on the PC and on the device.
 
