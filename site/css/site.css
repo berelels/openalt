@@ -131,14 +131,17 @@ html:not([lang="en"]) #sidesTitle { font-size: clamp(36px, 4.6vw, 66px); }
 .ui-win { position: absolute; border-radius: 5px; background: var(--card); border: 2px solid var(--ink); overflow: hidden; }
 .ui-win::before { content: ''; display: block; height: 12%; min-height: 6px; background: var(--paper-2); border-bottom: 2px solid var(--ink); }
 
-/* ── modos (rolagem lateral) ───────────────────────────── */
+/* nada passa da largura da tela (no celular, isso fazia a página abrir com zoom) */
+html, body { overflow-x: clip; }
+
+/* ── modos: um painel embaixo do outro ─────────────────── */
 .modes { overflow: hidden; }
-.modes-pin { height: 100vh; display: flex; align-items: center; }
-.track { display: flex; gap: clamp(16px, 2vw, 28px); padding: 0 var(--gut); will-change: transform; }
-.panel { position: relative; flex: none; width: min(78vw, 1060px); height: min(74vh, 640px); background: var(--card); border: 1.5px solid var(--ink); overflow: hidden; }
-.panel.intro { width: min(46vw, 560px); background: transparent; border: 0; display: flex; flex-direction: column; justify-content: center; }
-.panel.intro .hint { margin-top: 26px; display: flex; gap: 10px; align-items: center; }
-.panel.intro .hint svg { width: 40px; height: 16px; }
+.modes-pin { padding: 60px 0; }
+.track { display: flex; flex-direction: column; gap: clamp(16px, 2vw, 28px); padding: 0 var(--gut); max-width: 1180px; margin: 0 auto; }
+.panel { position: relative; flex: none; width: auto; height: min(74vh, 640px); background: var(--card); border: 1.5px solid var(--ink); overflow: hidden; }
+.panel.lead { width: auto; height: auto; padding: 20px 0; background: transparent; border: 0; display: flex; flex-direction: column; justify-content: center; }
+.panel.lead .hint { margin-top: 26px; display: flex; gap: 10px; align-items: center; }
+.panel.lead .hint svg { width: 40px; height: 16px; }
 .panel .txt { position: absolute; left: 36px; top: 36px; width: min(380px, 42%); z-index: 3; }
 .panel .num { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; }
 .panel h3 { margin-top: 12px; font-family: var(--serif); font-weight: 400; font-size: clamp(34px, 3.8vw, 56px); line-height: .98; letter-spacing: -0.03em; }
@@ -225,8 +228,7 @@ html:not([lang="en"]) #sidesTitle { font-size: clamp(36px, 4.6vw, 66px); }
   .cards { grid-template-columns: repeat(2, 1fr); }
   .foot .cols { grid-template-columns: 1fr 1fr; }
   .foot .cols > :first-child { grid-column: 1 / -1; }
-  .panel { width: 86vw; height: min(78vh, 680px); }
-  .panel.intro { width: 80vw; }
+  .panel { height: min(78vh, 680px); }
   .panel .txt { left: 22px; top: 22px; width: auto; right: 22px; }
   .panel .stage { width: 100%; height: 56%; }
   .panel p { font-size: 15px; }
@@ -234,6 +236,8 @@ html:not([lang="en"]) #sidesTitle { font-size: clamp(36px, 4.6vw, 66px); }
 @media (max-width: 560px) {
   :root { --t: 21vw; }
   .nav { padding: 12px 16px; }
+  .nav-end { gap: 6px; }
+  .lang button { padding: 8px 6px; }
   .nav .btn span { display: none; }
   .logo { font-size: 18px; }
   .stats { gap: 26px; } .stats b { font-size: 32px; }
@@ -249,9 +253,6 @@ html:not([lang="en"]) #sidesTitle { font-size: clamp(36px, 4.6vw, 66px); }
 
 /* quem pede menos movimento: sem rolagem lateral presa, os painéis ficam um embaixo do outro */
 @media (prefers-reduced-motion: reduce) {
-  .modes-pin { height: auto; display: block; padding: 60px 0; }
-  .track { flex-direction: column; }
-  .panel, .panel.intro { width: auto; }
   .btn { transition: none; }
 }
 

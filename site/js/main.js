@@ -1,6 +1,6 @@
 // Animações do site (GSAP 3.13 + ScrollTrigger, em vendor/). Regras seguidas (skills gsap-*):
 // - tudo dentro de gsap.matchMedia(): quem pede "reduzir movimento" vê a página parada e completa;
-// - a rolagem lateral usa ease "none" e as animações de dentro dela usam containerAnimation;
+// - os modos ficam um embaixo do outro (sem rolagem lateral presa), cada painel entra ao chegar na tela;
 // - ScrollTriggers criados de cima para baixo, na ordem da página; só transforms e autoAlpha.
 (function () {
   const i18n = window.OpenAltI18n;
@@ -125,18 +125,11 @@
     gsap.to('.mosaic .tile:nth-child(odd)', { yPercent: -18, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
     gsap.to('.hero-phone', { y: -50, rotation: 6, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
 
-    // 2) modos: a rolagem vertical move a faixa para o lado (ease "none", obrigatório)
+    // 2) modos: um painel embaixo do outro; cada um entra quando chega na tela
     const track = document.getElementById('track');
-    const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
-    const hScroll = gsap.to(track, {
-      x: () => -distance(),
-      ease: 'none',
-      scrollTrigger: { trigger: '#modes', pin: '.modes-pin', start: 'top top', end: () => '+=' + distance(), scrub: small ? 0.6 : 1, invalidateOnRefresh: true },
-    });
-    // dentro de cada painel, os aparelhos entram quando o painel chega (containerAnimation)
     track.querySelectorAll('[data-panel]').forEach((panel) => {
       const items = panel.querySelectorAll('[data-in]');
-      const tl = gsap.timeline({ scrollTrigger: { trigger: panel, containerAnimation: hScroll, start: 'left 75%', toggleActions: 'play none none reverse' } });
+      const tl = gsap.timeline({ scrollTrigger: { trigger: panel, start: 'top 75%', toggleActions: 'play none none reverse' } });
       tl.from(panel.querySelectorAll('.blk'), { scale: 0, transformOrigin: '100% 100%', duration: 0.6, stagger: 0.08, ease: 'power2.out' })
         .from(items, {
           x: (i, el) => (el.dataset.from === 'right' ? 140 : 0),
