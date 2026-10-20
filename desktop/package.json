@@ -1,6 +1,6 @@
 {
   "name": "@openalt/desktop",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenAlt: your Android phone or tablet as a second monitor, a mirror of your PC or a game screen.",
   "license": "GPL-3.0-or-later",
   "private": true,
