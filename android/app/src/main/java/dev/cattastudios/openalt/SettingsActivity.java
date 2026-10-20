@@ -259,6 +259,10 @@ public class SettingsActivity extends Activity {
         if (category == SettingsModel.Category.CONTROLLER) {
             addMappingRows(inflater);
         }
+        if (category == SettingsModel.Category.AUDIO) {
+            addLinkRow(inflater, R.drawable.oa_ic_info, getString(R.string.openalt_audio_tip_title),
+                    getString(R.string.openalt_audio_tip), null);
+        }
         if (category == SettingsModel.Category.ABOUT) {
             addLinkRow(inflater, R.drawable.oa_ic_info, getString(R.string.openalt_app_name) + " " + versionName(),
                     getString(R.string.openalt_about_text), null);

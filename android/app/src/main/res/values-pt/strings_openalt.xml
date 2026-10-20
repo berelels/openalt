@@ -156,4 +156,6 @@
     <string name="openalt_tour_pad_text">Os atalhos do seu controle aparecem aqui embaixo, com os nomes dos botões dele.</string>
     <string name="openalt_tour_again">Fazer o tour de novo</string>
     <string name="openalt_tour_again_summary">Mostra o que cada parte da tela de entrada faz, em poucos passos.</string>
+    <string name="openalt_audio_tip_title">O som toca no PC e aqui</string>
+    <string name="openalt_audio_tip">Com “Tocar áudio no PC” ligado, o PC mantém a própria saída de som e o som também toca neste aparelho. Para não ouvir em dobro, abaixe ou silencie o volume deste aparelho.</string>
 </resources>

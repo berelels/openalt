@@ -211,7 +211,7 @@
             android:key="checkbox_host_audio"
             android:title="@string/title_checkbox_host_audio"
             android:summary="@string/summary_checkbox_host_audio"
-            android:defaultValue="false" />
+            android:defaultValue="true" />
         <!-- OpenAlt: sons da interface (mover, escolher, voltar, conectar) -->
         <CheckBoxPreference
             android:key="openalt_ui_sounds"

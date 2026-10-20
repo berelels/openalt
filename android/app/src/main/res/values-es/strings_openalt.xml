@@ -156,4 +156,6 @@
     <string name="openalt_tour_pad_text">Los atajos de tu control aparecen aquí abajo, con los nombres de sus botones.</string>
     <string name="openalt_tour_again">Hacer el tour otra vez</string>
     <string name="openalt_tour_again_summary">Muestra qué hace cada parte de la pantalla de inicio, en pocos pasos.</string>
+    <string name="openalt_audio_tip_title">El sonido suena en el PC y aquí</string>
+    <string name="openalt_audio_tip">Con “Reproducir audio en el PC” activado, el PC mantiene su propia salida de sonido y el sonido también suena en este dispositivo. Para no oírlo doble, baja o silencia el volumen de este dispositivo.</string>
 </resources>

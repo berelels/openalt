@@ -79,7 +79,9 @@ public class PreferenceConfiguration {
     private static final boolean DEFAULT_STRETCH = false;
     private static final boolean DEFAULT_SOPS = true;
     private static final boolean DEFAULT_DISABLE_TOASTS = false;
-    private static final boolean DEFAULT_HOST_AUDIO = false;
+    // OpenAlt: ligado por padrão. Desligado, o Sunshine troca a saída de som do PC para a dele ao conectar;
+    // ligado, o som continua no PC (e também sai no aparelho: a dica é silenciar o volume dele)
+    private static final boolean DEFAULT_HOST_AUDIO = true;
     private static final int DEFAULT_DEADZONE = 7;
     private static final int DEFAULT_OPACITY = 90;
     public static final String DEFAULT_LANGUAGE = "default";

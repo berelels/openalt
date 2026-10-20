@@ -174,6 +174,7 @@ const PT: Dict = {
   'tour.tray.title': 'Em segundo plano', 'tour.tray.text': 'Mande o OpenAlt para a bandeja do sistema e ele continua funcionando. Ou saia da tela cheia.',
   'about.tour': 'Tour guiado', 'about.tour.hint': 'Mostra o que cada parte do app faz, em poucos passos.', 'about.tour.button': 'Fazer o tour de novo',
   'show.wallpaperTip': 'Sem papel de parede na tela nova? Reinicie o GNOME: Alt+F2, digite r e aperte Enter (os programas continuam abertos).',
+  'show.audioTip': 'O som continua na saída do PC e também toca em {dev}. Para não ouvir em dobro, silencie o volume dele.',
 };
 
 const ES: Dict = {
@@ -323,6 +324,7 @@ const ES: Dict = {
   'tour.tray.title': 'En segundo plano', 'tour.tray.text': 'Envía OpenAlt a la bandeja del sistema y sigue funcionando. O sal de la pantalla completa.',
   'about.tour': 'Tour guiado', 'about.tour.hint': 'Muestra qué hace cada parte de la app, en pocos pasos.', 'about.tour.button': 'Hacer el tour otra vez',
   'show.wallpaperTip': '¿Sin fondo de pantalla en la pantalla nueva? Reinicia GNOME: Alt+F2, escribe r y pulsa Enter (los programas siguen abiertos).',
+  'show.audioTip': 'El sonido sigue en la salida del PC y también suena en {dev}. Para no oírlo doble, silencia su volumen.',
 };
 
 const EN: Dict = {
@@ -472,6 +474,7 @@ const EN: Dict = {
   'tour.tray.title': 'In the background', 'tour.tray.text': 'Send OpenAlt to the system tray and it keeps working. Or leave fullscreen.',
   'about.tour': 'Guided tour', 'about.tour.hint': 'Shows what each part of the app does, in a few steps.', 'about.tour.button': 'Take the tour again',
   'show.wallpaperTip': 'No wallpaper on the new screen? Restart GNOME: Alt+F2, type r and press Enter (your programs stay open).',
+  'show.audioTip': 'Sound stays on the PC\'s output and also plays on {dev}. To avoid hearing it twice, mute its volume.',
 };
 
 const DICTS: Record<Lang, Dict> = { pt: PT, es: ES, en: EN };
