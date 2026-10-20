@@ -466,7 +466,7 @@ function showcaseCard(): string {
         <div class="device-stage">${deviceIllu(kind, size)}</div>
         <h2 class="device-title" id="devTitle">${d ? esc(d.name) : t('show.none')}</h2>
         <p class="device-sub">${kindLabel(kind)} · ${orientText} · ${size.width} × ${size.height}${d ? ` · ${d.fps} Hz` : ` ${t('show.estimated')}`}</p>
-        ${d && s.mode === 'extend' && s.checks.some((c) => c.id === 'desktop' && c.status === 'ok') ? `<p class="card-hint device-tip"><span class="ms" aria-hidden="true">wallpaper</span>${t('show.wallpaperTip')}</p>` : ''}
+        ${s.mode === 'extend' && s.checks.some((c) => c.id === 'desktop' && c.status === 'ok') ? `<p class="card-hint device-tip"><span class="ms" aria-hidden="true">wallpaper</span>${t('show.wallpaperTip')}</p>` : ''}
         ${d ? '' : `<div class="device-actions">${seg('kind', t('show.kindAria'), [['phone', kindLabel('phone'), 'smartphone'], ['tablet', kindLabel('tablet'), 'tablet']], s.previewKind, 'data-kind')}</div>`}
       </div>
     </section>`;
