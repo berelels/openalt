@@ -86,6 +86,7 @@ export function placeBeside(
     above: { x: alongX, y: a.y - h, width: w, height: h },
   }[placement.side];
 
+  clearStraddlers(out, name, placement.anchor, placement.side);
   pushAway(out, name, placement.anchor, placement.side);
   const result = normalize(out);
   validateLayout(result);
@@ -97,6 +98,31 @@ function overlaps(a: Rect, b: Rect): boolean {
     sharedLength(a.x, a.x + a.width, b.x, b.x + b.width) > 0 &&
     sharedLength(a.y, a.y + a.height, b.y, b.y + b.height) > 0
   );
+}
+
+/**
+ * Um monitor que atravessa a borda da referência (ex.: um mais alto ao lado dela, que desce além dela)
+ * não pode ser empurrado. Se o aparelho cair em cima dele, o aparelho anda mais no mesmo sentido até
+ * sair de cima: "abaixo do HDMI" com o LG ao lado descendo mais vira "abaixo do HDMI, encostado no LG".
+ */
+function clearStraddlers(layout: Layout, name: string, anchor: string, side: Side): void {
+  const horizontal = side === 'right' || side === 'left';
+  const forward = side === 'right' || side === 'below';
+  const a = layout[anchor];
+  const edge = horizontal ? (forward ? a.x + a.width : a.x) : forward ? a.y + a.height : a.y;
+  const crosses = (r: Rect) => {
+    const [pos, len] = horizontal ? [r.x, r.width] : [r.y, r.height];
+    return pos < edge && pos + len > edge;
+  };
+  const m = layout[name];
+  for (let i = 0; i < 64; i++) {
+    const blockers = Object.entries(layout).filter(([k, r]) => k !== name && k !== anchor && crosses(r) && overlaps(m, r)).map(([, r]) => r);
+    if (!blockers.length) return;
+    if (side === 'below') m.y = Math.max(...blockers.map((r) => r.y + r.height));
+    else if (side === 'above') m.y = Math.min(...blockers.map((r) => r.y)) - m.height;
+    else if (side === 'right') m.x = Math.max(...blockers.map((r) => r.x + r.width));
+    else m.x = Math.min(...blockers.map((r) => r.x)) - m.width;
+  }
 }
 
 /** Empurra, em cadeia, quem ficou por baixo de `start`, na direção `side`. */

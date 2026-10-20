@@ -53,7 +53,6 @@ import {
   resolvePlacement,
   retractDesktop,
   hasPendingRelease,
-  realSleep,
   refreshBackgroundsViaHelper,
   run,
   startSunshine,
@@ -450,14 +449,15 @@ export class Controller extends EventEmitter {
       this.connection = c;
       if (this.phase === 'waiting' || this.phase === 'connected') this.phase = c ? 'connected' : 'waiting';
       this.mutter = await getMutterState(run).catch(() => this.mutter);
-      // monitor do aparelho entrou ou saiu: extensões que guardam o monitor pelo número se perdem
-      // (ArcMenu abria o Super no tablet); recarregar só elas
-      // O monitor do aparelho entrou ou saiu: o processo principal reinicia o GNOME (Alt+F2 → r). Só
-      // recarregar as extensões resolvia o Super, mas não o papel de parede, que só volta reiniciando.
-      // Desconectou sem a permissão do sistema: a saída do aparelho ficou forçada (só fora da área de
-      // trabalho). Reiniciar o GNOME agora poderia religá-la; o "Desligar" a devolve e aí reinicia.
+      // Ao conectar, o GNOME NÃO é reiniciado (reiniciar embaralhava monitores e janelas): só as
+      // extensões que guardam o monitor pelo número (ArcMenu e a tecla Super) são recarregadas, e o app
+      // avisa que, sem papel de parede na tela nova, dá para reiniciar o GNOME à mão.
+      // Ao desconectar, o processo principal reinicia o GNOME para o papel de parede voltar; sem a
+      // permissão do sistema a saída do aparelho ficou forçada e reiniciar poderia religá-la: o
+      // "Desligar" a devolve e aí reinicia.
       const pending = !c && wasExtend && await hasPendingRelease(this.paths.runtime);
-      if ((c && c.mode !== 'mirror') || (!c && wasExtend && !pending)) this.emit('monitors-changed');
+      if (c && c.mode !== 'mirror') void this.reloadExtensions();
+      if (!c && wasExtend && !pending) this.emit('monitors-changed');
       // sem reiniciar, o papel de parede não volta sozinho: a extensão do OpenAlt só refaz os fundos
       if (pending) void refreshBackgroundsViaHelper(run);
       this.updateMaximizer();
@@ -489,26 +489,6 @@ export class Controller extends EventEmitter {
       this.mutter = await getMutterState(run).catch(() => this.mutter);
       this.emitState();
     }
-  }
-
-  /**
-   * Depois que o GNOME reinicia com a "Nova tela", ele arruma os monitores do jeito dele: para um
-   * aparelho que nunca viu, todos em fila da esquerda para a direita (e as janelas mudam de tela).
-   * Reaplica o lugar escolhido; tenta de novo se o GNOME ainda estiver arrumando.
-   */
-  async reapplyPlacement(): Promise<void> {
-    if (this.connection?.mode !== 'extend') return;
-    const p = settingsFor(this.settings, this.connection.name).placement;
-    for (let attempt = 0; attempt < 3; attempt++) {
-      try {
-        await moveDesktop({ anchor: p.anchor, anchorName: p.anchorName, side: p.side, align: p.align, offset: p.offset ?? 0 }, { remember: this.settings.rememberLayout });
-        break;
-      } catch {
-        await realSleep(1000);
-      }
-    }
-    this.mutter = await getMutterState(run).catch(() => this.mutter);
-    this.emitState();
   }
 
   async setMode(m: unknown) { if (m === 'extend' || m === 'mirror') await this.save({ mode: m }); }
@@ -585,6 +565,8 @@ export class Controller extends EventEmitter {
   async plan(p: unknown, size: unknown): Promise<{ layout?: Record<string, Rect>; error?: UiText }> {
     const v = p as Record<string, unknown>;
     const z = size as Record<string, unknown>;
+    // o arranjo de agora (a pessoa pode ter girado ou mudado um monitor de lugar com o app aberto)
+    this.mutter = await getMutterState(run).catch(() => this.mutter);
     if (!this.mutter) return { error: { key: 'layout.noMonitors' } };
     if (!v || typeof v.side !== 'string' || !isSide(v.side) || typeof v.align !== 'string' || !isAlign(v.align)
       || !z || !Number.isInteger(z.width) || !Number.isInteger(z.height)) return { error: { key: 'layout.badRequest' } };

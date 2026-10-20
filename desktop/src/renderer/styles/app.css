@@ -604,3 +604,7 @@ body:not(.ready) .fade-up { animation-play-state: paused; }
 .tour-gap { flex: 1; }
 .tour-actions .btn.ghost { padding-left: 0; }
 @media (prefers-reduced-motion: reduce) { .tour-hole, .tour-card { transition: none; } }
+
+/* aviso do papel de parede, no cartão do aparelho conectado em "Nova tela" */
+.device-tip { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; }
+.device-tip .ms { font-size: 18px; line-height: 1.2; flex: none; }

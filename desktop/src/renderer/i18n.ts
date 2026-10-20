@@ -173,6 +173,7 @@ const PT: Dict = {
   'tour.remote.title': 'Fora de casa', 'tour.remote.text': 'Com o Tailscale, o celular ou tablet espelha este PC de qualquer lugar, até no 4G.',
   'tour.tray.title': 'Em segundo plano', 'tour.tray.text': 'Mande o OpenAlt para a bandeja do sistema e ele continua funcionando. Ou saia da tela cheia.',
   'about.tour': 'Tour guiado', 'about.tour.hint': 'Mostra o que cada parte do app faz, em poucos passos.', 'about.tour.button': 'Fazer o tour de novo',
+  'show.wallpaperTip': 'Sem papel de parede na tela nova? Reinicie o GNOME: Alt+F2, digite r e aperte Enter (os programas continuam abertos).',
 };
 
 const ES: Dict = {
@@ -321,6 +322,7 @@ const ES: Dict = {
   'tour.remote.title': 'Fuera de casa', 'tour.remote.text': 'Con Tailscale, el celular o la tableta duplica este PC desde cualquier lugar, incluso con datos móviles.',
   'tour.tray.title': 'En segundo plano', 'tour.tray.text': 'Envía OpenAlt a la bandeja del sistema y sigue funcionando. O sal de la pantalla completa.',
   'about.tour': 'Tour guiado', 'about.tour.hint': 'Muestra qué hace cada parte de la app, en pocos pasos.', 'about.tour.button': 'Hacer el tour otra vez',
+  'show.wallpaperTip': '¿Sin fondo de pantalla en la pantalla nueva? Reinicia GNOME: Alt+F2, escribe r y pulsa Enter (los programas siguen abiertos).',
 };
 
 const EN: Dict = {
@@ -469,6 +471,7 @@ const EN: Dict = {
   'tour.remote.title': 'Away from home', 'tour.remote.text': 'With Tailscale, your phone or tablet mirrors this PC from anywhere, even on mobile data.',
   'tour.tray.title': 'In the background', 'tour.tray.text': 'Send OpenAlt to the system tray and it keeps working. Or leave fullscreen.',
   'about.tour': 'Guided tour', 'about.tour.hint': 'Shows what each part of the app does, in a few steps.', 'about.tour.button': 'Take the tour again',
+  'show.wallpaperTip': 'No wallpaper on the new screen? Restart GNOME: Alt+F2, type r and press Enter (your programs stay open).',
 };
 
 const DICTS: Record<Lang, Dict> = { pt: PT, es: ES, en: EN };

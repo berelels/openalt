@@ -99,12 +99,7 @@ function createWindow(): void {
   win.on('enter-full-screen', notify);
   win.on('leave-full-screen', notify);
 
-  // depois do reinício, o GNOME desfaz o lugar do aparelho: o app o põe de volta
-  const onMonitors = () => void restartShell(win).then(async (ok) => {
-    if (!ok) return controller.reloadExtensions();
-    await sleep(1500); // o GNOME acabou de subir e ainda arruma os monitores
-    await controller.reapplyPlacement();
-  });
+  const onMonitors = () => void restartShell(win).then((ok) => (ok ? undefined : controller.reloadExtensions()));
   controller.on('monitors-changed', onMonitors);
   win.on('closed', () => controller.off('monitors-changed', onMonitors));
 

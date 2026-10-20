@@ -52,11 +52,13 @@ test('"bem no meio, embaixo do principal"', () => {
   });
 });
 
-test('embaixo de um monitor pequeno ao lado de um mais alto: só cabe se não bater nele', () => {
+test('embaixo de um monitor pequeno ao lado de um mais alto: encostado nele se couber, senão desce até passar do mais alto', () => {
   // retrato cabe embaixo do 19" (termina exatamente onde o 27" começa)
   assert.deepEqual(placeBeside(PC, 'cel', RETRATO, at('HDMI-A-0', 'below', 'end')).cel, { x: 360, y: 900, width: 1080, height: 2400 });
-  // deitado e centralizado invadiria o 27" (que vai até y=1080): recusado com o nome dele
-  assert.throws(() => placeBeside(PC, 'cel', PAISAGEM, at('HDMI-A-0', 'below', 'center')), /ficaria por cima de DisplayPort-2/);
+  // deitado e centralizado invadiria o 27" (que vai até y=1080): desce até a base dele, sem empurrar ninguém
+  const r = placeBeside(PC, 'cel', PAISAGEM, at('HDMI-A-0', 'below', 'center'));
+  assert.equal(r.cel.y, r['DisplayPort-2'].y + r['DisplayPort-2'].height);
+  assert.deepEqual(r['DisplayPort-2'].width, PC['DisplayPort-2'].width);
 });
 
 // ── três monitores em fila, tamanhos diferentes, um em retrato ───────────────
@@ -138,9 +140,10 @@ test('monitor fora do caminho não se move', () => {
   assert.deepEqual(r.cel, { x: 100, y: 0, width: 50, height: 40 });
 });
 
-test('recusa quando bateria num monitor que não pode ser empurrado', () => {
+test('cairia num monitor que não pode ser empurrado: anda até passar dele', () => {
   const l: Layout = { a: { x: 0, y: 0, width: 100, height: 100 }, b: { x: 0, y: 100, width: 300, height: 100 } };
-  assert.throws(() => placeBeside(l, 'cel', { width: 50, height: 150 }, at('a', 'right')), /cel ficaria por cima de b/);
+  // à direita de "a" bateria em "b" (que atravessa a borda de "a"): vai para depois de "b", encostado nele
+  assert.deepEqual(placeBeside(l, 'cel', { width: 50, height: 150 }, at('a', 'right')).cel, { x: 300, y: 0, width: 50, height: 150 });
 });
 
 test('validateLayout: aceita arranjos reais e recusa monitor encostado só pelo canto', () => {
@@ -156,3 +159,21 @@ test('validateLayout: aceita arranjos reais e recusa monitor encostado só pelo 
 function normalizedY(l: Layout): Record<string, number> {
   return Object.fromEntries(Object.entries(l).map(([k, r]) => [k, r.y]));
 }
+
+test('abaixo de um monitor baixo, com um mais alto ao lado: o aparelho largo desce até passar do vizinho', () => {
+  // A (1440×900) à esquerda de B (1920×1080, desce 180 px além de A); aparelho 2560×1600 abaixo de A
+  const base: Layout = { A: { x: 0, y: 0, width: 1440, height: 900 }, B: { x: 1440, y: 0, width: 1920, height: 1080 } };
+  const r = placeBeside(base, 'cel', { width: 2560, height: 1600 }, { anchor: 'A', side: 'below', align: 'start', offset: 0 });
+  assert.deepEqual(r.cel, { x: 0, y: 1080, width: 2560, height: 1600 });
+  assert.deepEqual(r.B, base.B); // ninguém foi empurrado
+  // estreito o bastante para caber só embaixo de A: continua encostado em A
+  const s = placeBeside(base, 'cel', { width: 1328, height: 800 }, { anchor: 'A', side: 'below', align: 'center', offset: 0 });
+  assert.equal(s.cel.y, 900);
+});
+
+test('acima de um monitor baixo, com um mais alto ao lado subindo além dele: o aparelho sobe até passar', () => {
+  const base: Layout = { A: { x: 0, y: 180, width: 1440, height: 900 }, B: { x: 1440, y: 0, width: 1920, height: 1080 } };
+  const r = placeBeside(base, 'cel', { width: 2560, height: 1600 }, { anchor: 'A', side: 'above', align: 'start', offset: 0 });
+  // normalizado: o aparelho fica no topo, e a base dele encosta no topo de B
+  assert.equal(r.cel.y + r.cel.height, r.B.y);
+});
