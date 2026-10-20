@@ -166,5 +166,5 @@
     <string name="openalt_tour_again">Take the tour again</string>
     <string name="openalt_tour_again_summary">Shows what each part of the start screen does, in a few steps.</string>
     <string name="openalt_audio_tip_title">Sound plays on the PC and here</string>
-    <string name="openalt_audio_tip">With “Play audio on PC” on, the PC keeps its own sound output and the sound also plays on this device. To avoid hearing it twice, turn this device's volume down or mute it.</string>
+    <string name="openalt_audio_tip">With “Play audio on PC” on, the PC keeps its own sound output and the sound also plays on this device. To avoid hearing it twice, turn this device\'s volume down or mute it.</string>
 </resources>
